@@ -348,7 +348,13 @@ begin
   having count(*) >= 5 and count(distinct o.user_id) >= 2;
 end $$;
 
+-- `revoke ... from public` is NOT sufficient on Supabase: the platform grants EXECUTE to the
+-- `anon` and `authenticated` roles by default, so those grants survive a PUBLIC revoke. Verified
+-- against the live database 2026-09-21 — the ACL still read {anon=X, authenticated=X} after the
+-- line below alone. This function is SECURITY DEFINER and reads EVERY user's private outcomes,
+-- so it must only be callable by the scheduled job (service_role) and the owner.
 revoke all on function recompute_archetype_stats() from public;
+revoke execute on function recompute_archetype_stats() from anon, authenticated;
 
 -- ============================================================================
 -- NOT IN THIS SCHEMA, ON PURPOSE
