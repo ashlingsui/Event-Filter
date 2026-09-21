@@ -1,0 +1,445 @@
+{
+  "_note": "One-time manual LLM-pass classification, done by Claude directly in-session on 2026-09-18 because no ANTHROPIC_API_KEY was available to run enrich/llm_enrich.py's automated path. Same rubric (PROFILE_CONTEXT + FIELD_INSTRUCTIONS in enrich/llm_enrich.py), applied by hand to the reachable-or-unknown rows. Applied via enrich/llm_enrich.py:apply_manual(), which stamps _raw.enrichment_source = 'claude_manual_pass_2026-09-18' so it's distinguishable from a future automated run.",
+  "judgments": {
+    "luma:evt-wH6f1yBeClyzUMy": {
+      "participant": false,
+      "target_proximity": "wrong_ladder",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "tier1_vc"
+    },
+    "partiful:UqgWf7BtRhtDyBtUtPkB": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "unknown"
+    },
+    "luma:evt-j9CjWxQgbQHr2I5": {
+      "participant": true,
+      "target_proximity": "some",
+      "format": "panel",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "unknown"
+    },
+    "campusgroups:2251293": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "unknown"
+    },
+    "luma:evt-EZCwRbZdoggH6yR": {
+      "participant": true,
+      "target_proximity": "high",
+      "format": "build_night",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "unknown"
+    },
+    "partiful:COnMGcRccYCq7EIoDy1c": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "unknown"
+    },
+    "partiful:GTBXtDJipf1XP4zfgsHO": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "unknown"
+    },
+    "partiful:XNSpeyeoAvvpOaCDBSW6": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "unknown"
+    },
+    "luma:evt-ipJSDV78SbivbFH": {
+      "participant": true,
+      "target_proximity": "some",
+      "format": "workshop",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "scaled_co"
+    },
+    "luma:evt-QOHEGiCGVSoqTYj": {
+      "participant": true,
+      "target_proximity": "some",
+      "format": "workshop",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "scaled_co"
+    },
+    "luma:evt-dXxU4gdZ3fLGdZi": {
+      "participant": false,
+      "target_proximity": "some",
+      "format": "fireside",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "unknown"
+    },
+    "campusgroups:2251370": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "some",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "luma:evt-xEvJhiORHgy1rCG": {
+      "participant": true,
+      "target_proximity": "none",
+      "format": "workshop",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "scaled_co"
+    },
+    "luma:evt-kYwecCsEoRx5EC6": {
+      "participant": true,
+      "target_proximity": "none",
+      "format": "build_night",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "scaled_co"
+    },
+    "campusgroups:2251382": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "some",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "luma:evt-JyKG7U4110cFMjH": {
+      "participant": true,
+      "target_proximity": "some",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "scaled_co"
+    },
+    "luma:evt-CCwQRKwF4tll109": {
+      "participant": true,
+      "target_proximity": "none",
+      "format": "build_night",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "scaled_co"
+    },
+    "luma:evt-1CmFWGSzqGY1776": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "fireside",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "unknown"
+    },
+    "campusgroups:2251378": {
+      "participant": false,
+      "target_proximity": "wrong_ladder",
+      "format": "lecture",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "luma:evt-uioaOJ47XISggB0": {
+      "participant": false,
+      "target_proximity": "wrong_ladder",
+      "format": "demo_day",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "tier1_vc"
+    },
+    "campusgroups:2251355": {
+      "participant": false,
+      "target_proximity": "wrong_ladder",
+      "format": "class",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251292": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "high",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "luma:evt-x9cz11E9JIGYNDR": {
+      "participant": true,
+      "target_proximity": "none",
+      "format": "build_night",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "scaled_co"
+    },
+    "campusgroups:2251379": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "fireside",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251366": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "some",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251331": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "some",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251350": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "high",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251308": {
+      "participant": false,
+      "target_proximity": "some",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251390": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "lecture",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251383": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "some",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "luma:evt-YUXj40WxzAttDXn": {
+      "participant": false,
+      "target_proximity": "some",
+      "format": "panel",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "startup"
+    },
+    "campusgroups:2251381": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "fireside",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251389": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "panel",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "luma:evt-GmzaMgBi65qZ5W5": {
+      "participant": false,
+      "target_proximity": "some",
+      "format": "fireside",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "unknown"
+    },
+    "luma:calev-uu4CkTjsRScUsvH": {
+      "participant": false,
+      "target_proximity": "some",
+      "format": "panel",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "startup"
+    },
+    "luma:calev-7o4yOB4IgjhvKEI": {
+      "participant": false,
+      "target_proximity": "some",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "startup"
+    },
+    "campusgroups:2251376": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "panel",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251392": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "some",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "luma:evt-elfadbLlxmaUXhz": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "startup"
+    },
+    "luma:evt-ZdNHYieAfpLCHqZ": {
+      "participant": false,
+      "target_proximity": "some",
+      "format": "fireside",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "unknown"
+    },
+    "campusgroups:2251391": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "some",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "luma:evt-neSdW0i3Dr6eCBn": {
+      "participant": false,
+      "target_proximity": "some",
+      "format": "fireside",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "unknown"
+    },
+    "campusgroups:2251296": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "high",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251353": {
+      "participant": true,
+      "target_proximity": "none",
+      "format": "workshop",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251380": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251297": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "high",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "luma:evt-jeaYt028SDQcR86": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "startup"
+    },
+    "campusgroups:2251298": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "high",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "luma:evt-hQs0SOuBnuWL0Fq": {
+      "participant": true,
+      "target_proximity": "some",
+      "format": "workshop",
+      "cohort_saturation": "none",
+      "prior_hook": "topic",
+      "host_tier": "scaled_co"
+    },
+    "campusgroups:2251287": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "high",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251299": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "high",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251300": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "high",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251301": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "high",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2251302": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "high",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    },
+    "campusgroups:2250639": {
+      "participant": false,
+      "target_proximity": "none",
+      "format": "mixer",
+      "cohort_saturation": "none",
+      "prior_hook": "none",
+      "host_tier": "student_club"
+    }
+  }
+}

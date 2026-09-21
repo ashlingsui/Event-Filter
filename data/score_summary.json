@@ -1,0 +1,27 @@
+{
+  "scored_at": "2026-09-21T07:40:45.990196Z",
+  "verdict_counts": {
+    "skip": 38,
+    "suppressed": 59,
+    "go": 3,
+    "part": 8
+  },
+  "skip_summary": {
+    "total": 38,
+    "by_reason": {
+      "spectator": 31,
+      "quota_full": 1,
+      "below_bar": 6
+    }
+  },
+  "blocked_summary": {
+    "total": 0,
+    "by_reason": {}
+  },
+  "suppressed_summary": {
+    "total": 59,
+    "by_reason": {
+      "not_reachable": 59
+    }
+  }
+}

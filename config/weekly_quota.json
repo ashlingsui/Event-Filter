@@ -1,0 +1,4 @@
+{
+  "_format": "overrides maps an ISO week key ('YYYY-Www', e.g. '2026-W39') to an integer slot quota for that week. Absent weeks fall back to the phase-derived default in score/verdicts.py (PHASE_SLOT_QUOTA). This is 'she sets it per week' from BUILD_HANDOFF.md — hand-edit until step 5 gives it a UI.",
+  "overrides": {}
+}

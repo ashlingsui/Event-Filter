@@ -1,0 +1,452 @@
+<title>Skip or Go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#0A0D10; --surface:#11161B; --surface-2:#161D23;
+    --line:#222B33; --line-soft:#1A222A;
+    --text:#E7EDF2; --muted:#8795A1; --dim:#5C6874;
+    /* BART line colors — the Bay's own signage palette */
+    --go:#00B94F; --part:#FFC400; --block:#E4002B; --data:#189FD8; --wild:#F58025;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --rail:66px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--text);font-family:var(--sans);
+    font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+
+  /* ---------- rail ---------- */
+  .rail{
+    position:fixed;inset-block:0;left:0;width:var(--rail);background:var(--surface);
+    border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;
+    padding-block:18px;gap:4px;z-index:5;
+  }
+  .mark{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--data);
+    letter-spacing:-.05em;margin-bottom:14px;user-select:none}
+  .rail a{
+    position:relative;width:44px;height:42px;display:grid;place-items:center;border-radius:3px;
+    color:var(--dim);text-decoration:none;border-left:2px solid transparent;
+  }
+  .rail a:hover{color:var(--muted);background:var(--surface-2)}
+  .rail a.on{color:var(--data);border-left-color:var(--data);background:var(--surface-2)}
+  .rail a:focus-visible{outline:2px solid var(--data);outline-offset:2px}
+  .rail svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;
+    stroke-linecap:square}
+  .rail .badge{
+    position:absolute;top:4px;right:3px;min-width:15px;height:15px;padding:0 3px;
+    border-radius:8px;background:var(--wild);color:#0A0D10;font-family:var(--mono);
+    font-size:9.5px;font-weight:600;display:grid;place-items:center;line-height:1;
+  }
+  .rail .tip{
+    position:absolute;left:52px;white-space:nowrap;background:var(--surface-2);
+    border:1px solid var(--line);padding:3px 8px;border-radius:2px;font-family:var(--mono);
+    font-size:11px;color:var(--muted);opacity:0;pointer-events:none;transition:opacity .12s;
+  }
+  .rail a:hover .tip,.rail a:focus-visible .tip{opacity:1}
+
+  .wrap{max-width:1020px;margin:0 auto;padding-inline:26px;padding-block:40px 70px;
+    margin-left:var(--rail)}
+
+  /* ---------- header ---------- */
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--dim);display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  .eyebrow .tag{color:var(--wild)}
+  h1{font-family:var(--mono);font-weight:600;font-size:clamp(27px,4.6vw,38px);margin:13px 0 0;
+    letter-spacing:-.02em;text-wrap:balance}
+  .thesis{font-size:clamp(16px,2.3vw,18.5px);color:var(--muted);max-width:60ch;margin:13px 0 0;
+    text-wrap:balance}
+  .thesis em{color:var(--text);font-style:normal;font-weight:500}
+
+  /* ---------- actionable status ---------- */
+  .status{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));
+    gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+  .cell{background:var(--surface);padding:13px 15px}
+  .cell .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim)}
+  .cell .v{font-family:var(--mono);font-size:14.5px;font-weight:500;margin-top:5px;
+    font-variant-numeric:tabular-nums}
+  .cell .v small{font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400}
+  .v.attn{color:var(--wild)}
+  .v.ok{color:var(--go)}
+  .slots{display:inline-flex;gap:4px;margin-left:8px;vertical-align:2px}
+  .slot{width:20px;height:7px;border-radius:1px;background:var(--line-soft);display:inline-block}
+  .slot.used{background:var(--go)}
+
+  /* ---------- paste ---------- */
+  .paste{margin-top:14px;border:1px dashed var(--line);border-radius:3px;background:var(--surface);
+    padding:14px 15px}
+  .paste label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);display:block}
+  .pform{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+  .paste input{
+    flex:1 1 300px;min-width:0;background:var(--ground);border:1px solid var(--line);
+    border-radius:2px;color:var(--text);font-family:var(--mono);font-size:13px;padding:9px 11px;
+  }
+  .paste input::placeholder{color:var(--dim)}
+  .paste input:focus-visible{outline:2px solid var(--data);outline-offset:-1px;border-color:var(--data)}
+  .paste button{
+    background:var(--data);border:0;border-radius:2px;color:#061016;font-family:var(--mono);
+    font-size:12.5px;font-weight:600;letter-spacing:.06em;padding:9px 17px;cursor:pointer;
+  }
+  .paste button:hover{filter:brightness(1.1)}
+  .paste button:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+  .hint{font-family:var(--mono);font-size:11px;color:var(--dim);margin:9px 0 0;line-height:1.6}
+  .hint b{color:var(--muted);font-weight:400}
+  #queued{margin:9px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--go);line-height:1.6}
+
+  h2{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--dim);margin:46px 0 0;scroll-margin-top:24px}
+  h2 .n{color:var(--line);margin-left:7px}
+
+  /* ---------- verdict stack ---------- */
+  .stack{display:flex;flex-direction:column;margin-top:8px}
+  .row{display:grid;grid-template-columns:100px 1fr auto;gap:20px;align-items:start;
+    padding-block:21px;border-bottom:1px solid var(--line-soft)}
+  .row:first-child{border-top:1px solid var(--line-soft)}
+  .verdict{font-family:var(--mono);font-weight:600;font-size:12.5px;letter-spacing:.1em;
+    padding:5px 0 5px 11px;border-left:3px solid var(--dim);color:var(--dim)}
+  .verdict small{display:block;font-size:9.5px;letter-spacing:.08em;color:var(--dim);
+    font-weight:400;margin-top:3px}
+  .v-go{border-left-color:var(--go);color:var(--go)}
+  .v-part{border-left-color:var(--part);color:var(--part)}
+  .v-wild{border-left-color:var(--wild);color:var(--wild)}
+  .v-skip{border-left-color:var(--line);color:var(--dim)}
+  .v-block{border-left-color:var(--block);color:var(--block)}
+
+  .title{font-weight:600;font-size:16.5px;line-height:1.3;margin:0;text-wrap:balance}
+  .title a{text-decoration:none;border-bottom:1px solid transparent}
+  .title a:hover{border-bottom-color:var(--data);color:var(--data)}
+  .title a:focus-visible{outline:2px solid var(--data);outline-offset:3px;border-radius:1px}
+  .title a::after{content:"↗";font-family:var(--mono);font-size:11px;color:var(--dim);
+    margin-left:6px;vertical-align:2px}
+  .title a:hover::after{color:var(--data)}
+  .row.muted .title{color:var(--muted);font-weight:500}
+  .meta{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:6px;
+    display:flex;flex-wrap:wrap;gap:4px 9px}
+  .meta i{font-style:normal;color:var(--line);user-select:none}
+  .src{border:1px solid var(--line);border-radius:2px;padding:0 5px;font-size:10px;
+    letter-spacing:.07em;text-transform:uppercase}
+  .reason{margin:10px 0 0;color:var(--text);max-width:62ch;font-size:14.5px}
+  .row.muted .reason{color:var(--muted)}
+  .reason b{color:var(--text);font-weight:600}
+  .risk{margin:8px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--part);max-width:62ch;
+    line-height:1.55}
+  .risk::before{content:"▲ ";font-size:9px;vertical-align:1px}
+  .factors{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .f{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;border:1px solid var(--line);
+    border-radius:2px;padding:3px 7px;color:var(--dim);background:var(--surface);white-space:nowrap}
+  .f b{font-weight:500;color:var(--muted)}
+  .f.pos{border-color:#1B4A30;color:#63C98C;background:#0C1A12}
+  .f.pos b{color:#63C98C}
+  .f.neg{border-color:#40232A;color:#D2707F;background:#170D10}
+  .f.neg b{color:#D2707F}
+  .pcol{text-align:right;font-family:var(--mono);min-width:70px}
+  .p{font-size:25px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+    line-height:1.1}
+  .row.muted .p{color:var(--dim)}
+  .plabel{font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--dim);margin-top:3px}
+  .locked{font-size:9px;color:var(--data);letter-spacing:.05em;margin-top:6px}
+
+  /* ---------- history / calibration ---------- */
+  .panel{margin-top:10px;border:1px solid var(--line);border-radius:3px;background:var(--surface);
+    padding:6px 20px 20px}
+  .crow{display:grid;grid-template-columns:1fr 156px 104px;gap:18px;align-items:center;
+    padding-block:14px;border-bottom:1px solid var(--line-soft)}
+  .crow:last-of-type{border-bottom:0}
+  .cname{font-size:14px;line-height:1.3}
+  .cname a{text-decoration:none;border-bottom:1px solid transparent}
+  .cname a:hover{color:var(--data);border-bottom-color:var(--data)}
+  .cname span{display:block;font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:4px}
+  .bar{position:relative;height:8px;background:var(--surface-2);border-radius:1px;overflow:hidden}
+  .bar>i{position:absolute;inset-block:0;left:0;background:var(--data);border-radius:1px}
+  .barlab{font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:5px;letter-spacing:.05em}
+  .outcome{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.08em;
+    text-align:right}
+  .outcome span{display:block;font-weight:400;color:var(--dim);font-size:10px;margin-top:3px;
+    letter-spacing:0}
+  .o-hit{color:var(--go)} .o-null{color:var(--block)} .o-due{color:var(--wild)}
+  .gap{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;
+    color:var(--muted);max-width:66ch}
+  .gap b{color:var(--text);font-weight:600}
+  .counts{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:12px;
+    letter-spacing:.03em;line-height:1.65}
+
+  .principles{margin-top:50px;border-top:1px solid var(--line);padding-top:24px;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:20px 28px}
+  .principles p{margin:0;font-family:var(--mono);font-size:12px;line-height:1.65;color:var(--muted)}
+  .principles p::before{content:"";display:block;width:16px;height:2px;background:var(--data);
+    margin-bottom:8px}
+  .foot{margin-top:30px;font-family:var(--mono);font-size:10.5px;color:var(--dim);line-height:1.75}
+
+  @media (max-width:760px){
+    .rail{position:static;width:auto;flex-direction:row;inset:auto;border-right:0;
+      border-bottom:1px solid var(--line);padding:8px 12px;justify-content:flex-start;gap:2px}
+    .mark{margin:0 12px 0 0;align-self:center}
+    .rail a{border-left:0;border-bottom:2px solid transparent;height:38px}
+    .rail a.on{border-left-color:transparent;border-bottom-color:var(--data)}
+    .rail .tip{display:none}
+    .wrap{margin-left:0;padding-inline:18px}
+    .row{grid-template-columns:1fr;gap:12px}
+    .pcol{text-align:left;display:flex;gap:10px;align-items:baseline}
+    .plabel,.locked{margin-top:0}
+    .crow{grid-template-columns:1fr;gap:9px}
+    .outcome{text-align:left}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<nav class="rail" aria-label="Sections">
+  <div class="mark">S/G</div>
+  <a href="#week" class="on" aria-label="This week">
+    <svg viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="13"/><path d="M2.5 8h15M6.5 2v3M13.5 2v3"/><rect x="5.5" y="11" width="3" height="3" fill="currentColor" stroke="none"/></svg>
+    <span class="tip">This week</span></a>
+  <a href="#history" aria-label="History">
+    <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5"/><path d="M10 5.5V10l3 2"/></svg>
+    <span class="badge">1</span><span class="tip">History · 1 check due</span></a>
+  <a href="#calibration" aria-label="Calibration">
+    <svg viewBox="0 0 20 20"><path d="M3 17V8M8 17V4M13 17v-6M18 17v-9"/></svg>
+    <span class="tip">Calibration</span></a>
+  <a href="#watchlist" aria-label="Watchlist">
+    <svg viewBox="0 0 20 20"><circle cx="10" cy="7" r="3.2"/><path d="M4 17c0-3.3 2.7-5 6-5s6 1.7 6 5"/></svg>
+    <span class="tip">Watchlist · 12 people</span></a>
+  <a href="#prep" aria-label="Prep briefs">
+    <svg viewBox="0 0 20 20"><path d="M4.5 2.5h11v15h-11z"/><path d="M7 6.5h6M7 9.5h6M7 12.5h3.5"/></svg>
+    <span class="badge">2</span><span class="tip">Prep · 2 briefs ready</span></a>
+</nav>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow"><span class="tag">▚ PROTOTYPE</span><span>·</span>
+      <span>Thu Sep 17 2026</span><span>·</span><span>phase: build</span></div>
+    <h1>Skip or Go</h1>
+    <p class="thesis">Is this event for someone like me, or am I
+      <em>watching someone else's event?</em></p>
+  </header>
+
+  <section class="status" aria-label="Status">
+    <div class="cell"><div class="k">slots left</div>
+      <div class="v ok">1 of 2<span class="slots"><i class="slot used"></i><i class="slot"></i></span></div></div>
+    <div class="cell"><div class="k">next commitment</div>
+      <div class="v">Fri 12:00 <small>OpenRouter, SF</small></div></div>
+    <div class="cell"><div class="k">rsvp closing</div>
+      <div class="v attn">2 days <small>AI Heist</small></div></div>
+    <div class="cell"><div class="k">outcome checks due</div>
+      <div class="v attn">1 <small>Venture Math 02, overdue</small></div></div>
+  </section>
+
+  <div class="paste">
+    <label for="ev">Paste an event link</label>
+    <form class="pform" id="pform">
+      <input id="ev" name="ev" type="url" autocomplete="off"
+             placeholder="luma.com/… · partiful.com/e/… · haas.campusgroups.com/rsvp?id=…">
+      <button type="submit">Score it</button>
+    </form>
+    <p class="hint">Anything the scan missed — a link a friend sent you, a private invite, a
+      calendar you don't follow. <b>Luma, Partiful and CampusGroups links all parse.</b></p>
+    <p id="queued" hidden></p>
+  </div>
+
+  <h2 id="week">This week — verdicts <span class="n">7</span></h2>
+  <div class="stack">
+
+    <article class="row">
+      <div class="verdict v-go">GO<small>full</small></div>
+      <div>
+        <h3 class="title"><a href="https://luma.com/openro-kcis" target="_blank" rel="noopener">The New Model Dilemma: Should You Switch?</a></h3>
+        <div class="meta"><span class="src">luma</span><span>Fri Sep 18 · 12:00–14:00</span><i>|</i>
+          <span>SF</span><i>|</i><span>OpenRouter × a16z</span><i>|</i><span>lunch &amp; learn</span></div>
+        <p class="reason">Effectively free: Friday, no class, Ivy is driving, and it sits on your
+          route to Yosemite. You already use OpenRouter, so you arrive with something to say
+          instead of an opener.</p>
+        <p class="risk">Hard stop at 14:00 — no post-event mingle, which is where contacts usually
+          form. Get there early and work the room before it starts.</p>
+        <div class="factors"><span class="f pos"><b>participant</b></span>
+          <span class="f pos"><b>hook</b> · uses the product</span>
+          <span class="f pos"><b>trip-chained</b></span><span class="f pos"><b>cost</b> 0 blocks</span>
+          <span class="f"><b>proximity</b> some</span><span class="f"><b>cohort sat.</b> none</span></div>
+      </div>
+      <div class="pcol"><div class="p">0.60</div><div class="plabel">P(contact∪build)</div>
+        <div class="locked">◆ locked 09-18</div></div>
+    </article>
+
+    <article class="row">
+      <div class="verdict v-go">GO<small>full</small></div>
+      <div>
+        <h3 class="title"><a href="https://partiful.com/e/CQdFO5si7fnkMcfXet7q" target="_blank" rel="noopener">AI Heist Challenge — Cogent × Modal × LangChain</a></h3>
+        <div class="meta"><span class="src">partiful</span><span>SF Tech Week</span><i>|</i>
+          <span>SF</span><i>|</i><span>team-based build</span></div>
+        <p class="reason">Best profile on the board. Team format means you're <b>doing the thing</b>,
+          not watching it — and teams force conversation in a way no mixer does. Modal and LangChain
+          people are squarely on-target.</p>
+        <div class="factors"><span class="f pos"><b>participant</b></span>
+          <span class="f pos"><b>format</b> hands-on</span><span class="f pos"><b>proximity</b> high</span>
+          <span class="f pos"><b>cohort sat.</b> none</span><span class="f"><b>cost</b> 1 block</span></div>
+      </div>
+      <div class="pcol"><div class="p">0.70</div><div class="plabel">P(contact∪build)</div>
+        <div class="locked">◆ locked 09-18</div></div>
+    </article>
+
+    <article class="row">
+      <div class="verdict v-part">GO<small>this part only</small></div>
+      <div>
+        <h3 class="title"><a href="https://partiful.com/e/Iok3TlIvDZje7pSm3ufb" target="_blank" rel="noopener">Love at First Slide — Gamma × Atlassian</a></h3>
+        <div class="meta"><span class="src">partiful</span><span>SF Tech Week</span><i>|</i>
+          <span>SF</span><i>|</i><span>lightning talks</span><i>|</i><span>you present</span></div>
+        <p class="reason">You'd be on stage, which inverts networking — people come to you
+          afterward. Atlassian is scaled and sponsors. Bring the BaZi material; it's the most
+          memorable thing in the room and nobody else has it.</p>
+        <p class="risk">Go for your slot and the hour after. Skip the open mingle at the end — lowest
+          yield of the night, and it costs you Saturday morning.</p>
+        <div class="factors"><span class="f pos"><b>participant</b> · presenting</span>
+          <span class="f pos"><b>proximity</b> some</span><span class="f"><b>cohort sat.</b> none</span>
+          <span class="f"><b>cost</b> 1 block</span></div>
+      </div>
+      <div class="pcol"><div class="p">0.55</div><div class="plabel">P(contact∪build)</div>
+        <div class="locked">◆ locked 09-18</div></div>
+    </article>
+
+    <article class="row">
+      <div class="verdict v-wild">GO<small>wildcard</small></div>
+      <div>
+        <h3 class="title"><a href="https://luma.com/0ikx27v2" target="_blank" rel="noopener">Founders' Fireside Chat w/ Swift Ventures</a></h3>
+        <div class="meta"><span class="src">luma</span><span>Wed Sep 24 · 17:30</span><i>|</i>
+          <span>Berkeley · 2232 Piedmont</span><i>|</i><span>49 going</span></div>
+        <p class="reason">The model says skip — a fund is the <b>wrong ladder</b>, and firesides
+          rarely produce builds. But this is your exploration slot: the model has never seen a VC
+          fireside with a prior contact in the room, and it can't learn what it doesn't attend.
+          Go, and we find out whether it's wrong.</p>
+        <div class="factors"><span class="f neg"><b>ladder</b> wrong</span>
+          <span class="f neg"><b>spectator</b></span>
+          <span class="f pos"><b>hook</b> · met him at SkyDeck</span>
+          <span class="f pos"><b>cost</b> 0.5 blocks</span><span class="f"><b>cohort sat.</b> some</span></div>
+      </div>
+      <div class="pcol"><div class="p">0.30</div><div class="plabel">P(contact∪build)</div>
+        <div class="locked">◆ locked 09-18</div></div>
+    </article>
+
+    <article class="row muted">
+      <div class="verdict v-skip">SKIP<small>recurring</small></div>
+      <div>
+        <h3 class="title"><a href="https://haas.campusgroups.com/rsvp?id=2251378" target="_blank" rel="noopener">Venture Math Speaker Series 04</a></h3>
+        <div class="meta"><span class="src">campusgroups</span><span>Wed Sep 23 · 16:30</span><i>|</i>
+          <span>campus</span><i>|</i><span>Haas FinTech Club</span></div>
+        <p class="reason">You went to Session 02 and got nothing — interesting, no connection,
+          off-target topic. <b>Session 05 is in two weeks</b> and 06 after that. Nothing here is
+          scarce.</p>
+        <div class="factors"><span class="f neg"><b>spectator</b></span>
+          <span class="f neg"><b>topic</b> off-target</span>
+          <span class="f pos"><b>recurring</b> · next in 14d</span>
+          <span class="f"><b>cost</b> 0.5 blocks</span></div>
+      </div>
+      <div class="pcol"><div class="p">0.12</div><div class="plabel">P(contact∪build)</div></div>
+    </article>
+
+    <article class="row muted">
+      <div class="verdict v-skip">SKIP<small>not your ladder</small></div>
+      <div>
+        <h3 class="title"><a href="https://haas.campusgroups.com/rsvp?id=2251355" target="_blank" rel="noopener">VC 101: Sourcing</a></h3>
+        <div class="meta"><span class="src">campusgroups</span><span>Wed Sep 23 · 17:00</span><i>|</i>
+          <span>campus</span><i>|</i><span>Academic</span></div>
+        <p class="reason">You are not sourcing deals. This is someone else's event and you'd be in
+          the audience for all of it.</p>
+        <div class="factors"><span class="f neg"><b>spectator</b></span>
+          <span class="f neg"><b>ladder</b> wrong</span><span class="f"><b>cost</b> 0.5 blocks</span></div>
+      </div>
+      <div class="pcol"><div class="p">0.08</div><div class="plabel">P(contact∪build)</div></div>
+    </article>
+
+    <article class="row muted">
+      <div class="verdict v-block">BLOCKED<small>hard filter</small></div>
+      <div>
+        <h3 class="title"><a href="https://luma.com/x0ips3nj" target="_blank" rel="noopener">make :**: out — NODE</a></h3>
+        <div class="meta"><span class="src">luma</span><span>Sat Sep 19 · 18:30</span><i>|</i>
+          <span>Palo Alto</span></div>
+        <p class="reason">Not BART-reachable and nobody is driving you. Never scored — it doesn't
+          reach the model.</p>
+        <div class="factors"><span class="f neg"><b>reachable</b> no</span>
+          <span class="f neg"><b>39 min</b> from nearest station</span></div>
+      </div>
+      <div class="pcol"><div class="p">—</div><div class="plabel">filtered out</div></div>
+    </article>
+
+  </div>
+
+  <h2 id="history">History — attended <span class="n">3</span></h2>
+  <div class="panel">
+    <div class="crow">
+      <div class="cname"><a href="https://luma.com/a16zgrokbotbuildnight" target="_blank" rel="noopener">Grok Bot build night for women</a>
+        <span>Sep 3 · a16z SF · build night · went alone</span></div>
+      <div><div class="bar"><i style="width:90%"></i></div><div class="barlab">felt 9.0</div></div>
+      <div class="outcome o-hit">HIT<span>build + contact</span></div>
+    </div>
+    <div class="crow">
+      <div class="cname"><a href="https://luma.com/yvisyytf" target="_blank" rel="noopener">Haas Founder &amp; Funder Night</a>
+        <span>Aug 19 · Berkeley SkyDeck · 200 · with classmates</span></div>
+      <div><div class="bar"><i style="width:80%"></i></div><div class="barlab">felt 8.0</div></div>
+      <div class="outcome o-null">NULL<span>cohort only</span></div>
+    </div>
+    <div class="crow">
+      <div class="cname"><a href="https://luma.com/tcv4mxsv" target="_blank" rel="noopener">Venture Math — Session 02</a>
+        <span>Sep 9 · campus · 73 · lecture</span></div>
+      <div><div class="bar"><i style="width:50%"></i></div><div class="barlab">felt 5.0</div></div>
+      <div class="outcome o-due">T+7 DUE<span>overdue 2 days</span></div>
+    </div>
+  </div>
+
+  <h2 id="calibration">Calibration — felt vs. delivered</h2>
+  <div class="panel">
+    <p class="gap">The eight-point night that delivered nothing is the finding.
+      <b>Founder &amp; Funder felt almost as good as the build night and produced zero
+      contacts</b> — 200 people, most of them your own class, on a ladder you're not climbing.
+      Mixers appear to feel great and deliver nothing; two more nulls and that stops being an
+      impression and starts being a rule.</p>
+    <p class="counts">3 attended · 2 labeled · 1 check overdue · 0 wildcards resolved<br>
+      Too few for a hit rate. Raw counts only until n ≥ 10 — a conversion rate over 2 events is
+      noise wearing a percentage sign.</p>
+  </div>
+
+  <h2 id="watchlist">Watchlist</h2>
+  <div class="panel"><p class="counts" style="margin-top:14px">12 people accumulated from scanned
+    speaker lists · 0 confirmed. Thumbs up the ones worth an alert.</p></div>
+
+  <h2 id="prep">Prep briefs</h2>
+  <div class="panel"><p class="counts" style="margin-top:14px">2 ready — OpenRouter (Fri),
+    AI Heist. Generated on a yes, not before.</p></div>
+
+  <div class="principles">
+    <p>A prior hook is what makes an event warm for you.</p>
+    <p>Scoring picks the room; follow-up is what converts it.</p>
+    <p>Watching people instead of watching events — let me build your watchlist.</p>
+    <p>Reasons argue with you. Rules decide for you.</p>
+  </div>
+
+  <p class="foot">Coverage: 8 subscribed calendars — Luma, Haas CampusGroups, Partiful. Not
+    everything in the Bay Area; everything on your calendars.<br>
+    Felt scores inferred from your own descriptions pending your real entries. Prototype for design
+    review — the scoring model is not fitted.</p>
+
+</div>
+
+<script>
+  (function(){
+    var f=document.getElementById('pform'),i=document.getElementById('ev'),
+        q=document.getElementById('queued');
+    f.addEventListener('submit',function(e){
+      e.preventDefault();
+      var v=i.value.trim(); if(!v) return;
+      var src=/lu\.ma|luma\.com/.test(v)?'Luma':/partiful/.test(v)?'Partiful':
+              /campusgroups/.test(v)?'CampusGroups':'unknown source';
+      q.hidden=false;
+      q.textContent='✓ Queued — '+src+' link. It will be parsed and scored in the next scan.';
+      i.value='';
+    });
+    var links=[].slice.call(document.querySelectorAll('.rail a'));
+    window.addEventListener('hashchange',function(){
+      links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')===location.hash)});
+    });
+  })();
+</script>

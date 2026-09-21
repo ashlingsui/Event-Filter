@@ -1,0 +1,33 @@
+# --- Secrets. The service_role key bypasses RLS entirely. Never commit. ---
+.env
+.env.*
+!.env.example
+supabase/.env
+supabase/.env.*
+!supabase/.env.example
+supabase/.temp/
+
+# --- Personal data (SPEC.md §4 privacy boundary) ---
+# These contain named real people and judgments about them. Kept out of the repo so
+# this can be made public later without rewriting history.
+data/outcomes.json
+data/contacts*
+data/pending_hypotheses.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# --- OS / editor ---
+.DS_Store
+.vscode/
+.idea/
+
+# --- Node, if the frontend gains a build step ---
+node_modules/
+.next/
+dist/
+.vercel/

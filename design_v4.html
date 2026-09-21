@@ -1,0 +1,1229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Skip or Go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* =====================================================================
+     AWS Builder Center is the real reference: builder.aws.com is a LIGHT
+     system — white ground, near-black hairline-bordered cards, Amazon-
+     Ember-style sans body copy, and a Duospace monospace used ONLY for
+     code-flavored accents ("if building:", "#hashtag" labels), never for
+     body text. Near-black shows up inside specific image/icon panels, not
+     as the page chrome. IBM Plex Mono/Sans stand in for the (proprietary)
+     AmazonEmberDuospace/Amazon Ember pairing, matching that same division
+     of labour. The BART palette stays (that's the product's own signage
+     language, independent of AWS's own blue/purple accent), but on a
+     light ground a fully-saturated hue fails text contrast, so each BART
+     colour gets an "ink" (darkened, AA-safe as text) and "tint" (very
+     light, AA-safe as a fill) variant. Decorative, non-text uses — a 3px
+     accent bar, a small filled pip, a countdown-pill fill — keep the
+     bright hue; text/labels use the ink variant; soft callout boxes use
+     the tint. The event-DETAIL screen is the one place that stays dark —
+     that's Partiful's borrowed language, not AWS's, and the brief frames
+     it as a separate screen on purpose. Its dark palette overrides live
+     in the .detail block below, using the SAME variable names, so every
+     shared component (risk lines, factor chips, the unblock callout)
+     renders correctly in whichever theme it appears in without a second
+     copy of its rules. */
+  :root{
+    color-scheme:light;
+    /* Cypherpunk variation: electric lavender replaces TypeUI's lime. The
+       background is intentionally assertive, but the reading surfaces stay
+       warm and quiet — this is a decision tool, not a security dashboard. */
+    --ground:#B9A4FF; --surface:#F7F0E4; --surface-2:#E7DBFF;
+    --line:#101014; --line-soft:#2D2936;
+    --text:#101014; --muted:#282530; --dim:#554F64;
+    --ink:#101014;
+    /* BART line colors — the Bay's own signage palette. Bright = decorative
+       (bars, pips, fills). *-text = darkened, AA-safe as text on light.
+       *-bg / *-border = very light tint + mid border for soft callouts. */
+    --go:#00B94F; --part:#FFC400; --block:#E4002B; --data:#2956D9; --cond:#F58025;
+    --go-text:#0C7A34; --part-text:#6F5200; --block-text:#B4001F; --data-text:#1E3EAE; --cond-text:#9A4107;
+    --go-bg:#E4F7EC; --part-bg:#FFF6DB; --block-bg:#FBE4E7; --data-bg:#E3F3FA; --cond-bg:#FDEBDD;
+    --go-border:#B8E6C8; --part-border:#F5DE9A; --block-border:#F0B8C0; --data-border:#B9E0F0; --cond-border:#F5C89A;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --rail:66px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--ground);color:var(--text);font-family:var(--sans);
+    font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  :where(a,button,input,textarea,summary,[tabindex]):focus-visible{
+    outline:2px solid var(--data-text);outline-offset:2px;border-radius:2px}
+  .vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+    clip-path:inset(50%);white-space:nowrap}
+  .skip-link{position:fixed;top:-60px;left:8px;z-index:20;background:var(--data);color:var(--ink);
+    font-family:var(--mono);font-size:12px;padding:9px 14px;border-radius:4px;text-decoration:none}
+  .skip-link:focus-visible{top:8px}
+
+  /* ---------- rail — exists to carry state badges ---------- */
+  .rail{
+    position:fixed;inset-block:0;left:0;width:var(--rail);background:var(--surface);
+    border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;
+    padding-block:18px;gap:4px;z-index:5}
+  .mark{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--data-text);
+    letter-spacing:-.05em;margin-bottom:14px;user-select:none}
+  .rail a{position:relative;width:46px;height:44px;display:grid;place-items:center;border-radius:4px;
+    color:var(--dim);text-decoration:none;border-left:2px solid transparent}
+  .rail a:hover{color:var(--muted);background:var(--surface-2)}
+  .rail a.on{color:var(--data-text);border-left-color:var(--data);background:var(--surface-2)}
+  .rail svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:square}
+  .rail .badge{position:absolute;top:4px;right:3px;min-width:15px;height:15px;padding:0 3px;
+    border-radius:8px;background:var(--cond);color:var(--ink);font-family:var(--mono);
+    font-size:9.5px;font-weight:600;display:grid;place-items:center;line-height:1;
+    box-shadow:0 0 0 2px var(--surface)}
+  .rail .tip{position:absolute;left:54px;white-space:nowrap;background:var(--text);
+    border:1px solid var(--text);padding:3px 8px;border-radius:4px;font-family:var(--mono);
+    font-size:11px;color:var(--ground);opacity:0;pointer-events:none;transition:opacity .12s;z-index:2}
+  .rail a:hover .tip,.rail a:focus-visible .tip{opacity:1}
+
+  .wrap{max-width:1020px;margin:0 auto;padding:40px 26px 80px;margin-left:var(--rail)}
+
+  /* ---------- header ---------- */
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--dim);display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  .eyebrow .tag{color:var(--cond-text)}
+  h1{font-family:var(--mono);font-weight:600;font-size:clamp(27px,4.6vw,38px);margin:13px 0 0;
+    letter-spacing:-.02em;text-wrap:balance}
+  .thesis{font-size:clamp(16px,2.3vw,18.5px);color:var(--muted);max-width:60ch;margin:13px 0 0;
+    text-wrap:balance}
+  .thesis em{color:var(--text);font-style:normal;font-weight:500}
+
+  /* ---------- status: only things she would act on ---------- */
+  .status{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));
+    gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .cell{background:var(--surface);padding:13px 15px}
+  .cell .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .cell .v{font-family:var(--mono);font-size:14.5px;font-weight:500;margin-top:5px;font-variant-numeric:tabular-nums}
+  .cell .v small{display:block;font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400}
+  .v.attn{color:var(--cond-text)} .v.ok{color:var(--go-text)}
+  .slots{display:inline-flex;gap:4px;margin-left:8px;vertical-align:2px}
+  .slot{width:20px;height:7px;border-radius:1px;background:var(--line-soft);display:inline-block}
+  .slot.used{background:var(--go)}
+
+  h2{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--dim);margin:52px 0 0;scroll-margin-top:24px}
+  h2 .n{color:var(--dim);opacity:.55;margin-left:7px}
+  .lede{color:var(--muted);max-width:68ch;margin:10px 0 0;font-size:14px}
+
+  /* ---------- verdict stack — never a card grid ---------- */
+  .stack{display:flex;flex-direction:column;margin-top:10px}
+  .row{display:grid;grid-template-columns:112px 1fr auto;gap:20px;align-items:start;
+    padding-block:21px;border-bottom:1px solid var(--line-soft)}
+  .row:first-child{border-top:1px solid var(--line-soft)}
+  .verdict{font-family:var(--mono);font-weight:600;font-size:12.5px;letter-spacing:.1em;
+    padding:5px 0 5px 12px;border-left:3px solid var(--dim);color:var(--dim)}
+  .verdict small{display:block;font-size:9.5px;letter-spacing:.08em;color:var(--dim);
+    font-weight:400;margin-top:3px;text-transform:none}
+  .v-go{border-left-color:var(--go);color:var(--go-text)}
+  .v-part{border-left-color:var(--part);color:var(--part-text)}
+  /* go_if: orange AND interrupted — the verdict is broken by a condition.
+     Distinguishable without color. */
+  .v-goif{color:var(--cond-text);border-left:0;position:relative;padding-left:12px}
+  .v-goif::before{content:"";position:absolute;left:0;top:2px;bottom:2px;width:3px;
+    background:repeating-linear-gradient(to bottom,var(--cond) 0 5px,transparent 5px 10px)}
+  .v-skip{border-left-color:var(--line);color:var(--dim)}
+  .v-block{border-left-color:var(--block);color:var(--block-text)}
+
+  .title{font-weight:600;font-size:16.5px;line-height:1.3;margin:0;text-wrap:balance}
+  .title a{text-decoration:none;border-bottom:1px solid transparent}
+  .title a:hover{border-bottom-color:var(--data-text);color:var(--data-text)}
+  .row.muted .title{color:var(--muted);font-weight:500}
+  .meta{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:6px;
+    display:flex;flex-wrap:wrap;gap:4px 9px;align-items:center}
+  .meta i{font-style:normal;color:var(--line);user-select:none}
+  .src{border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:10px;
+    letter-spacing:.07em;text-transform:uppercase}
+  .reason{margin:10px 0 0;color:var(--text);max-width:62ch;font-size:14.5px}
+  .row.muted .reason{color:var(--muted)}
+  .reason b{color:var(--text);font-weight:600}
+  /* the unblocking condition reads as an ACTION, not a caveat */
+  .unblock{margin:11px 0 0;display:block;
+    border:1px dashed var(--cond-border);background:var(--cond-bg);border-radius:4px;padding:8px 12px;
+    font-family:var(--mono);font-size:12px;color:var(--cond-text);max-width:60ch;line-height:1.5}
+  .unblock b{font-weight:600;letter-spacing:.06em;margin-right:9px}
+  .risk{margin:8px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--part-text);max-width:62ch;line-height:1.55}
+  .risk::before{content:"\25B2 ";font-size:9px;vertical-align:1px}
+  .flag{margin:8px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--dim);max-width:64ch;
+    line-height:1.55;border-left:2px solid var(--line);padding-left:10px}
+  .factors{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .f{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;border:1px solid var(--line);
+    border-radius:4px;padding:3px 7px;color:var(--dim);background:var(--surface);white-space:nowrap}
+  .f b{font-weight:500;color:var(--muted)}
+  .f.pos{border-color:var(--go-border);color:var(--go-text);background:var(--go-bg)}
+  .f.pos b{color:var(--go-text)}
+  .f.neg{border-color:var(--block-border);color:var(--block-text);background:var(--block-bg)}
+  .f.neg b{color:var(--block-text)}
+  .f.rec{border-style:dashed;border-color:var(--dim);color:var(--muted)}
+  .pcol{text-align:right;font-family:var(--mono);min-width:76px}
+  .p{font-size:25px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+  .row.muted .p{color:var(--dim)}
+  .plabel{font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--dim);margin-top:3px}
+  .locked{font-size:9px;color:var(--data-text);letter-spacing:.05em;margin-top:6px}
+
+  /* ---------- skip collapse ---------- */
+  .fold{margin-top:22px;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
+  .fold-btn{width:100%;display:flex;gap:14px;align-items:center;justify-content:space-between;
+    background:none;border:0;color:inherit;text-align:left;padding:16px 18px;cursor:pointer;
+    font-family:var(--sans);font-size:14.5px;min-height:44px}
+  .fold-btn .n{font-family:var(--mono);font-weight:600;color:var(--muted);font-size:15px}
+  .fold-btn .why{color:var(--muted);font-family:var(--mono);font-size:11.5px;letter-spacing:.04em}
+  .fold-btn .chev{font-family:var(--mono);font-size:11px;color:var(--dim);white-space:nowrap}
+  .fold-btn:hover{background:var(--surface-2)}
+  .fold-body{border-top:1px solid var(--line);padding:4px 18px 10px}
+  .fold-body[hidden]{display:none}
+  .sk{display:grid;grid-template-columns:78px 1fr auto;gap:14px;align-items:baseline;
+    padding-block:10px;border-bottom:1px solid var(--line-soft);font-size:13.5px}
+  .sk:last-child{border-bottom:0}
+  .sk .d{font-family:var(--mono);font-size:11px;color:var(--dim)}
+  .sk .t{color:var(--muted);min-width:0;overflow-wrap:anywhere}
+  .sk .r{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.06em;text-align:right}
+
+  /* ---------- one honest line, never 59 rows ---------- */
+  .suppressed{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--dim);
+    line-height:1.7;border-left:2px solid var(--line);padding-left:12px;max-width:74ch}
+  .suppressed b{color:var(--muted);font-weight:500}
+
+  /* ---------- panels ---------- */
+  .panel{margin-top:12px;border:1px solid var(--line);border-radius:4px;background:var(--surface);padding:18px 20px}
+  .counts{font-family:var(--mono);font-size:11.5px;color:var(--dim);letter-spacing:.03em;line-height:1.75;margin:0}
+  .counts b{color:var(--muted);font-weight:500}
+
+  /* ---------- pending hypotheses ---------- */
+  .hyp{display:grid;grid-template-columns:1fr 130px;gap:18px;align-items:start;
+    padding-block:16px;border-bottom:1px solid var(--line-soft)}
+  .hyp:last-of-type{border-bottom:0}
+  .hyp p{margin:0;font-size:14.5px;color:var(--text);max-width:64ch;line-height:1.5}
+  .hyp .ev{margin-top:7px;font-family:var(--mono);font-size:11px;color:var(--dim);line-height:1.6;max-width:64ch}
+  .support{text-align:right;font-family:var(--mono)}
+  .pips{display:inline-flex;gap:4px}
+  .pip{width:16px;height:6px;border-radius:1px;background:var(--line-soft);
+    border:1px solid var(--line-soft)}
+  .pip.on{background:var(--data-text);border-color:var(--data-text)}
+  .support .c{font-size:11px;color:var(--dim);letter-spacing:.08em;margin-top:6px}
+  .support .c b{color:var(--muted);font-weight:500}
+  .support .act{font-size:10px;letter-spacing:.08em;margin-top:4px}
+  .frozen{margin-top:18px;padding-top:15px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:11.5px;color:var(--dim);line-height:1.75;max-width:74ch}
+  .frozen b{color:var(--muted);font-weight:500}
+
+  /* ---------- read-back: two panes that must not merge ---------- */
+  .say label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);display:block}
+  .say textarea{width:100%;margin-top:9px;min-height:96px;resize:vertical;background:var(--ground);
+    border:1px solid var(--line);border-radius:4px;color:var(--text);font-family:var(--sans);
+    font-size:15px;line-height:1.6;padding:12px 13px}
+  .say textarea::placeholder{color:var(--dim)}
+  .say textarea:focus-visible{outline:2px solid var(--data-text);outline-offset:-1px;border-color:var(--data-text)}
+  .say-bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center}
+  /* AWS's own primary CTA ("Join now"): near-black fill, white text, 4px
+     radius, compact — not a chunky pill. That shape is reserved for the
+     Partiful-borrowed detail screen. */
+  .btn{background:var(--ink);border:1px solid var(--ink);border-radius:4px;color:#fff;
+    font-family:var(--sans);font-size:13.5px;font-weight:500;letter-spacing:0;
+    padding:11px 20px;cursor:pointer;min-height:44px}
+  .btn:hover{background:#232B35;border-color:#232B35}
+  .btn.ghost{background:var(--ground);border:1px solid var(--line);color:var(--muted);font-weight:400}
+  .btn.ghost:hover{background:var(--surface-2);color:var(--text)}
+
+  .panes{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:22px;align-items:start}
+  .panes[hidden]{display:none}
+  .pane-h{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    display:flex;align-items:center;gap:8px}
+  .pane-sub{font-family:var(--mono);font-size:11px;color:var(--dim);margin:7px 0 12px;line-height:1.6;max-width:42ch}
+
+  /* Recorded — a solid ledger. Flush, filled, editable. */
+  .recorded .pane-h{color:var(--go-text)}
+  .rec-list{border:1px solid var(--line);border-radius:4px;background:var(--surface);overflow:hidden}
+  .rec{display:grid;grid-template-columns:118px 1fr;gap:12px;align-items:center;padding:10px 13px;
+    border-bottom:1px solid var(--line-soft)}
+  .rec:last-child{border-bottom:0}
+  .rec .k{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.04em;overflow-wrap:anywhere}
+  .rec input{width:100%;background:var(--ground);border:1px solid var(--line);border-radius:4px;
+    color:var(--text);font-family:var(--mono);font-size:12.5px;padding:7px 9px;min-height:34px}
+  .rec input:focus-visible{outline:2px solid var(--go-text);outline-offset:-1px;border-color:var(--go-text)}
+  .rec .ro{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .rec-foot{font-family:var(--mono);font-size:11px;color:var(--go-text);margin:10px 0 0;line-height:1.6}
+
+  /* Suspected — a different kind of object: unfilled, hatched, offset, no control. */
+  .suspected{padding-left:18px}
+  .suspected .pane-h{color:var(--cond-text)}
+  .sus{position:relative;margin-bottom:14px;padding:13px 15px;border:1px dashed var(--cond-border);
+    border-radius:4px;color:var(--muted);font-size:14px;line-height:1.5;
+    background-image:repeating-linear-gradient(135deg,rgba(245,128,37,.09) 0 2px,transparent 2px 9px)}
+  .sus q{quotes:none;color:var(--text)}
+  .sus .src-note{display:block;font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:9px;line-height:1.6}
+  .sus .ctr{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+    color:var(--cond-text);border:1px solid var(--cond-border);border-radius:4px;padding:2px 6px;margin-top:10px}
+  .no-approve{font-family:var(--mono);font-size:11px;color:var(--dim);line-height:1.7;margin:0}
+
+  /* ---------- calibration container, honest empty state ---------- */
+  .empty{border:1px dashed var(--line);border-radius:4px;padding:20px;margin-top:12px}
+  .empty .big{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--muted);
+    letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+  .empty .big span{color:var(--dim);font-size:14px;font-weight:400;letter-spacing:.06em}
+  .ghost-rows{margin-top:16px;display:flex;flex-direction:column;gap:7px}
+  .ghost-row{height:10px;border-radius:1px;background:repeating-linear-gradient(90deg,
+    var(--line-soft) 0 22px,transparent 22px 30px)}
+  .ghost-row.real{background:var(--data-text);width:11%}
+
+  .principles{margin-top:56px;border-top:1px solid var(--line);padding-top:24px;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:20px 28px}
+  .principles p{margin:0;font-family:var(--mono);font-size:12px;line-height:1.65;color:var(--muted)}
+  .principles p::before{content:"";display:block;width:16px;height:2px;background:var(--data-text);margin-bottom:8px}
+  .foot{margin-top:30px;font-family:var(--mono);font-size:10.5px;color:var(--dim);line-height:1.8;max-width:78ch}
+
+  /* ---------- Cypherpunk experiment: the weekly system ----------
+     Lavender is the field. Warm paper panels contain the actual reading. This
+     gives the state machine a more personal, technical character without
+     turning every SKIP into a threat. The event-detail screen below deliberately
+     opts out: it is still the separate, Partiful-borrowed dark mode. */
+  .week{min-height:100vh;background:var(--ground)}
+  body:not(.on-detail) .rail{border-right-width:2px;background:var(--surface)}
+  body:not(.on-detail) .rail a{border-radius:0}
+  body:not(.on-detail) .rail a.on{border-left-width:4px;background:var(--surface-2)}
+  .week .eyebrow .tag{display:inline-block;background:var(--ink);color:var(--ground);padding:2px 6px}
+  .week h1{letter-spacing:-.04em}
+  .week h2{display:table;background:var(--ink);color:var(--surface);padding:4px 7px;margin-top:54px}
+  .week h2 .n{color:var(--ground);opacity:1}
+  .week .status{gap:2px;border-width:2px;border-radius:0}
+  .week .cell{background:var(--surface)}
+  /* One paper stack, never a grid of paper cards: the decision remains a
+     continuous queue, but its text no longer has to compete with the field. */
+  .week .stack{background:var(--surface);border:2px solid var(--line);padding-inline:16px}
+  .week .row{border-bottom-width:2px}
+  .week .row:first-child{border-top-width:2px}
+  .week .fold,.week .panel,.week .rec-list,.week .empty{border-width:2px;border-radius:0}
+  .week .fold-btn:hover{background:var(--surface-2)}
+  .week .src,.week .f,.week .unblock,.week .sus,.week .sus .ctr,
+  .week .say textarea,.week .rec input{border-radius:0}
+  .week .src,.week .f{border-width:1px}
+  .week .btn{border-radius:0;font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+  .week .btn.ghost{border-width:2px}
+  .week .pip{border-radius:0}
+  .week .principles{border-top-width:2px}
+  .week .principles p::before{width:24px;height:3px;background:var(--ink)}
+  .readback-page .say{max-width:860px}
+  .readback-due{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:12px 14px;margin-bottom:20px;border:2px solid var(--ink);background:var(--surface-2)}
+  .readback-due .due-k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--cond-text)}
+  .readback-due strong{display:block;margin-top:2px;font-size:15px}.readback-due span:last-child{font-family:var(--mono);font-size:11px;color:var(--dim)}
+
+  /* ---------- v4 information architecture ---------- */
+  .home{display:none;min-height:100vh;background:var(--ground);padding:40px 26px 80px;margin-left:var(--rail)}
+  .home-inner{max-width:900px;margin:0 auto;padding-top:38px}
+  .home h1{margin-top:16px;font-size:clamp(32px,5vw,48px);letter-spacing:-.045em}
+  .home .thesis{font-size:19px;max-width:52ch}
+  .home-actions{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:42px;max-width:760px}
+  .home-action{min-height:236px;border:2px solid var(--ink);background:var(--surface);color:var(--text);
+    text-decoration:none;padding:22px;display:flex;flex-direction:column;align-items:flex-start}
+  .home-action:hover{background:var(--surface-2)}
+  .home-action .action-k{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--data-text)}
+  .home-action strong{font-size:23px;line-height:1.16;margin-top:42px;letter-spacing:-.025em}
+  .home-action span:not(.action-k){font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:9px;line-height:1.5}
+  .home-action b{font-family:var(--mono);font-size:12px;letter-spacing:.04em;margin-top:auto}
+  .choose-action b{color:var(--go-text)} .readback-action b{color:var(--cond-text)}
+  .learn-link{display:inline-block;margin-top:24px;color:var(--text);font-family:var(--mono);font-size:12px}
+  .week-picker{margin-top:30px;border:2px solid var(--ink);background:var(--surface);display:flex;
+    align-items:stretch;width:max-content;max-width:100%;font-family:var(--mono)}
+  .week-picker>div{padding:8px 20px;display:grid;gap:0;min-width:160px;border-inline:2px solid var(--ink)}
+  .picker-k{font-size:9px;letter-spacing:.14em;color:var(--dim)}
+  .week-picker strong{font-size:14px;line-height:1.3}.week-picker small{font-size:10px;color:var(--dim)}
+  .week-arrow{appearance:none;border:0;background:var(--ink);color:var(--surface);width:42px;font:600 16px var(--mono);cursor:pointer}
+  .week-arrow:hover{background:#2D2936}
+  .week-jump{appearance:none;border:0;border-left:2px solid var(--ink);background:var(--surface);color:var(--dim);
+    font:11px var(--mono);padding-inline:14px;cursor:pointer}
+  .week-jump:hover,.week-jump.on{background:var(--surface-2);color:var(--text);font-weight:600}
+  .week-picker + h2{margin-top:30px}
+  /* The choose queue answers exactly four questions: verdict, what, when, why.
+     Everything else is held for the detail page. */
+  .choose-page .status{display:none}
+  .choose-page .row{grid-template-columns:112px 1fr;gap:20px;padding-block:18px}
+  .choose-page .row .meta,.choose-page .row .factors,.choose-page .row .risk,
+  .choose-page .row .flag,.choose-page .row .pcol{display:none}
+  .choose-page .row .reason{margin-top:5px;font-size:14px;max-width:65ch}
+  .choose-page .title{font-size:18px}
+  .choose-page .fold{margin-top:16px}.choose-page .suppressed{display:none}
+  .choose-page .v-skip{border-left-color:var(--line)}
+  body.page-home .home{display:block}
+  body.page-home .week,body.page-home .rail{display:none}
+  body.page-choose .readback-page,body.page-choose .learn-page{display:none}
+  body.page-readback .choose-page,body.page-readback .learn-page{display:none}
+  body.page-learn .choose-page,body.page-learn .readback-page{display:none}
+  body.on-detail .home{display:none}
+
+  /* ================= DETAIL SCREEN — same system, tighter focus =================
+     Partiful's useful contribution was the single-event concentration, not the
+     dark skin. The sheet below is therefore the same lavender field and warm
+     paper used by Choose / Read-back, just at a more deliberate scale. */
+  .detail{
+    --ground:#B9A4FF; --surface:#F7F0E4; --surface-2:#E7DBFF;
+    --line:#101014; --line-soft:#2D2936;--text:#101014;--muted:#282530;--dim:#554F64;
+    --ink:#101014;--go-text:#0C7A34;--part-text:#6F5200;--block-text:#B4001F;--data-text:#1E3EAE;--cond-text:#9A4107;
+    --go-bg:#E4F7EC;--part-bg:#FFF6DB;--block-bg:#FBE4E7;--data-bg:#E3F3FA;--cond-bg:#FDEBDD;
+    --go-border:#B8E6C8;--part-border:#F5DE9A;--block-border:#F0B8C0;--data-border:#B9E0F0;--cond-border:#F5C89A;
+    color-scheme:light;background:var(--ground);color:var(--text);
+    display:none;min-height:100vh;position:relative;isolation:isolate}
+  body.on-detail{background:#B9A4FF}
+  body.on-detail .detail{display:block}
+  body.on-detail .week,body.on-detail .rail{display:none}
+  .glow{display:none}
+  .sheet{max-width:740px;margin:32px auto 80px;padding:24px 28px 46px;background:var(--surface);border:2px solid var(--ink)}
+  .back{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.08em;color:var(--surface);background:var(--ink);text-decoration:none;padding:8px 10px;min-height:40px}
+  .back:hover{background:#2D2936;color:var(--surface)}
+  .d-eyebrow{margin-top:24px;display:flex;gap:8px;justify-content:flex-start;flex-wrap:wrap;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+  .d-title{font-family:var(--mono);font-weight:600;font-size:clamp(26px,6.4vw,40px);line-height:1.12;
+    letter-spacing:-.025em;text-align:left;margin:16px 0 0;text-wrap:balance;overflow-wrap:anywhere}
+  /* The route lands focus on the heading for screen readers; it is not a control. */
+  .d-title:focus{outline:none}
+  .d-when{text-align:left;margin-top:22px;font-family:var(--mono)}
+  .d-when .day{font-size:clamp(20px,4.6vw,27px);font-weight:600;letter-spacing:-.01em}
+  .d-when .hrs{font-size:clamp(20px,4.6vw,27px);font-weight:400;color:var(--muted);letter-spacing:-.01em}
+  .d-where{text-align:left;margin-top:9px;font-family:var(--mono);font-size:12.5px;color:var(--dim);line-height:1.7}
+  .d-where b{color:var(--muted);font-weight:400}
+
+  /* the verdict card — decision leads, probability demoted */
+  .d-verdict{margin-top:30px;border:2px solid var(--line);border-radius:0;background:var(--surface-2);
+    padding:20px 22px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:start}
+  .d-verdict .lab{font-family:var(--mono);font-size:19px;font-weight:600;letter-spacing:.06em}
+  .d-verdict .sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--dim);margin-top:5px}
+  .d-verdict .txt{margin:12px 0 0;font-size:15px;color:var(--text);max-width:52ch}
+  .d-p{text-align:right;font-family:var(--mono);min-width:82px}
+  .d-p .n{font-size:27px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+    transition:color .18s}
+  .d-p .l{font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--dim);margin-top:3px}
+  .d-p .delta{font-size:10.5px;letter-spacing:.05em;margin-top:6px;min-height:14px}
+  .delta.up{color:var(--go)} .delta.down{color:var(--part)}
+
+  /* the big chunky pills */
+  .pills{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px}
+  .pill{appearance:none;border:2px solid var(--line);background:var(--surface);color:var(--text);
+    font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:.04em;
+    border-radius:0;padding:18px 16px;min-height:62px;cursor:pointer;transition:background .15s,border-color .15s}
+  .pill:hover{background:var(--surface-2)}
+  .pill.want[aria-pressed="true"]{background:var(--go-bg);border-color:var(--go);color:var(--go-text)}
+  .pill.pass[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+  .pill .s{display:block;font-size:10px;font-weight:400;letter-spacing:.08em;color:var(--dim);margin-top:5px}
+  .pill[aria-pressed="true"] .s{color:inherit;opacity:.72}
+
+  /* ---------- the context strip: three taps, one gesture ---------- */
+  .ctx{margin-top:22px;border:2px solid var(--go-border);border-radius:0;background:var(--go-bg);padding:18px 20px}
+  .ctx[hidden]{display:none}
+  .ctx h3{margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--go-text);font-weight:600}
+  .ctx .note{font-family:var(--mono);font-size:11px;color:var(--dim);margin:8px 0 0;line-height:1.65;max-width:52ch}
+  .qs{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+  .q{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .q .lab{font-size:14.5px;color:var(--text);padding:0;min-width:0}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:0;overflow:hidden;background:var(--surface)}
+  .seg label{position:relative;font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;
+    color:var(--muted);padding:0 18px;min-height:44px;display:grid;place-items:center;cursor:pointer}
+  .seg input{position:absolute;opacity:0;width:1px;height:1px}
+  .seg label:has(input:checked){background:var(--go);color:#04180C;font-weight:600}
+  .seg label:has(input:focus-visible){outline:2px solid var(--data);outline-offset:-2px}
+  .seg label:hover:not(:has(input:checked)){background:var(--surface-2);color:var(--text)}
+  .recomputed{margin:16px 0 0;font-family:var(--mono);font-size:12px;color:var(--muted);
+    line-height:1.7;border-top:1px solid #16311F;padding-top:13px;min-height:22px}
+  .recomputed b{color:var(--text);font-weight:500}
+  .recomputed .rec-unweighted{color:var(--cond)}
+
+  .passed{margin-top:22px;border:2px solid var(--line);border-radius:0;background:var(--surface-2);
+    padding:18px 20px;font-size:14.5px;color:var(--muted);line-height:1.6}
+  .passed[hidden]{display:none}
+  .passed b{color:var(--text);font-weight:600}
+  .passed .alt{display:block;margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--dim);line-height:1.7}
+  .gatebox{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--dim);line-height:1.7}
+  .gatebox button{background:none;border:1px solid var(--line);border-radius:2px;color:var(--muted);
+    font-family:var(--mono);font-size:11.5px;padding:9px 12px;min-height:40px;cursor:pointer;margin-top:8px}
+  .gatebox button:hover{background:var(--surface-2);color:var(--text)}
+
+  .d-why{margin-top:28px}
+  .d-why h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);margin:0 0 12px;font-weight:600}
+  .d-raw{font-family:var(--mono);font-size:11px;color:var(--dim);line-height:1.8;margin:14px 0 0;
+    overflow-wrap:anywhere;border-left:2px solid var(--line);padding-left:11px}
+  .d-out{margin-top:26px;text-align:center}
+  .d-out a{font-family:var(--mono);font-size:12px;color:var(--data);letter-spacing:.06em;
+    display:inline-block;padding:12px;min-height:44px}
+
+  @media (max-width:820px){
+    .panes{grid-template-columns:1fr;gap:30px}
+    .suspected{padding-left:0}
+  }
+  @media (max-width:760px){
+    .rail{position:static;width:auto;flex-direction:row;inset:auto;border-right:0;
+      border-bottom:1px solid var(--line);padding:8px 10px;justify-content:flex-start;gap:2px;
+      overflow-x:auto}
+    .mark{margin:0 10px 0 0;align-self:center}
+    .rail a{border-left:0;border-bottom:2px solid transparent;height:40px;flex:0 0 auto}
+    .rail a.on{border-left-color:transparent;border-bottom-color:var(--data)}
+    .rail .tip{display:none}
+    .wrap{margin-left:0;padding:26px 16px 70px}
+    .row{grid-template-columns:1fr;gap:12px}
+    .pcol{text-align:left;display:flex;gap:10px;align-items:baseline}
+    .plabel,.locked{margin-top:0}
+    .hyp{grid-template-columns:1fr;gap:12px}
+    .support{text-align:left}
+    .sk{grid-template-columns:1fr;gap:3px}
+    .sk .r{text-align:left}
+    .rec{grid-template-columns:1fr;gap:5px}
+    .d-verdict{grid-template-columns:1fr}
+    .d-p{text-align:left;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+    .d-p .l,.d-p .delta{margin-top:0}
+    .sheet{padding:16px 16px 80px}
+    .q{align-items:flex-start;flex-direction:column;gap:8px}
+    .seg{width:100%}
+    .seg label{flex:1 1 0}
+    .home{margin-left:0;padding:26px 16px 70px}.home-inner{padding-top:8px}
+    .home-actions{grid-template-columns:1fr;margin-top:30px}.home-action{min-height:180px}
+    .week-picker{width:100%;flex-wrap:wrap}.week-picker>div{min-width:0;flex:1}
+    .week-jump{min-height:42px;flex:1 1 50%;border-top:2px solid var(--ink);border-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to this week's verdicts</a>
+
+<nav class="rail" aria-label="Sections">
+  <div class="mark" aria-hidden="true">S/G</div>
+  <a href="#/choose" class="on" data-route="choose"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="4" width="15" height="13"/><path d="M2.5 8h15M6.5 2v3M13.5 2v3"/><rect x="5.5" y="11" width="3" height="3" fill="currentColor" stroke="none"/></svg>
+    <span class="vh">Choose</span><span class="tip" aria-hidden="true">Choose</span></a>
+  <a href="#/readback" data-route="readback"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4.5h14v9H8l-4 3.5V13.5H3z"/><path d="M6.5 8h7M6.5 10.5h4"/></svg>
+    <span class="badge" aria-hidden="true">1</span><span class="vh">Read-back — 1 due</span>
+    <span class="tip" aria-hidden="true">Read-back · 1 due</span></a>
+  <a href="#/learn" data-route="learn"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5a5 5 0 0 0-3 9v2h6v-2a5 5 0 0 0-3-9z"/><path d="M8 17h4"/></svg>
+    <span class="badge" aria-hidden="true">5</span><span class="vh">Learn</span>
+    <span class="tip" aria-hidden="true">Learn · 5 open</span></a>
+</nav>
+
+<main class="home" id="home" aria-label="Skip or Go home">
+  <div class="home-inner">
+    <div class="eyebrow"><span class="tag">&#9622; DESIGN v4</span><span>&middot;</span><span>Mon Sep 21 2026</span></div>
+    <h1>What do you need to do?</h1>
+    <p class="thesis">Choose a schedule, or teach the system what happened. Nothing else needs your attention right now.</p>
+    <div class="home-actions">
+      <a class="home-action choose-action" href="#/choose"><span class="action-k">01 / CHOOSE</span><strong>This week&rsquo;s decisions</strong><span>4 events to settle &middot; 2 slots left</span><b>Open plan &rarr;</b></a>
+      <a class="home-action readback-action" href="#/readback"><span class="action-k">02 / READ-BACK</span><strong>Record what happened</strong><span>1 outcome check is due &middot; OpenRouter T+7</span><b>Start read-back &rarr;</b></a>
+    </div>
+    <a class="learn-link" href="#/learn">Or review what the tool is learning &rarr;</a>
+  </div>
+</main>
+
+<div class="week">
+<div class="wrap">
+
+<section class="choose-page page">
+  <header>
+    <div class="eyebrow"><span class="tag">&#9622; CHOOSE</span><span>&middot;</span>
+      <span>Mon Sep 21 2026</span><span>&middot;</span><span>phase: build</span><span>&middot;</span>
+      <span>scan 07:40 UTC</span></div>
+    <h1>Choose your week</h1>
+    <p class="thesis">Make the schedule small enough to keep. Open an event only when you want the evidence behind its verdict.</p>
+  </header>
+
+  <section class="status" aria-label="Status">
+    <div class="cell"><div class="k">slots left</div>
+      <div class="v ok">2 of 2<span class="slots" aria-hidden="true"><i class="slot"></i><i class="slot"></i></span>
+      <small>phase: build</small></div></div>
+    <div class="cell"><div class="k">next commitment</div>
+      <div class="v">&mdash;<small>nothing confirmed</small></div></div>
+    <div class="cell"><div class="k">rsvp closing</div>
+      <div class="v attn">closed<small>both Monday workshops sold out</small></div></div>
+    <div class="cell"><div class="k">outcome checks due</div>
+      <div class="v attn" id="checks">1<small>OpenRouter, T+7 Fri Sep 25</small></div></div>
+  </section>
+
+  <div class="week-picker" aria-label="Choose a week">
+    <button type="button" class="week-arrow" id="prevWeek" aria-label="Previous week">&larr;</button>
+    <div><span class="picker-k">PLAN</span><strong id="weekLabel">This week</strong><small id="weekRange">Sep 21 &ndash; 27</small></div>
+    <button type="button" class="week-arrow" id="nextWeek" aria-label="Next week">&rarr;</button>
+    <button type="button" class="week-jump on" data-week="current">This week</button>
+    <button type="button" class="week-jump" data-week="next">Next week</button>
+  </div>
+
+  <h2 id="content" tabindex="-1">This week &mdash; verdicts <span class="n">4 live</span></h2>
+  <p class="lede">Monday 21 &ndash; Sunday 27 September. 52 events reached the scorer; four of them
+    are decisions. The rest are below, folded.</p>
+
+  <div class="stack" id="stack"></div>
+
+  <h2 id="conditional">Conditional <span class="n">go_if</span></h2>
+  <p class="lede">Reachability is a cost, not a gate. An unreachable event is still scored, and
+    surfaces if it ranks in the week&rsquo;s top three by value &mdash; a higher bar than an
+    ordinary go, not a lower one. <b>No row cleared that bar this week</b>; the nearest real
+    candidate on the board is below, and the condition is written as something to do.</p>
+  <div class="stack" id="condStack"></div>
+
+  <div class="fold">
+    <button class="fold-btn" id="foldBtn" aria-expanded="false" aria-controls="foldBody">
+      <span><span class="n">14 skipped</span>
+        <span class="why">&nbsp; 11 spectator &middot; 2 below bar &middot; 1 quota full</span></span>
+      <span class="chev" aria-hidden="true">show all &darr;</span>
+    </button>
+    <div class="fold-body" id="foldBody" hidden></div>
+  </div>
+
+  <p class="suppressed">
+    <b>34 more were suppressed as unreachable</b> &mdash; Barcelona 5, Mumbai 2, Bengaluru 2,
+    Miami 2, Sydney, Takamatsu, Ch&iacute;a and 15 others, plus 5 with no location on the listing
+    at all. Across the whole 108-event scan that is <b>59 suppressed</b>. They are counted, not
+    dropped: an unreachable event can still surface as <b>GO&nbsp;IF</b> when it ranks in the
+    week&rsquo;s top three by value.</p>
+</section>
+
+<section class="learn-page page">
+  <h2 id="hypotheses">Pending hypotheses <span class="n">5 open</span></h2>
+  <p class="lede">Things the system suspects and has not earned the right to act on. A hypothesis
+    needs the same claim raised independently across <b>three separate events</b> before it becomes
+    an actionable proposal. Until then it is logged, counted, and changes nothing.</p>
+  <div class="panel" id="hypPanel"></div>
+</section>
+
+<section class="readback-page page">
+  <h2 id="readback">Read-back &mdash; what I heard</h2>
+  <p class="lede">Describe an event in your own words. There is no form, and there never will be:
+    your phrasing is the highest-signal data in the project.</p>
+
+  <div class="panel say">
+    <div class="readback-due"><div><span class="due-k">DUE NOW / OUTCOME CHECK</span><strong>OpenRouter &middot; T+7</strong></div><span>Friday Sep 25</span></div>
+    <label for="freetext">Tell me what happened</label>
+    <textarea id="freetext" placeholder="Enjoyed it. Presentation was weak &mdash; their headline number came from their own traffic. Value came from the room, not the stage. Ivy drove, it was on the way to Yosemite&hellip;"></textarea>
+    <div class="say-bar">
+      <button class="btn" id="readBtn" type="button">Read it back</button>
+      <button class="btn ghost" id="replayBtn" type="button">Replay her Sep 18 entry</button>
+    </div>
+    <p class="counts" style="margin-top:12px">No model is attached to this page. The read-back
+      below is the extraction <b>capture/extract.py</b> produced for the OpenRouter event, recorded
+      by hand on Sep&nbsp;21 &mdash; there is no <b>ANTHROPIC_API_KEY</b> in this environment, so
+      the live call has never run.</p>
+
+    <div class="panes" id="panes" hidden>
+      <div class="recorded">
+        <h3 class="pane-h"><span aria-hidden="true">&#9632;</span> Recorded &mdash; facts</h3>
+        <p class="pane-sub">What she said about this event. Correct any of it; corrections apply
+          immediately, because they are facts.</p>
+        <div class="rec-list" id="recList"></div>
+        <p class="rec-foot" id="recFoot">&#10003; Written straight to outcomes.json on edit.</p>
+      </div>
+
+      <div class="suspected">
+        <h3 class="pane-h"><span aria-hidden="true">&#9671;</span> Suspected &mdash; inferences</h3>
+        <p class="pane-sub">Patterns this might be evidence for. Not facts, not approvable, and
+          deliberately not shaped like the pane on the left.</p>
+        <div id="susList"></div>
+        <p class="no-approve">There is no approve control here, and its absence is the design.
+          A correct fact sitting next to a speculative inference gets the inference rubber-stamped
+          along with it &mdash; so the two panes are different objects, not two columns of the
+          same card.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="learn-page page">
+  <h2 id="calibration">Calibration &mdash; predicted vs. delivered</h2>
+  <p class="lede">The one number in this project that has to be honest.</p>
+  <div class="panel">
+    <div class="empty">
+      <div class="big">1 <span>of ~10 rows. Too few for a rate.</span></div>
+      <div class="ghost-rows" aria-hidden="true">
+        <div class="ghost-row real"></div>
+        <div class="ghost-row"></div><div class="ghost-row"></div><div class="ghost-row"></div>
+      </div>
+      <p class="counts" style="margin-top:18px">Four events are logged. Only <b>one</b> &mdash;
+        OpenRouter, Sep&nbsp;18 &mdash; had a probability written down <b>before</b> it happened
+        (0.60 by hand, 0.20 by the tool; ranked 5 of 106). The other three were labelled
+        retrospectively on Sep&nbsp;21 and no prediction was ever made for them, so they can grow
+        the training set and can never enter the track record. This panel counts <b>n&nbsp;=&nbsp;1</b>,
+        not n&nbsp;=&nbsp;4, and stays a container until there is something in it.</p>
+    </div>
+    <p class="counts" style="margin-top:16px">4 attended &middot; 3 labelled &middot; 1 awaiting
+      T+7 on Fri Sep&nbsp;25 &middot; 0 wildcards resolved. Retrospective labels stay marked as
+      retrospective forever &mdash; memory favours the memorable.</p>
+  </div>
+
+  <h2>Felt vs. delivered &mdash; the reference case</h2>
+  <div class="panel">
+    <p class="reason" style="max-width:70ch">Haas Founder &amp; Funder Night felt like an
+      <b>8</b> and delivered nothing. 200 people, most of them her own class, on a ladder she is
+      not climbing. Every structural feature predicted the null: spectator, wrong ladder, high
+      cohort saturation, no prior hook.</p>
+    <p class="reason" style="max-width:70ch;margin-top:14px">And the event she calls her
+      favourite &mdash; the a16z build night &mdash; produced <b>zero contacts</b>. What fired was
+      S1 and S3; S1 does not count toward a hit by design. Her best night and her worst night both
+      argue against trusting how a room felt.</p>
+    <p class="counts" style="margin-top:14px">Sitting with this rather than explaining it away.
+      Two more nulls and &ldquo;mixers feel great and deliver nothing&rdquo; stops being an
+      impression and starts being a rule.</p>
+  </div>
+
+  <div class="principles">
+    <p>A prior hook is what makes an event warm for you.</p>
+    <p>Scoring picks the room; follow-up is what converts it.</p>
+    <p>Watching people instead of watching events &mdash; let me build your watchlist.</p>
+    <p>Reasons argue with you. Rules decide for you.</p>
+  </div>
+
+  <p class="foot">Coverage: 8 subscribed Luma calendars, Haas CampusGroups, Partiful &mdash; not
+    everything in the Bay Area, everything on your calendars. 108 events scored at 07:40 UTC on
+    Sep&nbsp;21: 3 go, 8 go-for-part, 38 skip, 59 suppressed.<br>
+    The scoring model is a hand-written v0 heuristic, not fitted weights &mdash; at 2&ndash;4 events
+    a week a fitted model would be theatre. Every number on this page is read from
+    data/events.json, data/outcomes.json, data/pending_hypotheses.json and data/score_summary.json;
+    nothing here is invented, and where something is missing it says so.</p>
+</section>
+
+</div>
+</div>
+
+<main class="detail" id="detail" aria-label="Event"></main>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Every row below is copied from the project's own data files, unchanged:
+   data/events.json (scored 2026-09-21T07:40Z), data/outcomes.json,
+   data/pending_hypotheses.json, data/score_summary.json.
+   The scoring constants mirror score/scorer.py and score/verdicts.py exactly,
+   so the context strip's recompute is the real arithmetic, not a mock.
+--------------------------------------------------------------------------- */
+(function(){
+"use strict";
+
+var FORMAT_S3={build_night:2.0,hackathon:2.0,demo_day:1.5,workshop:1.0,
+  panel:0.0,fireside:0.0,mixer:0.0,lecture:0.0,"class":0.0};
+var TP_POINTS={none:0.0,wrong_ladder:0.0,some:1.0,high:2.0};
+var HOOK_MULT={none:1.0,topic:1.2};            /* 'person' is NOT in this map — see below */
+var COHORT_MULT={none:1.0,some:0.85,high:0.6};
+var COMPANIONS_MULT=1.15, DIVISOR=6.0, MAX_P=0.95;
+var GO_BAR=0.30, PART_BAR=0.15, COST_TO_PART=1.5, TRIP_DISCOUNT=1.0;
+
+function sizeMult(n){ if(!n) return 1.0; if(n<=20) return 1.15; if(n<=75) return 1.0;
+  if(n<=150) return 0.85; return 0.65; }
+
+function score(e){
+  var s3=e.part?(FORMAT_S3[e.fmt]||0):0, s2=TP_POINTS[e.tp]||0;
+  var hook=HOOK_MULT[e.hook]!==undefined?HOOK_MULT[e.hook]:1.0;
+  var coh=COHORT_MULT[e.cohort]!==undefined?COHORT_MULT[e.cohort]:1.0;
+  var comp=e.companions?COMPANIONS_MULT:1.0;
+  var v=(s3+s2)*hook*coh*comp*sizeMult(e.size);
+  return Math.round(Math.min(MAX_P,v/DIVISOR)*100)/100;
+}
+function verdictOf(e,p,cost){
+  if(!e.reachable) return p>=GO_BAR?"go_if":"suppressed";
+  if(p<PART_BAR) return "skip";
+  if(p<GO_BAR) return "part";
+  return cost>=COST_TO_PART?"part":"go";
+}
+
+var EVENTS=[
+{id:"cc-sf",url:"https://lu.ma/claude-code-workshop-sf-sept-21",
+ name:"Claude Code Workshop with Provectus - San Francisco",
+ day:"Mon Sep 21",time:"13:00",end:"17:30",city:"San Francisco",venue:null,bart:6,
+ station:"Embarcadero",hosts:["Build with Claude","Provectus"],src:"luma",
+ cal:"Claude Workshops",tier:"participant",size:0,fmt:"workshop",part:true,tp:"some",
+ hook:"topic",cohort:null,cost:0.5,companions:false,reachable:true,dur:4.5,
+ soldout:true,spots:0,approval:true,verdict:"go",p:0.40,
+ why:"S3(format=workshop,participant=True)=1.0 | S2(target_proximity=some)=1.0 | ×1.20 prior_hook=topic",
+ reason:"You would be <b>doing the thing</b>, not watching it — workshop, and you are eligible to take part. You already use the tool, so you arrive with something to say instead of an opener.",
+ risk:"RSVP is closed: sold out, and it required approval anyway. Wanting in and not getting in is not a skip — it records as <b>rejected</b> and never enters a rate.",
+ flag:null},
+
+{id:"cw-sf",url:"https://lu.ma/claude-workshop-sf-sept-21",
+ name:"Claude Workshop with Provectus - San Francisco",
+ day:"Mon Sep 21",time:"13:00",end:"17:30",city:"San Francisco",venue:null,bart:8,
+ station:"Embarcadero",hosts:["Build with Claude","Provectus"],src:"luma",
+ cal:"Claude Workshops",tier:"participant",size:0,fmt:"workshop",part:true,tp:"some",
+ hook:"topic",cohort:null,cost:0.5,companions:false,reachable:true,dur:4.5,
+ soldout:true,spots:0,approval:true,verdict:"go",p:0.40,
+ why:"S3(format=workshop,participant=True)=1.0 | S2(target_proximity=some)=1.0 | ×1.20 prior_hook=topic",
+ reason:"Identical profile to the row above, from the same host, in the same hour.",
+ risk:null,
+ flag:"Same host, same start, same score, two minutes apart on the walk from Embarcadero. The scorer has no de-duplication rule, so it ranked both and they are eating the week's two slots between them. Treat as one decision until that rule exists."},
+
+{id:"waymo",url:"https://lu.ma/dmitri-waymo-spc",
+ name:"-1 to Waymo with Dmitri Dolgov",
+ day:"Mon Sep 21",time:"14:30",end:"16:00",city:"San Francisco",venue:null,bart:12,
+ station:"Montgomery St.",hosts:["South Park Commons"],src:"luma",
+ cal:"South Park Commons",tier:"participant",size:0,fmt:"fireside",part:false,tp:"some",
+ hook:"none",cohort:null,cost:0.5,companions:false,reachable:true,dur:1.5,
+ soldout:true,spots:0,approval:true,verdict:"part",p:0.17,
+ why:"S3(format=fireside,participant=False)=0.0 | S2(target_proximity=some)=1.0",
+ reason:"A fireside is a room you sit in. The <b>people</b> are on target, the <b>format</b> gives you nothing to do — so it earns the room and not the programme.",
+ risk:"Go for the twenty minutes after it ends, which is the only part that can produce a contact. If you stay for the talk and leave at the applause, you have spent half a block on a podcast.",
+ flag:null},
+
+{id:"ewmbaa",url:"https://luma.com/ewmbaa-fall-social",
+ name:"EWMBAA East Bay Fall Social",
+ day:"Sat Sep 26",time:"18:00",end:"21:00",city:"Emeryville",venue:"Emeryville Public Market",
+ bart:16,station:"MacArthur",hosts:["*EWMBA Association (Evening & Weekend)"],src:"campusgroups",
+ cal:"Haas CampusGroups",tier:"spectator",size:0,fmt:"mixer",part:false,tp:"some",
+ hook:"none",cohort:null,cost:0.5,companions:false,reachable:true,dur:3.0,
+ soldout:null,spots:null,approval:null,verdict:"part",p:0.17,
+ why:"S3(format=mixer,participant=False)=0.0 | S2(target_proximity=some)=1.0",
+ reason:"Your own cohort, on a Saturday night. Real value, and it is <b>S4</b> — which does not count toward a hit by design.",
+ risk:"Cohort saturation is unrecorded on this row, so the 0.85 penalty that a room full of your own class should carry has not been applied. The number is probably generous.",
+ flag:null}
+];
+
+/* Next week is a real, intentionally quiet plan: one partial recommendation
+   and six settled skips. The skipped rows stay folded because the schedule is
+   the product; the audit trail belongs in the detail / learning views. */
+var NEXT_EVENTS=[
+{id:"openrouter-oct",url:"https://lu.ma/icar7u2x",name:"How AI Models Learn to Do Real Work",
+ day:"Wed Sep 30",time:"17:30",end:"20:30",city:"San Francisco",venue:null,bart:3,
+ station:"Montgomery St.",hosts:["OpenRouter"],src:"luma",cal:"OpenRouter Events",tier:"participant",
+ size:0,fmt:"panel",part:false,tp:"some",hook:"topic",cohort:"none",cost:0,companions:false,
+ reachable:true,dur:3,soldout:false,spots:476,approval:true,verdict:"part",p:0.20,
+ why:"S3(format=panel,participant=False)=0.0 | S2(target_proximity=some)=1.0 | ×1.20 prior_hook=topic",
+ reason:"The topic and room are relevant; the panel is still spectator. Go for the conversation around it, not the programme.",
+ risk:"476 spots already registered. Arrive with a specific OpenRouter question, or this becomes a large-room panel.",flag:null}
+];
+var NEXT_SKIPS=[
+ ["Wed Sep 30","11:00","The Philosopher CEO: Becoming a Wise Leader in the Age of AI","spectator",null],
+ ["Wed Sep 30","16:30","Crypto &amp; Venture Capital with Ani Pai","below bar",null],
+ ["Wed Sep 30","17:00","Property &amp; Pints","spectator",null],
+ ["Thu Oct 1","13:00","IB Chat with Haas alumnus Jeff Chang from Qatalyst","spectator",null],
+ ["Fri Oct 2","08:30","The Future of Finance Summit","spectator",null],
+ ["Sat Oct 3","10:30","costco hotdog run 🌭","below bar",null]
+];
+
+var CONDITIONAL={id:"tenex-sb",url:"https://lu.ma/tenex-claude-code-workshop-south-bay-dec",
+ name:"Claude Code Workshop with Tenex - South Bay",
+ day:"Tue Dec 8",time:"10:00",end:"13:00",city:"Sunnyvale",venue:null,bart:170,
+ station:"Milpitas",hosts:["Sarah Henkel","Tenex Training"],src:"luma",
+ cal:"Claude Workshops",tier:"participant",size:0,fmt:null,part:null,tp:null,
+ hook:null,cohort:null,cost:2.0,companions:false,reachable:false,dur:3.0,
+ soldout:false,spots:80,approval:true,verdict:"go_if",p:null,
+ unblock:"Ask Ivy if she is driving south that Tuesday.",
+ why:"S3(format=None,participant=None)=0.0 | S2(target_proximity=None)=0.0",
+ reason:"Same host, same 80-seat Claude Code workshop as the San Francisco one on Dec&nbsp;9 that the scorer put at <b>0.40</b> — one day earlier, in Sunnyvale. If someone is driving, it is the same event.",
+ flag:"This row has never been enriched: format, participant and target_proximity are all null, so it scores 0.00 and cannot rank into the top three that go_if requires. It is shown to design the state, flagged rather than faked. Its probability is blank, not borrowed from its sibling."};
+
+var SKIPS=[
+ ["Mon Sep 21","19:00","Yom Kippur Break-the-Fast Potluck","spectator",null],
+ ["Tue Sep 22","09:30","New York | Building with Claude: AI for Impact &amp; Climate","quota full",
+  "Scored 0.40 as a build night and then lost a slot to the quota — but it is in New York. Its listing carries no coordinates, so the reachability cost never applied and it competed for a Bay Area slot. Reason code is wrong; the outcome happens to be right."],
+ ["Tue Sep 22","17:00","Beyond Capitalism Yap &amp; Snacks!","spectator",null],
+ ["Tue Sep 22","18:00","Codex Community Meetup - San Francisco","below bar",
+  "0.13, just under the 0.15 line. Participant room, on-target people — and 394 RSVPs, which the size penalty cuts by a third."],
+ ["Wed Sep 23","14:30","The Future of Tech Policy in CA with Steve Hilton","spectator",null],
+ ["Wed Sep 23","16:30","Speak with Nnamdi Iregbulem, Partner at Lightspeed Ventures","spectator",null],
+ ["Wed Sep 23","17:00","afore portfolio fall showcase","spectator",null],
+ ["Wed Sep 23","17:00","VC 101: Sourcing","spectator",null],
+ ["Wed Sep 23","17:45","Story Salon #1 - Fall '26","spectator",null],
+ ["Thu Sep 24","13:30","Alumni Chat with Matt Friend, newly former CFO of Nike - Thurs 9/24 at 1:30 in C125 at Haas","spectator",null],
+ ["Thu Sep 24","16:30","ABC Mid-Autumn Festival Picnic","spectator",null],
+ ["Fri Sep 25","14:00","San Francisco | Claude Meetup - For the Business Moms: The AI Back Office You Didn't Know You Had","below bar",null],
+ ["Sat Sep 26","13:00","LAHBA BBQ - First of the Year!","spectator",null],
+ ["Sat Sep 26","17:00","FTMBA Alumni Mixer","spectator",null]
+];
+
+var HYPOTHESES=[
+ {t:"Her contacts form where there is a <q>recurring context</q> — a class, a series, a community she will be in again — not at one-off encounters.",
+  n:2, ev:"a16z build night: one-off meeting with a high-profile person, photo taken, no follow-up, and she says there won't be one. OpenRouter: both live contacts carry built-in repeat contact — she has class with one of them on Tuesdays."},
+ {t:"Convening power — the ability to assemble a room or make introductions — is a real signal that <q>target_proximity</q> misses, because that feature measures density of people <em>at</em> target companies, not who can <em>convene</em> them.",
+  n:1, ev:"Met a Berkeley junior with effectively zero target_proximity who instructs Engineering 198; all eight of its speakers come from his own network, and he offered her the course next year."},
+ {t:"S1 obtained by <q>doing</q> at a participant event behaves differently from S1 obtained by <q>listening</q> at a spectator event — the first may be worth travelling for.",
+  n:1, ev:"The agent-orchestration technique from the a16z build night is now her daily practice. S1 was demoted out of hit on the reasoning that opinions are cheap on campus; this was a technique practised, not an opinion heard."},
+ {t:"In-person, participant-ish SF events may carry more unmodeled upside — unplanned high-value encounters — than the cost model currently credits.",
+  n:1, ev:"Her words were broader (“SF doesn't matter that much”), and she narrowed them herself: that trip cost zero and the payoff came from a chance encounter. Logged as unmodeled upside, not as a reason to retire cost_blocks."},
+ {t:"Host prestige and speaker seniority predict outcomes — sharper than host_tier alone, so that a small company landing a well-known speaker outscores a generic tier-1 VC mixer.",
+  n:0, ev:"Seeded on Sep 21 at her explicit request, with zero supporting events. It is on the list so it can accumulate, not because anything supports it yet."}
+];
+
+var RECORDED=[
+ ["felt_score","9",true,"proposed from “pretty high” — correct to 8 if that is nearer"],
+ ["companions","Ivy",true,null],
+ ["trip_chained","true",true,"Friday, no class, en route to Yosemite"],
+ ["cost_blocks","0",true,null],
+ ["contacts_forming","3",true,"AI legal founder · Airwallex/Schwarzman · Eng 198 instructor"],
+ ["value_before_doors","true",false,"met the instructor in the queue outside, before it started"],
+ ["s1_pov … s4_cohort","pending T+7",false,"due Fri Sep 25"],
+ ["hit","pending",false,"not derivable until the four streams are answered"]
+];
+
+var SUSPECTED=[
+ {t:"Convening power is a real signal that <q>target_proximity</q> misses.",
+  src:"From: “all 8 of its speakers come from his own network, and he offered us the course next year.”",n:1},
+ {t:"In-person participant-ish SF events may carry more unmodeled upside than the cost model credits.",
+  src:"From: “the fact that it's in SF doesn't matter that much.” Raised once. Had the system asked that night whether to change the filter, she would have said yes — at an event that happened to cost zero.",n:1},
+ {t:"Her contacts form where there is a recurring context, not at one-off encounters.",
+  src:"From: both live contacts here have built-in repeat contact; the celebrity meeting at the last event produced nothing.",n:2}
+];
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/&(?![a-z#0-9]+;)/gi,"&amp;").replace(/</g,"&lt;");}
+function el(html){var d=document.createElement("div");d.innerHTML=html;return d.firstElementChild;}
+function pct(p){return p===null||p===undefined?"—":p.toFixed(2);}
+function where(e){
+  var bits=[];
+  if(e.venue) bits.push(esc(e.venue));
+  else if(e.city) bits.push(esc(e.city));
+  else bits.push("<b>location not on the listing</b>");
+  if(e.bart===null||e.bart===undefined) bits.push("<b>no BART distance on file</b>");
+  else if(e.reachable) bits.push(e.bart+" min walk from "+esc(e.station));
+  else bits.push("<b>"+e.bart+" min</b> from "+esc(e.station)+" \u2014 not reachable on foot");
+  return bits.join(" &middot; ");
+}
+function hostLine(e){
+  if(!e.hosts||!e.hosts.length) return "<b>no host on the listing</b>";
+  return esc(e.hosts.join(" × "));
+}
+function factors(e){
+  var out=[];
+  function f(cls,label,val){out.push('<span class="f '+cls+'"><b>'+label+'</b>'+(val?" "+esc(val):"")+'</span>');}
+  if(e.part===true) f("pos","participant","");
+  else if(e.part===false) f("neg","spectator","");
+  else f("rec","participant","unrecorded");
+  if(e.fmt) f(FORMAT_S3[e.fmt]>0?"pos":"neg","format",e.fmt.replace("_"," "));
+  else f("rec","format","unrecorded");
+  if(e.tp) f(TP_POINTS[e.tp]>0?"pos":"neg","proximity",e.tp==="wrong_ladder"?"wrong ladder":e.tp);
+  else f("rec","proximity","unrecorded");
+  if(e.hook&&e.hook!=="none") f("pos","hook",e.hook);
+  if(e.size) f(e.size>150?"neg":"","room",e.size+" rsvps");
+  f(e.cost>=1.5?"neg":(e.cost<=0.5?"pos":""),"cost",e.cost+" blocks");
+  if(e.soldout) f("neg","rsvp","closed · sold out");
+  else if(e.spots) f("","rsvp",e.spots+" spots");
+  if(e.approval) f("","gated","approval");
+  return '<div class="factors">'+out.join("")+"</div>";
+}
+var VERDICT_LABEL={go:["GO","full"],part:["GO","this part only"],go_if:["GO IF","conditional"],
+  skip:["SKIP","settled"],suppressed:["SUPPRESSED","unreachable"],wildcard:["GO","wildcard"]};
+var VERDICT_CLASS={go:"v-go",part:"v-part",go_if:"v-goif",skip:"v-skip",
+  suppressed:"v-skip",wildcard:"v-block"};
+
+function rowHTML(e){
+  var lab=VERDICT_LABEL[e.verdict];
+  var h='<article class="row'+(e.verdict==="skip"?" muted":"")+'">'
+   +'<div class="verdict '+VERDICT_CLASS[e.verdict]+'">'+lab[0]+'<small>'+lab[1]+'</small></div><div>'
+   +'<h3 class="title"><a href="#/e/'+e.id+'">'+esc(e.name)+'</a></h3>'
+   +'<div class="meta"><span class="src">'+esc(e.src)+'</span><span>'+e.day+' &middot; '+e.time
+     +(e.end?"–"+e.end:"")+'</span><i>|</i><span>'+where(e)+'</span><i>|</i><span>'+hostLine(e)+'</span></div>'
+   +'<p class="reason">'+e.reason+'</p>';
+  if(e.unblock) h+='<p class="unblock"><b>TO UNBLOCK</b> <span>'+esc(e.unblock)+'</span></p>';
+  if(e.risk) h+='<p class="risk">'+e.risk+'</p>';
+  if(e.flag) h+='<p class="flag">'+esc(e.flag)+'</p>';
+  h+=factors(e)+'</div><div class="pcol"><div class="p">'+pct(e.p)+'</div>'
+   +'<div class="plabel">P(contact∪build)</div>'
+   +(e.p===null?'<div class="plabel">unscored</div>':'')+'</div></article>';
+  return h;
+}
+
+/* ---------- render the plan ---------- */
+var stack=document.getElementById("stack"),condStack=document.getElementById("condStack"),
+    foldBody=document.getElementById("foldBody"),foldBtn=document.getElementById("foldBtn"),
+    currentWeek="current";
+function renderSkipRows(items){
+  foldBody.innerHTML="";
+  items.forEach(function(s){
+    var h='<div class="sk"><span class="d">'+s[0]+' '+s[1]+'</span><span class="t">'+s[2]
+      +(s[4]?'<span class="flag" style="margin-top:7px;display:block">'+s[4]+'</span>':'')
+      +'</span><span class="r">'+s[3]+'</span></div>';
+    foldBody.appendChild(el(h));
+  });
+}
+function renderWeek(which){
+  currentWeek=which;
+  var isNext=which==="next", events=isNext?NEXT_EVENTS:EVENTS, skips=isNext?NEXT_SKIPS:SKIPS;
+  stack.innerHTML="";events.forEach(function(e){stack.appendChild(el(rowHTML(e)));});
+  condStack.innerHTML="";document.getElementById("conditional").style.display=isNext?"none":"table";
+  document.getElementById("conditional").nextElementSibling.style.display=isNext?"none":"block";
+  condStack.style.display=isNext?"none":"flex";
+  document.getElementById("weekLabel").textContent=isNext?"Next week":"This week";
+  document.getElementById("weekRange").textContent=isNext?"Sep 28 – Oct 4":"Sep 21 – 27";
+  document.querySelector("#content .n").textContent=isNext?"1 decision":"4 decisions";
+  document.querySelector("#content").childNodes[0].nodeValue=isNext?"Next week — verdicts ":"This week — verdicts ";
+  document.querySelector("#content").nextElementSibling.textContent=isNext
+    ?"Monday 28 September – Sunday 4 October. One event earns time in the plan; six are settled below."
+    :"Monday 21 – Sunday 27 September. Four events are decisions. The rest are below, folded.";
+  foldBtn.querySelector(".n").textContent=skips.length+" skipped";
+  foldBtn.querySelector(".why").textContent=isNext?" 4 spectator · 2 below bar":" 11 spectator · 2 below bar · 1 quota full";
+  foldBtn.setAttribute("aria-expanded","false");foldBody.hidden=true;
+  foldBtn.querySelector(".chev").textContent="show all ↓";
+  renderSkipRows(skips);
+  document.querySelectorAll(".week-jump").forEach(function(b){b.classList.toggle("on",b.dataset.week===which);});
+}
+renderWeek("current");
+foldBtn.addEventListener("click",function(){
+  var open=foldBtn.getAttribute("aria-expanded")==="true";
+  foldBtn.setAttribute("aria-expanded",String(!open));
+  foldBody.hidden=open;
+  foldBtn.querySelector(".chev").textContent=open?"show all ↓":"fold away ↑";
+});
+document.querySelectorAll(".week-jump").forEach(function(b){b.addEventListener("click",function(){renderWeek(b.dataset.week);});});
+document.getElementById("prevWeek").addEventListener("click",function(){renderWeek(currentWeek==="current"?"next":"current");});
+document.getElementById("nextWeek").addEventListener("click",function(){renderWeek(currentWeek==="current"?"next":"current");});
+
+var hp=document.getElementById("hypPanel");
+HYPOTHESES.forEach(function(h){
+  var pips="";for(var i=0;i<3;i++)pips+='<span class="pip'+(i<h.n?" on":"")+'"></span>';
+  hp.appendChild(el('<div class="hyp"><div><p>'+h.t+'</p><p class="ev">'+h.ev+'</p></div>'
+   +'<div class="support"><span class="pips" aria-hidden="true">'+pips+'</span>'
+   +'<div class="c"><b>'+h.n+'</b> of 3 events</div>'
+   +'<div class="act" style="color:'+(h.n>=3?"var(--go-text)":"var(--dim)")+'">'
+   +(h.n>=3?"ACTIONABLE":"changes nothing yet")+'</div></div></div>'));
+});
+hp.appendChild(el('<p class="frozen">Three things are absent from this list by construction and '
+ +'will never appear on it: <b>what counts as a hit</b>, the <b>T+0/T+7/T+30 horizons</b>, and any '
+ +'proposal to redefine an outcome. Not greyed out, not behind a confirm — simply not '
+ +'offerable, because otherwise they become negotiable at 11pm after a good night, and every row '
+ +'collected before that night stops being comparable.</p>'));
+
+/* ---------- read-back ---------- */
+var panes=document.getElementById("panes"),recList=document.getElementById("recList"),
+    susList=document.getElementById("susList"),ft=document.getElementById("freetext");
+function renderPanes(){
+  if(recList.childElementCount) return;
+  RECORDED.forEach(function(r){
+    var val=r[2]
+      ? '<input type="text" value="'+esc(r[1])+'" aria-label="'+esc(r[0])+'">'
+      : '<span class="ro">'+esc(r[1])+'</span>';
+    recList.appendChild(el('<div class="rec"><span class="k">'+esc(r[0])+'</span><span>'+val
+      +(r[3]?'<span class="k" style="display:block;margin-top:5px">'+esc(r[3])+'</span>':'')
+      +'</span></div>'));
+  });
+  SUSPECTED.forEach(function(s){
+    susList.appendChild(el('<div class="sus">'+s.t+'<span class="src-note">'+esc(s.src)+'</span>'
+      +'<span class="ctr">'+s.n+' of 3 events · accumulating</span></div>'));
+  });
+}
+function reveal(){renderPanes();panes.hidden=false;
+  document.getElementById("recFoot").textContent="✓ Corrections write straight to outcomes.json. Applied on edit — no confirm step, because they are facts.";}
+document.getElementById("readBtn").addEventListener("click",reveal);
+document.getElementById("replayBtn").addEventListener("click",function(){
+  ft.value="Enjoyed it. The presentation itself was weak — their headline claim that "
+   +"open-weight usage beats closed-weight came entirely from their own traffic. Read the whole "
+   +"thing as built for founders, to drive adoption. The value came from the room, not the stage: "
+   +"I met the Engineering 198 instructor outside in the queue before doors opened, and all eight "
+   +"of his speakers come from his own network. Ivy drove and it was on the way to Yosemite, so "
+   +"the trip cost nothing. Honestly the fact that it's in SF doesn't matter that much — "
+   +"I'm willing to go to events in SF.";
+  reveal();
+});
+recList.addEventListener("input",function(){
+  document.getElementById("recFoot").textContent="✓ Applied to outcomes.json · luma:openro-kcis · just now.";
+});
+
+/* ================= DETAIL SCREEN ================= */
+var detail=document.getElementById("detail");
+var TINT={go:"rgba(0,185,79,.17)",part:"rgba(255,196,0,.13)",go_if:"rgba(245,128,37,.15)",
+  skip:"rgba(135,149,161,.07)",suppressed:"rgba(135,149,161,.06)"};
+var COLOR={go:"var(--go)",part:"var(--part)",go_if:"var(--cond)",skip:"var(--dim)",
+  suppressed:"var(--dim)"};
+
+function byId(id){
+  if(CONDITIONAL.id===id) return CONDITIONAL;
+  for(var i=0;i<EVENTS.length;i++) if(EVENTS[i].id===id) return EVENTS[i];
+  for(var j=0;j<NEXT_EVENTS.length;j++) if(NEXT_EVENTS[j].id===id) return NEXT_EVENTS[j];
+  return null;
+}
+
+function renderDetail(e){
+  var lab=VERDICT_LABEL[e.verdict];
+  var h=''
+  +'<div class="glow" style="--tint:'+TINT[e.verdict]+'"></div>'
+  +'<div class="sheet">'
+  +'<a class="back" href="#content">&larr; <span>THIS WEEK</span></a>'
+  +'<div class="d-eyebrow"><span>'+esc(e.src)+'</span><span>&middot;</span><span>'+esc(e.cal)+'</span>'
+    +'<span>&middot;</span><span>'+esc(e.tier)+' calendar</span></div>'
+  +'<h1 class="d-title" id="dTitle" tabindex="-1">'+esc(e.name)+'</h1>'
+  +'<div class="d-when"><span class="day">'+e.day+'</span> <span class="hrs">'+e.time
+    +(e.end?"–"+e.end:"")+'</span></div>'
+  +'<p class="d-where">'+where(e)+'<br><b>'+hostLine(e)+'</b>'
+    +(e.soldout?'<br><b style="color:var(--part)">RSVP closed — sold out</b>'
+      :(e.spots?'<br>'+e.spots+' spots left'+(e.approval?" · approval required":""):""))+'</p>'
+
+  +'<section class="d-verdict" aria-label="Verdict"><div>'
+    +'<div class="lab" id="dLab" style="color:'+COLOR[e.verdict]+'">'+lab[0]+'</div>'
+    +'<div class="sub" id="dSub">'+lab[1]+'</div>'
+    +'<p class="txt">'+e.reason+'</p>'
+    +(e.risk?'<p class="risk">'+e.risk+'</p>':'')
+    +(e.unblock?'<p class="unblock"><b>TO UNBLOCK</b> <span>'+esc(e.unblock)+'</span></p>':'')
+    +'</div>'
+    +'<div class="d-p"><div class="n" id="dP">'+pct(e.p)+'</div>'
+      +'<div class="l">P(contact∪build)</div>'
+      +'<div class="delta" id="dDelta">'+(e.p===null?"unscored":"")+'</div></div>'
+  +'</section>'
+
+  +'<div class="pills">'
+    +'<button class="pill want" id="wantBtn" type="button" aria-pressed="false">Want to go'
+      +'<span class="s">RECORDS INTENT</span></button>'
+    +'<button class="pill pass" id="passBtn" type="button" aria-pressed="false">Pass'
+      +'<span class="s">NOTHING ELSE NEEDED</span></button>'
+  +'</div>'
+
+  +'<section class="ctx" id="ctx" hidden aria-label="Context">'
+    +'<h3>Three things no crawler can see</h3>'
+    +'<p class="note">These are the biggest source of model error, and they only exist in your '
+      +'head. Answer them here and the verdict recomputes in place.</p>'
+    +'<div class="qs">'
+      +q("ride","Have a ride?")
+      +q("with","Going with someone?")
+      +q("follow","Already use this, or follow the host?")
+    +'</div>'
+    +'<p class="recomputed" id="recomputed" aria-live="polite">Nothing answered yet — the '
+      +'verdict above is still the scraped-only one.</p>'
+    +(e.approval||e.soldout?'<div class="gatebox">Gated event: RSVP needs approval'
+      +(e.soldout?" and is currently sold out":"")+'. If you want it and do not get in, that is '
+      +'<b>rejected</b>, not a pass — it never counts as a skip in any rate.'
+      +'<br><button type="button" id="rejBtn">Didn’t get in</button>'
+      +'<span id="rejMsg"></span></div>':"")
+  +'</section>'
+
+  +'<p class="passed" id="passed" hidden>Passed. <b>Nothing else is needed from you.</b>'
+    +'<span class="alt">Recorded as a pass at '+e.day+'. It will not be raised again this week, '
+    +'and it costs you nothing to have been wrong — if the same kind of room turns out to '
+    +'deliver, that shows up in the calibration panel, not here.</span></p>'
+
+  +'<section class="d-why"><h3>Why this number</h3>'+factors(e)
+    +'<p class="d-raw">'+esc(e.why)+'</p>'
+    +(e.flag?'<p class="flag" style="margin-top:14px">'+esc(e.flag)+'</p>':"")
+  +'</section>'
+
+  +'<p class="d-out"><a href="'+esc(e.url)+'" target="_blank" rel="noopener">Open the listing ↗</a></p>'
+  +'</div>';
+  return h;
+}
+function q(name,label){
+  return '<div class="q" role="group" aria-labelledby="lbl-'+name+'">'
+   +'<span class="lab" id="lbl-'+name+'">'+label+'</span><span class="seg">'
+   +'<label><input type="radio" name="'+name+'" value="yes"> Yes</label>'
+   +'<label><input type="radio" name="'+name+'" value="no"> No</label></span></div>';
+}
+
+function wireDetail(e){
+  var ctx=document.getElementById("ctx"),passed=document.getElementById("passed"),
+      wantBtn=document.getElementById("wantBtn"),passBtn=document.getElementById("passBtn");
+  wantBtn.addEventListener("click",function(){
+    wantBtn.setAttribute("aria-pressed","true");passBtn.setAttribute("aria-pressed","false");
+    ctx.hidden=false;passed.hidden=true;
+    var first=ctx.querySelector("input");if(first)first.focus();
+  });
+  passBtn.addEventListener("click",function(){
+    passBtn.setAttribute("aria-pressed","true");wantBtn.setAttribute("aria-pressed","false");
+    ctx.hidden=true;passed.hidden=false;
+  });
+  var rej=document.getElementById("rejBtn");
+  if(rej) rej.addEventListener("click",function(){
+    document.getElementById("rejMsg").innerHTML=" &nbsp;✓ recorded as <b>rejected</b> "
+      +"— excluded from every rate.";
+    rej.disabled=true;
+  });
+
+  ctx.addEventListener("change",function(){recompute(e,ctx);});
+}
+
+function answer(ctx,name){
+  var el=ctx.querySelector('input[name="'+name+'"]:checked');
+  return el?el.value:null;
+}
+
+function recompute(e,ctx){
+  var ride=answer(ctx,"ride"),withx=answer(ctx,"with"),follow=answer(ctx,"follow");
+  /* prior_hook is a single enum, so a "person" answer never overwrites a stronger
+     "topic" hook already on the row. */
+  var hook=e.hook;
+  if(follow==="yes"&&hook!=="topic") hook="person";
+  var w={part:e.part,fmt:e.fmt,tp:e.tp,cohort:e.cohort,size:e.size,
+         hook:hook,companions:(withx==="yes")};
+  var cost=e.cost, notes=[];
+  if(ride==="yes"){
+    cost=Math.max(0,cost-TRIP_DISCOUNT);
+    notes.push("<b>trip_chained → true.</b> cost "+e.cost.toFixed(1)+" → "
+      +cost.toFixed(1)+" blocks"+(e.reachable?".":", and reachability stops blocking."));
+  } else if(ride==="no"&&!e.reachable){
+    notes.push("<b>No ride.</b> "+e.bart+" minutes from "+esc(e.station)
+      +" keeps this at the unreachable cost of 2.0 blocks.");
+  }
+  if(withx==="yes") notes.push("<b>companions → true.</b> ×1.15 on value.");
+  if(follow==="yes") notes.push(
+    (e.hook==="topic" ? '<b>prior_hook stays topic.</b> ' : '<b>prior_hook \u2192 person.</b> ')
+    +'<span class="rec-unweighted">Recorded, weight 1.00 \u2014 PRIOR_HOOK_MULT holds '
+    +'\u201cnone\u201d and \u201ctopic\u201d only, so a person hook falls through unweighted '
+    +'and moves nothing. Record early, weight late: it takes 3 supporting events before this '
+    +'can change a number.</span>');
+
+  var reachable=e.reachable||ride==="yes";
+  var unscored=(e.p===null&&!e.fmt);
+  var p=unscored?null:score(w);
+  var v=unscored?"go_if":verdictOf({reachable:reachable},p,cost);
+
+  var dP=document.getElementById("dP"),dLab=document.getElementById("dLab"),
+      dSub=document.getElementById("dSub"),dDelta=document.getElementById("dDelta"),
+      out=document.getElementById("recomputed");
+  dP.textContent=pct(p);
+  if(p!==null&&e.p!==null){
+    var d=Math.round((p-e.p)*100)/100;
+    dDelta.textContent=d===0?"unchanged":(d>0?"+":"")+d.toFixed(2)+" from scraped";
+    dDelta.className="delta "+(d>0?"up":(d<0?"down":""));
+    dP.style.color=d>0?"var(--go)":(d<0?"var(--part)":"");
+  }
+  var lab=VERDICT_LABEL[v];
+  dLab.textContent=lab[0];dLab.style.color=COLOR[v];dSub.textContent=lab[1];
+  var head=(v!==e.verdict)
+    ? "<b>Verdict changed: "+VERDICT_LABEL[e.verdict][0]+" → "+lab[0]+".</b> "
+    : "";
+  if(unscored) head+="Value is still unscored — this row was never enriched, so no answer "
+    +"here can produce a probability. ";
+  out.innerHTML=notes.length?head+notes.join(" "):head+"Nothing answered yet.";
+}
+
+/* ---------- routing: opening the product is a choice, not a long scroll ---------- */
+var lastRoute=null;
+function setPage(page){
+  document.body.classList.remove("page-home","page-choose","page-readback","page-learn");
+  document.body.classList.add("page-"+page);
+  document.querySelectorAll(".rail a[data-route]").forEach(function(a){
+    a.classList.toggle("on",a.dataset.route===page);
+  });
+}
+function route(){
+  var key=location.hash||"#/home";
+  if(key===lastRoute) return;
+  lastRoute=key;
+  var m=/^#\/e\/(.+)$/.exec(location.hash||"");
+  if(m){
+    var e=byId(decodeURIComponent(m[1]));
+    if(e){
+      detail.innerHTML=renderDetail(e);
+      wireDetail(e);
+      document.body.classList.add("on-detail");
+      document.body.classList.remove("page-home","page-choose","page-readback","page-learn");
+      document.title=e.name+" — Skip or Go";
+      var t=document.getElementById("dTitle");if(t)t.focus();
+      window.scrollTo(0,0);
+      return;
+    }
+  }
+  document.body.classList.remove("on-detail");
+  detail.innerHTML="";
+  document.title="Skip or Go";
+  var page=key==="#/choose"?"choose":key==="#/readback"?"readback":key==="#/learn"?"learn":"home";
+  setPage(page);
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange",route);
+/* Some contexts (a data: URL preview, a sandboxed frame) never fire hashchange.
+   Route off the click as well; route() is idempotent on an unchanged hash. */
+document.addEventListener("click",function(ev){
+  var a=ev.target.closest&&ev.target.closest('a[href^="#"]');
+  if(a) setTimeout(route,0);
+});
+route();
+})();
+</script>
+</body>
+</html>
