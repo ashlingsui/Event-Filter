@@ -36,6 +36,14 @@ SUPABASE_DB_USER = os.environ.get("SUPABASE_DB_USER", "postgres")
 SUPABASE_DB_PASSWORD = os.environ.get("SUPABASE_DB_PASSWORD")
 SUPABASE_DB_NAME = os.environ.get("SUPABASE_DB_NAME", "postgres")
 
+# Supabase's Postgres endpoints present a chain signed by their own CA, which is not in the
+# OS/certifi trust stores. The CA certificate is PUBLIC (not a credential) and is downloaded from
+# the dashboard: Project Settings -> Database -> SSL Configuration -> Download certificate.
+# It is committed to the repo on purpose so every machine verifies against the same root.
+SUPABASE_CA_CERT = os.environ.get(
+    "SUPABASE_CA_CERT", str(Path(__file__).parent / "prod-ca-2021.crt")
+)
+
 
 def require(*names):
     missing = [n for n in names if not globals().get(n)]

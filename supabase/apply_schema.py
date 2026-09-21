@@ -6,7 +6,11 @@ loudly instead of silently no-op'ing. For a schema this security-sensitive (RLS 
 write-once trigger), a loud failure on accidental re-run is the right default — don't paper over
 it with IF NOT EXISTS/OR REPLACE without thinking about what that would hide.
 
+TLS is fully verified against Supabase's published CA — see _connection_ssl_context().
+
 Usage:
+    # once: Supabase dashboard -> Project Settings -> Database -> SSL Configuration ->
+    #       Download certificate -> save as supabase/prod-ca-2021.crt
     set -a; source supabase/.env; set +a
     python3 supabase/apply_schema.py
 """
@@ -23,18 +27,43 @@ SCHEMA_PATH = Path(__file__).parent / "schema.sql"
 
 
 def _connection_ssl_context():
-    """Supabase's pooler presents a cert chain signed by their own private
-    'Supabase Intermediate 2021 CA', which isn't in any standard OS/certifi trust store — this is
-    a documented Supabase infrastructure quirk, not a MITM: verified 2026-09-21 by inspecting the
-    live handshake directly (hostname matches *.pooler.supabase.com, O=Supabase Inc, valid dates).
-    Direct+pooler hosts and ports 5432/6543 all fail identically with the OS default context, and
-    pinning the leaf cert alone still fails chain validation (the intermediate itself has no
-    trusted parent in this environment). Verification is disabled for THIS connection only —
-    used solely to run schema.sql's non-secret DDL — never for the REST/Auth API calls elsewhere
-    in this directory, which verify normally and successfully over port 443."""
-    ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
+    """Fully-verifying TLS context, trusting Supabase's published CA in addition to the system
+    roots.
+
+    Supabase's Postgres endpoints present a chain signed by their own 'Supabase Intermediate 2021
+    CA', which is not in the OS/certifi trust stores — so the default context fails. The previous
+    version of this function responded by setting check_hostname=False and verify_mode=CERT_NONE,
+    on the reasoning that schema.sql contains only non-secret DDL.
+
+    That reasoning was wrong, and the mistake is worth keeping written down: the DDL is not the
+    asset at risk. This connection AUTHENTICATES, so SUPABASE_DB_PASSWORD crosses it during the
+    handshake. With verification disabled, any party able to intercept the connection can present
+    any certificate, complete the handshake, and collect the database password — which reaches
+    Postgres as a superuser and bypasses every RLS policy in schema.sql. "The payload is public"
+    never justifies an unverified channel that carries a credential.
+
+    The correct fix is to trust the right root, not no root. Supabase publishes the CA certificate
+    (Project Settings -> Database -> SSL Configuration -> Download certificate); it is public, not
+    a secret, and is committed to the repo so every machine verifies against the same root.
+    """
+    ca_path = Path(config.SUPABASE_CA_CERT)
+    if not ca_path.is_file():
+        raise SystemExit(
+            "Supabase CA certificate not found at {}.\n\n"
+            "Download it from the Supabase dashboard:\n"
+            "  Project Settings -> Database -> SSL Configuration -> Download certificate\n"
+            "and save it to that path (or set SUPABASE_CA_CERT to point at it).\n\n"
+            "The certificate is public, not a credential — commit it so every machine verifies\n"
+            "against the same root. TLS verification is NOT optional here: this connection "
+            "carries the database password.".format(ca_path)
+        )
+
+    # create_default_context() gives check_hostname=True and verify_mode=CERT_REQUIRED, and loads
+    # the system roots; load_verify_locations then adds Supabase's CA alongside them.
+    ctx = ssl.create_default_context()
+    ctx.load_verify_locations(cafile=str(ca_path))
+    if not ctx.check_hostname or ctx.verify_mode != ssl.CERT_REQUIRED:
+        raise SystemExit("Refusing to connect: TLS context is not fully verifying.")
     return ctx
 
 

@@ -29,9 +29,16 @@ imports it so Claude Code and Codex work from the same rules.
   before staging when relevant.
 - `SUPABASE_SERVICE_ROLE_KEY` in `supabase/.env` is malformed. Do not correct it,
   rotate credentials, or otherwise modify credentials without explicit user approval.
-- Do not run `supabase/apply_schema.py`. Its SSL context disables certificate and
-  hostname verification. Use a separately reviewed, TLS-verifying approach if schema
-  work is later authorized.
+- `supabase/apply_schema.py` now verifies TLS properly (fixed 2026-09-21). It trusts the
+  system roots plus Supabase's published CA, and refuses to connect if the context is not
+  fully verifying. It requires `supabase/prod-ca-2021.crt` (public certificate, downloaded
+  from Project Settings -> Database -> SSL Configuration) and exits with instructions if
+  it is absent.
+- Never reintroduce `check_hostname = False` or `verify_mode = CERT_NONE` anywhere. The
+  earlier justification — "schema.sql is non-secret DDL" — was wrong: that connection
+  authenticates, so the database password crosses it. An unverified channel carrying a
+  credential is never acceptable, regardless of how public the payload is.
+- Running it still requires explicit user authorization and valid credentials.
 - Do not run live Supabase scripts or tests without explicit authorization and valid,
   safely configured credentials.
 
