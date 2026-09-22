@@ -1,5 +1,5 @@
 window.EVENT_FILTER_DATA = {
-  "generated_at": "2026-09-22T06:41:52.261864Z",
+  "generated_at": "2026-09-22T06:48:25.132499Z",
   "source_scored_at": "2026-09-21T07:40:45.990196Z",
   "events": [
     {
@@ -388,7 +388,7 @@ window.EVENT_FILTER_DATA = {
       "cost_blocks": 0.5,
       "is_exploration": false,
       "why_raw": "S3(format=mixer,participant=False)=0.0 | S2(target_proximity=none)=0.0 | \u00d70.85 cohort_saturation=some | \u00d71.15 size=16",
-      "decision_line": "Social / cohort plan \u2014 kept outside the professional score.",
+      "decision_line": "Social / cohort plan. The pipeline still scored it like any professional event (0.00 P, spectator) before this override moved it here \u2014 that number isn't why it's on your plan.",
       "duplicate_of_name": null,
       "intent": "undecided",
       "rsvp_state": "none",
@@ -1449,7 +1449,7 @@ window.EVENT_FILTER_DATA = {
       "cost_blocks": 0.5,
       "is_exploration": false,
       "why_raw": "S3(format=mixer,participant=False)=0.0 | S2(target_proximity=none)=0.0 | \u00d70.85 cohort_saturation=some | \u00d70.85 size=88",
-      "decision_line": "Social / cohort plan \u2014 kept outside the professional score.",
+      "decision_line": "Social / cohort plan. The pipeline still scored it like any professional event (0.00 P, spectator) before this override moved it here \u2014 that number isn't why it's on your plan.",
       "duplicate_of_name": null,
       "intent": "undecided",
       "rsvp_state": "none",
@@ -1911,7 +1911,7 @@ window.EVENT_FILTER_DATA = {
       "cost_blocks": 1.0,
       "is_exploration": false,
       "why_raw": "S3(format=mixer,participant=False)=0.0 | S2(target_proximity=none)=0.0 | \u00d70.85 cohort_saturation=some | \u00d70.85 size=78",
-      "decision_line": "Social / cohort plan \u2014 kept outside the professional score.",
+      "decision_line": "Social / cohort plan. The pipeline still scored it like any professional event (0.00 P, spectator) before this override moved it here \u2014 that number isn't why it's on your plan.",
       "duplicate_of_name": null,
       "intent": "undecided",
       "rsvp_state": "none",
@@ -1952,7 +1952,7 @@ window.EVENT_FILTER_DATA = {
       "cost_blocks": 0.5,
       "is_exploration": false,
       "why_raw": "S3(format=mixer,participant=False)=0.0 | S2(target_proximity=none)=0.0 | \u00d70.60 cohort_saturation=high | \u00d70.65 size=161",
-      "decision_line": "Social / cohort plan \u2014 kept outside the professional score.",
+      "decision_line": "Social / cohort plan. The pipeline still scored it like any professional event (0.00 P, spectator) before this override moved it here \u2014 that number isn't why it's on your plan.",
       "duplicate_of_name": null,
       "intent": "undecided",
       "rsvp_state": "none",

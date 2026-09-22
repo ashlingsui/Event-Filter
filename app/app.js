@@ -339,7 +339,13 @@
 
     let scoreBlock;
     if (kind === "social_cohort") {
-      scoreBlock = `<p class="p-score-help">A shared plan, not a professional bet. It never receives a P and it never becomes a read-back.</p>`;
+      // score/verdicts.py scores this row like any other event — it has no "social" concept.
+      // The real P exists; show it, de-emphasized, rather than falsely claim there isn't one.
+      scoreBlock = `
+        <div class="selected-score muted-score">
+          <b>${pText(e)}</b>
+          <span>Pipeline's professional P, shown for transparency — not why this is on your plan. It never becomes a read-back.</span>
+        </div>`;
     } else {
       scoreBlock = `
         <div class="selected-score">
@@ -367,7 +373,7 @@
   function inventoryRow(e) {
     const kind = rowKind(e);
     const label = kind === "social_cohort" ? "SOCIAL" : kind === "skip" ? "SKIP" : (PROF_STATE_LABEL[e.verdict] || e.verdict.toUpperCase());
-    const scoreCell = kind === "social_cohort" ? "PLAN" : kind === "skip" ? "SETTLED" : pText(e);
+    const scoreCell = kind === "social_cohort" ? `${pText(e)} · plan` : kind === "skip" ? "SETTLED" : pText(e);
     return `<article class="inventory-row ${kind}${e.id === selectedId ? " selected" : ""}">
       <span class="item-state">${label}</span>
       <button class="event-name" type="button" data-id="${e.id}">${escapeHtml(e.name)}</button>

@@ -104,6 +104,22 @@ def _host(row):
     return ", ".join(names) if names else "Host not listed"
 
 
+def _social_line(row):
+    """score/verdicts.py has no concept of a social/cohort lane — it scores every row, including
+    these, as an ordinary professional candidate. The manual override (app/config/
+    social_cohort_overrides.json) only changes which LANE the frontend puts the row in; it does
+    not erase the real predicted_p the pipeline computed. Saying the event 'never receives a P'
+    would be false — it received one, same as everything else — so this states the real number
+    instead of hiding it, while still being clear it isn't the reason to go or skip."""
+    p = row.get("predicted_p")
+    p_txt = f"{p:.2f}" if isinstance(p, (int, float)) else "unscored"
+    return (
+        f"Social / cohort plan. The pipeline still scored it like any professional event "
+        f"({p_txt} P, {row.get('primary_reason') or 'below_bar'}) before this override moved it "
+        f"here — that number isn't why it's on your plan."
+    )
+
+
 def _decision_line(row, quota_winners_by_week, week_key):
     verdict = row.get("verdict")
     primary = row.get("primary_reason")
@@ -205,7 +221,7 @@ def build():
             "decision_line": (
                 _decision_line(row, quota_winners_by_week, wk)
                 if track == "professional"
-                else "Social / cohort plan — kept outside the professional score."
+                else _social_line(row)
             ),
             "duplicate_of_name": duplicate_of.get(row["id"]),
             "intent": row.get("intent"),
