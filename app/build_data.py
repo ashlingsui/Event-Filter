@@ -29,6 +29,24 @@ PRIVATE_OUT_PATH = APP_DIR / "generated" / "private_data.js"
 # silently reprojected into it.
 BAY_AREA_BOUNDS = {"lat_min": 37.28, "lat_max": 37.96, "lng_min": -122.46, "lng_max": -121.98}
 
+# California only (checked live 2026-09-21: covers the whole state with margin, but nothing in
+# a neighboring state). Used to drop out-of-state/international rows from the board entirely,
+# per Ashling's 2026-09-21 call: they're not "suppressed" (a solvable-friction category — a ride,
+# a long drive) — they're categorically not happening, so they don't need to be counted either.
+CALIFORNIA_BOUNDS = {"lat_min": 32.4, "lat_max": 42.1, "lng_min": -124.6, "lng_max": -114.0}
+
+# The source calendars use a "<City> | <title>" naming convention for anything outside the Bay
+# Area (confirmed live: "Barcelona | Claude...", "New York | Building with Claude...",
+# "San Francisco | Claude Meetup..."). A handful of these rows have no lat/lng at all, so the
+# only signal is the title prefix. Used ONLY to exclude — a title that doesn't match this pattern,
+# or whose city isn't recognized either way, is left alone (unknown is not false: SPEC.md's
+# missing-data policy applies to exclusion decisions too, not just displayed facts).
+CALIFORNIA_CITY_PREFIXES = {
+    "san francisco", "oakland", "berkeley", "emeryville", "palo alto", "san jose",
+    "sacramento", "los angeles", "san diego", "mountain view", "menlo park",
+    "fremont", "santa clara", "sunnyvale", "walnut creek", "san mateo", "redwood city",
+}
+
 # Real, published city coordinates — used only to orient the schematic fallback map (labels),
 # never to place an event. Projected through the same _project() function as event markers so
 # a label and a real nearby event marker land in a consistent relative position.
@@ -73,6 +91,26 @@ def _week_label(local_date):
     if monday.month == sunday.month:
         return f"{monday.strftime('%b %-d')}–{sunday.day}"
     return f"{monday.strftime('%b %-d')}–{sunday.strftime('%b %-d')}"
+
+
+def _in_california(row):
+    """True/False when confident, None when genuinely unknown (kept, never excluded — SPEC.md's
+    missing-data policy: unknown is not false)."""
+    lat, lng = row.get("lat"), row.get("lng")
+    if lat is not None and lng is not None:
+        b = CALIFORNIA_BOUNDS
+        return b["lat_min"] <= lat <= b["lat_max"] and b["lng_min"] <= lng <= b["lng_max"]
+
+    name = row.get("name") or ""
+    if "|" in name:
+        prefix = name.split("|", 1)[0].strip().lower()
+        if prefix in CALIFORNIA_CITY_PREFIXES:
+            return True
+        # A short, capitalized "<City> |" prefix that isn't a known CA city is confidently
+        # elsewhere (Barcelona, New York, Yamagata, Brisbane, Seoul all matched this live).
+        if 0 < len(prefix.split()) <= 3 and name.split("|", 1)[0].strip()[:1].isupper():
+            return False
+    return None
 
 
 def _map_bucket(row):
@@ -184,7 +222,11 @@ def build():
             seen_start_host.setdefault(key, row["name"])
 
     out_events = []
+    excluded_non_ca = []
     for row in events:
+        if _in_california(row) is False:
+            excluded_non_ca.append(row["name"])
+            continue
         wk = week_of.get(row["id"])
         bucket = _map_bucket(row)
         track = "social_cohort" if row["id"] in social_ids else "professional"
@@ -250,12 +292,21 @@ def build():
         xy = _project({"lat": lat, "lng": lng}, "bay_area")
         reference_cities.append({"name": name, "lat": lat, "lng": lng, "xy": xy})
 
+    # score_summary.json's suppressed_summary.total (59) is the raw pipeline count and includes
+    # every excluded non-California row — showing it as-is next to a board that no longer
+    # displays those rows at all would overstate what's on screen. Recompute the total from the
+    # already-CA-filtered out_events instead, so the "N suppressed" line matches what a click
+    # into the drawer can actually show.
+    ca_suppressed_total = sum(1 for e in out_events if e["verdict"] == "suppressed")
+
     public_payload = {
         "generated_at": dt.datetime.utcnow().isoformat() + "Z",
         "source_scored_at": score_summary.get("scored_at"),
         "events": out_events,
         "weeks": [{"key": k, "label": v} for k, v in sorted(week_meta.items())],
         "score_summary": score_summary,
+        "ca_suppressed_total": ca_suppressed_total,
+        "excluded_non_california_count": len(excluded_non_ca),
         "social_cohort_overrides_note": overrides_doc.get("_note"),
         "map_bounds": BAY_AREA_BOUNDS,
         "map_reference_cities": reference_cities,
@@ -274,6 +325,9 @@ def build():
     )
     print(f"wrote {OUT_PATH} ({len(out_events)} events, {len(week_meta)} weeks)")
     print(f"wrote {PRIVATE_OUT_PATH} (gitignored — outcomes + pending hypotheses)")
+    print(f"excluded {len(excluded_non_ca)} non-California events entirely (not shown, not counted):")
+    for name in excluded_non_ca:
+        print(f"  - {name}")
 
 
 if __name__ == "__main__":

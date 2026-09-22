@@ -69,6 +69,17 @@ const DataAccess = (() => {
     return raw().map_reference_cities;
   }
 
+  // California-only count, recomputed after excluding out-of-state/international rows
+  // entirely (Ashling's call, 2026-09-21) — not the raw score_summary.json total, which still
+  // includes them. getExcludedNonCaliforniaCount() exists for later use; nothing renders it today.
+  function getCaliforniaSuppressedTotal() {
+    return raw().ca_suppressed_total;
+  }
+
+  function getExcludedNonCaliforniaCount() {
+    return raw().excluded_non_california_count;
+  }
+
   return {
     getEvents,
     getEvent,
@@ -82,5 +93,7 @@ const DataAccess = (() => {
     getSocialCohortNote,
     getMapBounds,
     getMapReferenceCities,
+    getCaliforniaSuppressedTotal,
+    getExcludedNonCaliforniaCount,
   };
 })();

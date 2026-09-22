@@ -428,9 +428,11 @@
   }
 
   function renderCoverageLine(week, weekSuppressed) {
-    const summary = DataAccess.getScoreSummary();
-    const total = summary.suppressed_summary ? summary.suppressed_summary.total : 0;
-    coverageLine.innerHTML = `${total} events suppressed as unreachable across all scored weeks (${weekSuppressed.length} this week). <button id="suppressedJump" type="button">Inspect the boundary</button>`;
+    // California-only, recomputed in app/build_data.py — score_summary.json's raw total (59)
+    // still includes the out-of-state/international rows this board excludes entirely, so it
+    // no longer matches what's actually reachable from this page.
+    const total = DataAccess.getCaliforniaSuppressedTotal();
+    coverageLine.innerHTML = `${total} California events suppressed as unreachable across all scored weeks (${weekSuppressed.length} this week). <button id="suppressedJump" type="button">Inspect the boundary</button>`;
     const jump = document.getElementById("suppressedJump");
     if (jump) {
       jump.addEventListener("click", () => {

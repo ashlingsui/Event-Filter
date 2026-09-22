@@ -42,6 +42,16 @@ Python entry points execute a file-backed pipeline rooted at the repository:
     `ingest/`, `enrich/`, `score/`, or `capture/`. Re-run it after every pipeline run.
   - `app/data_access.js` is the single data-access module every view reads through. Swapping
     the local snapshot for a live Supabase backend later means rewriting this one file.
+  - `app/build_data.py` also drops any event confidently outside California entirely (not
+    shown, not counted — not even in the suppressed line), per Ashling's 2026-09-21 call: an
+    out-of-state or international row on this local pipeline's calendars isn't a solvable-
+    friction "suppressed" case, it's categorically not happening. Confident means real lat/lng
+    outside a California bounding box, or a "`<City> |` title" prefix that names a recognized
+    non-California city; a row with neither signal is left in (SPEC.md's missing-data policy —
+    unknown is not false — applies to exclusion decisions too). `score_summary.json`'s raw
+    suppressed total still includes these rows (it's the pipeline's own unmodified output); the
+    board shows a recomputed California-only total instead so the displayed number matches what
+    a click into the drawer can actually show.
   - `app/config/social_cohort_overrides.json` is a small, explicitly human-curated, mostly-
     empty allowlist of event ids to show in the board's Social/Cohort lane. It exists because
     `score/verdicts.py` has no field distinguishing a social/cohort plan from an ordinary
