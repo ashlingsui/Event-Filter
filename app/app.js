@@ -17,9 +17,21 @@
   const toggleSkips = document.getElementById("toggleSkips");
   const skipDrawer = document.getElementById("skipDrawer");
 
+  const detailOverlay = document.getElementById("detailOverlay");
+  const detailSheet = document.getElementById("detailSheet");
+  const closeDetailBtn = document.getElementById("closeDetail");
+  const wantButton = document.getElementById("wantButton");
+  const passButton = document.getElementById("passButton");
+  const contextSection = document.getElementById("context");
+  const toastEl = document.getElementById("toast");
+
   const currentWeekKey = DataAccess.getCurrentWeekKey();
   let currentWeekIndex = Math.max(0, weeks.findIndex((w) => w.key === currentWeekKey));
   let selectedId = null;
+  let detailEventId = null;
+  let detailContext = { ride: null, companion: null, hook: null };
+  let lastFocusBeforeDetail = null;
+  let toastTimer = null;
 
   // 'schematic' (default, no external dependency) or 'google' (this account's own Maps API key,
   // see app/maps_key.example.js). Falls back to schematic if no key is configured or the Google
@@ -170,6 +182,23 @@
   // has almost no contrast to register as a point at all, "quiet" or not. A light neutral grey
   // reads clearly against the dark basemap while still staying desaturated/calm, never a color.
   const KIND_HEX = { go: "#00b94f", part: "#ffc400", go_if: "#ffc400", wildcard: "#00b94f", social_cohort: "#189fd8", skip: "#cfd2cb" };
+
+  const DETAIL_GLOW = {
+    go: "rgba(0,185,79,.25)", wildcard: "rgba(0,185,79,.25)",
+    part: "rgba(255,196,0,.25)", go_if: "rgba(255,196,0,.25)",
+    social_cohort: "rgba(24,159,216,.25)", skip: "rgba(130,140,135,.16)",
+  };
+
+  // The handoff's four decision-tier lines (Set B), reserved for this exact banner per the
+  // 2026-09-21 conflict resolution — SPEC/DESIGN_BRIEF's four principle lines (Set A) stay on
+  // the board headline and Learning/About material instead. "What decision does this event
+  // deserve?" is the standing kicker above the banner (see index.html); these three answer it.
+  function principleLineFor(kind, verdict) {
+    if (kind === "social_cohort") return "A shared plan, not a professional bet.";
+    if (verdict === "go" || verdict === "go_if" || verdict === "wildcard") return "Strong room + real access. Go with intent.";
+    if (verdict === "part") return "Interesting, but the outcome is not clear enough.";
+    return "Not everything good belongs on your calendar."; // skip, suppressed, blocked
+  }
 
   function fmtTime(iso) {
     if (!iso) return "Date unknown";
@@ -585,33 +614,10 @@
       ${dupNote}
       <div class="selected-actions">
         ${e.url ? `<a href="${escapeAttr(e.url)}" target="_blank" rel="noopener">EVENT LISTING ↗</a>` : `<span class="selected-note">No listing URL recorded.</span>`}
-      </div>
-      ${moreDetailBlock(e, kind)}`;
-  }
-
-  // A compact stand-in for the full event-detail page (step 2, not built yet). Board-scoped:
-  // more of the facts already in the data, not the Want/Pass workflow or context-strip inputs,
-  // which belong to that step. Native <details> keeps it keyboard/screen-reader accessible with
-  // no extra JS.
-  function moreDetailBlock(e, kind) {
-    const rows = [
-      ["Host", e.host_display || "Not listed"],
-      ["Format", e.format || "Unknown"],
-      ["Source", e.source || "Unknown"],
-      ["RSVP state", e.rsvp_state || "none"],
-    ];
-    if (kind !== "social_cohort") {
-      rows.push(["Cost blocks", e.cost_blocks != null ? String(e.cost_blocks) : "Unknown"]);
-      rows.push(["BART walk", e.bart_walk_min != null ? `${e.bart_walk_min} min` : "Unknown"]);
-      if (e.why_raw) rows.push(["Score factors (raw)", e.why_raw]);
-    }
-    return `
-      <details class="more-detail">
-        <summary>More detail</summary>
-        <div class="detail-facts">
-          ${rows.map(([k, v]) => `<div><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`).join("")}
-        </div>
-      </details>`;
+        <button type="button" data-open-detail="${e.id}">OPEN DETAILS →</button>
+      </div>`;
+    const openBtn = selectedEventEl.querySelector("[data-open-detail]");
+    if (openBtn) openBtn.addEventListener("click", () => openDetail(e.id));
   }
 
   function inventoryRow(e) {
@@ -702,6 +708,205 @@
       renderMapSchematic(DataAccess.getEventsForWeek(currentWeek().key));
     }
   }
+
+  // ---------- Event detail overlay (step 2) ----------
+
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3400);
+  }
+
+  function renderWhyGrid(e, kind) {
+    const grid = document.getElementById("whyGrid");
+    if (kind === "social_cohort") {
+      grid.innerHTML = "";
+      return;
+    }
+    const participantTxt = e.participant === true ? "Participant" : e.participant === false ? "Spectator" : "Unknown";
+    const roomTxt = {
+      none: "No target-company density", wrong_ladder: "VC/founder room, not a target-employer room",
+      some: "Some target-company density", high: "High target-company density",
+    }[e.target_proximity] || "Unknown";
+    const hookTxt = { none: "None", topic: "Topic hook (×1.20 value)" }[e.prior_hook] || "Unknown";
+    const companionsTxt = e.companions && e.companions.length ? e.companions.join(", ") : "None recorded";
+    const cohortTxt = { none: "Low", some: "Some (×0.85 value)", high: "High (×0.60 value)" }[e.cohort_saturation] || "Unknown";
+    const travelBits = [`${e.cost_blocks != null ? e.cost_blocks : "—"} cost blocks`];
+    if (e.bart_walk_min != null) travelBits.push(`${e.bart_walk_min} min BART walk`);
+    if (e.reachable === false) travelBits.push("not BART-reachable");
+    const rows = [
+      ["Format", `${e.format || "Unknown"} · ${participantTxt}`],
+      ["Room", roomTxt],
+      ["Prior hook", hookTxt],
+      ["Companions", companionsTxt],
+      ["Cohort saturation", cohortTxt],
+      ["Travel", travelBits.join(" · ")],
+    ];
+    grid.innerHTML = rows.map(([k, v]) => `<div><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`).join("");
+  }
+
+  function renderDetailFacts(e) {
+    const rows = [
+      ["Address", e.address],
+      ["Host", e.host_display || "Not listed"],
+      ["RSVP state", e.rsvp_state || "none"],
+      ["Data status", "Pre-event score and listing provenance retained"],
+    ];
+    if (e.duplicate_of_name) rows.push(["Also listed as", `${e.duplicate_of_name} — same host and time`]);
+    if (e.recurring) rows.push(["Recurring", e.next_occurrence ? `Next: ${fmtTime(e.next_occurrence)}` : "Yes"]);
+    if (e.speakers && e.speakers.length) {
+      rows.push(["Speakers", e.speakers.map((s) => (typeof s === "string" ? s : s.name)).filter(Boolean).join(", ") || "Listed, names pending"]);
+    }
+    document.getElementById("detailFacts").innerHTML = rows.map(([k, v]) => `<div><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`).join("");
+  }
+
+  function renderProvenance(e) {
+    const scoredAt = DataAccess.getSourceScoredAt();
+    const listingLink = e.url
+      ? `<a href="${escapeAttr(e.url)}" target="_blank" rel="noopener">Open event listing ↗</a>`
+      : "No listing URL recorded.";
+    document.getElementById("provenance").innerHTML =
+      `<b>PROVENANCE</b>Source: ${escapeHtml(e.source || "unknown")}. Score facts were recorded before the decision — pipeline last scored ${escapeHtml(scoredAt || "unknown")}. ${listingLink}`;
+  }
+
+  function updateToggleUI() {
+    contextSection.querySelectorAll(".toggle").forEach((t) => {
+      const field = t.dataset.field;
+      t.querySelectorAll("button").forEach((b) => {
+        const val = b.dataset.value === "yes";
+        b.classList.toggle("selected", detailContext[field] === val);
+      });
+    });
+  }
+
+  function updateRecomputeDisplay(e, kind) {
+    const rec = document.getElementById("recompute");
+    const probEl = document.getElementById("detailProbability");
+    const anyAnswered = detailContext.ride !== null || detailContext.companion !== null || detailContext.hook !== null;
+    if (kind === "social_cohort") {
+      rec.classList.remove("show");
+      probEl.textContent = `${pText(e)} P — pipeline's number, not why this is on your plan`;
+      return;
+    }
+    if (!anyAnswered) {
+      rec.classList.remove("show");
+      probEl.textContent = `${pText(e)} P(contact ∪ build)`;
+      return;
+    }
+    const newP = Scoring.recomputeP(e, detailContext);
+    const newCost = Scoring.recomputeCostBlocks(e, detailContext);
+    const oldP = typeof e.predicted_p === "number" ? e.predicted_p : 0;
+    const oldCost = typeof e.cost_blocks === "number" ? e.cost_blocks : 0;
+    const changed = Math.abs(newP - oldP) > 0.004 || Math.abs(newCost - oldCost) > 0.004;
+    rec.classList.add("show");
+    rec.textContent = changed
+      ? `Recomputed: P ${oldP.toFixed(2)} → ${newP.toFixed(2)}, cost ${oldCost} → ${newCost} blocks. The verdict itself is decided by the next real pipeline run, not live here.`
+      : `Recomputed: no change from what was already scraped (P stays ${newP.toFixed(2)}).`;
+    probEl.textContent = `${newP.toFixed(2)} P(contact ∪ build) — recomputed live`;
+  }
+
+  function updateIntentUI(intent) {
+    wantButton.classList.toggle("selected", intent === "want");
+    passButton.classList.toggle("selected", intent === "pass");
+    contextSection.classList.toggle("open", intent === "want");
+    const status = document.getElementById("intentStatus");
+    const saved = IntentStore.get(detailEventId);
+    status.textContent = saved
+      ? `Saved on this device — ${saved.intent}, ${new Date(saved.saved_at).toLocaleString()}. Not yet part of the outcome record.`
+      : "Not recorded yet — this stays on this device only, not in data/outcomes.json.";
+  }
+
+  function saveIntent(intent) {
+    IntentStore.set(detailEventId, { intent, context: detailContext });
+    updateIntentUI(intent);
+  }
+
+  function openDetail(id) {
+    const e = DataAccess.getEvent(id);
+    if (!e) return;
+    detailEventId = id;
+    lastFocusBeforeDetail = document.activeElement;
+    const kind = rowKind(e);
+
+    detailSheet.style.setProperty("--detail-glow", DETAIL_GLOW[kind] || DETAIL_GLOW.skip);
+    document.getElementById("detailSource").textContent = e.source ? `${e.source} · listing` : "Source unknown";
+    document.getElementById("detailTitle").textContent = e.name;
+    document.getElementById("detailWhen").textContent = fmtTime(e.start);
+    document.getElementById("detailPlace").textContent = e.address;
+
+    const banner = document.getElementById("decisionBanner");
+    banner.className = `decision-banner ${kind}`;
+    const stateLabel = kind === "social_cohort" ? "SOCIAL / COHORT" : kind === "skip" ? "SETTLED SKIP" : (PROF_STATE_LABEL[e.verdict] || e.verdict.toUpperCase());
+    document.getElementById("detailVerdict").textContent = stateLabel;
+    document.getElementById("detailPrincipleLine").textContent = principleLineFor(kind, e.verdict);
+    document.getElementById("detailReason").textContent = e.decision_line;
+
+    renderWhyGrid(e, kind);
+    renderDetailFacts(e);
+    renderProvenance(e);
+
+    const saved = IntentStore.get(id);
+    detailContext = saved && saved.context ? { ...saved.context } : { ride: null, companion: null, hook: null };
+    updateToggleUI();
+    updateIntentUI(saved ? saved.intent : null);
+    updateRecomputeDisplay(e, kind);
+
+    // Intent/context only make sense for professional decisions — a social plan or a settled
+    // skip has nothing to "want" in the SPEC.md §1b sense.
+    const showIntent = kind !== "social_cohort" && kind !== "skip";
+    document.getElementById("intentPills").style.display = showIntent ? "" : "none";
+    document.getElementById("intentStatus").style.display = showIntent ? "" : "none";
+    if (!showIntent) contextSection.classList.remove("open");
+
+    detailOverlay.classList.add("open");
+    detailOverlay.setAttribute("aria-hidden", "false");
+    document.addEventListener("keydown", onDetailKeydown);
+    closeDetailBtn.focus();
+  }
+
+  function closeDetail() {
+    detailOverlay.classList.remove("open");
+    detailOverlay.setAttribute("aria-hidden", "true");
+    document.removeEventListener("keydown", onDetailKeydown);
+    if (lastFocusBeforeDetail && typeof lastFocusBeforeDetail.focus === "function") lastFocusBeforeDetail.focus();
+    detailEventId = null;
+  }
+
+  function onDetailKeydown(ev) {
+    if (ev.key === "Escape") closeDetail();
+  }
+
+  closeDetailBtn.addEventListener("click", closeDetail);
+  detailOverlay.addEventListener("click", (ev) => {
+    if (ev.target === detailOverlay) closeDetail();
+  });
+  wantButton.addEventListener("click", () => {
+    saveIntent("want");
+    showToast("Recorded as want — saved on this device. Add ride/companion/hook if it changes the picture.");
+  });
+  passButton.addEventListener("click", () => {
+    detailContext = { ride: null, companion: null, hook: null };
+    saveIntent("pass");
+    updateToggleUI();
+    const e = DataAccess.getEvent(detailEventId);
+    if (e) updateRecomputeDisplay(e, rowKind(e));
+    showToast("Passed — saved on this device. Won't be raised again this session.");
+  });
+  contextSection.querySelectorAll(".toggle button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const field = btn.closest(".toggle").dataset.field;
+      detailContext[field] = btn.dataset.value === "yes";
+      updateToggleUI();
+      const e = DataAccess.getEvent(detailEventId);
+      if (!e) return;
+      const kind = rowKind(e);
+      updateRecomputeDisplay(e, kind);
+      const intent = wantButton.classList.contains("selected") ? "want" : (passButton.classList.contains("selected") ? "pass" : "want");
+      IntentStore.set(detailEventId, { intent, context: detailContext });
+      updateIntentUI(intent);
+    });
+  });
 
   function escapeHtml(str) {
     return String(str == null ? "" : str).replace(/[&<>"']/g, (c) => (

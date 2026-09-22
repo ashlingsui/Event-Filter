@@ -21,7 +21,13 @@ Updated: 2026-09-21
   route at a time per that handoff's sequence, stopping for review after each. Step 1 (decision
   board, `#/choose`) is built in `app/`, grounded in real `data/events.json` /
   `data/score_summary.json` via `app/build_data.py` + `app/data_access.js` — no fixture data.
-  Steps 2–4 (event detail, read-back, then prep/learn/about/intake) are not built yet.
+  Step 2 (event detail overlay, opened from the board's "OPEN DETAILS" action) is now built
+  too: decision banner with the handoff's four principle lines, Want/Pass + the ride/companion/
+  warm-hook context strip with a live P recompute (`app/scoring.js`, a faithful port of
+  `score/scorer.py`'s value formula — the verdict itself stays authoritative from the next real
+  pipeline run), why-grid/facts/provenance from real fields, and per-device intent persistence
+  (`app/intent_store.js`, localStorage — explicitly not the real `capture/` layer). Steps 3–4
+  (read-back, then prep/learn/about/intake) are not built yet.
   Two conflicts were surfaced and resolved with Ashling before building: `quota_full` renders
   as "lost its slot to `<event>`", never a capacity meter; the SPEC/brief principle lines stay
   as the board headline + Learning/About material, and the handoff's four decision-tier lines

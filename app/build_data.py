@@ -245,12 +245,29 @@ def build():
             "lng": row.get("lng"),
             "map_bucket": bucket,
             "map_xy": _project(row, bucket),
+            "duration_hr": row.get("duration_hr"),
             "bart_walk_min": row.get("bart_walk_min"),
             "reachable": row.get("reachable"),
             "host_display": _host(row),
+            "host_names": row.get("host_names") or [],
             "host_tier": row.get("host_tier"),
             "format": row.get("format"),
             "size": row.get("size"),
+            "speakers": row.get("speakers") or [],
+            # Everything below is only here because app/scoring.js needs it to recompute P
+            # client-side when the event-detail context strip (ride/companion/warm-hook) changes
+            # — a faithful port of score/scorer.py's value formula, not a re-implementation of
+            # score/verdicts.py's weekly ranking. The recomputed number is real; the verdict
+            # (go/part/skip) stays authoritative from the next actual pipeline run.
+            "participant": row.get("participant"),
+            "target_proximity": row.get("target_proximity"),
+            "cohort_saturation": row.get("cohort_saturation"),
+            "prior_hook": row.get("prior_hook"),
+            "companions": row.get("companions") or [],
+            "trip_chained": row.get("trip_chained"),
+            "recurring": row.get("recurring"),
+            "next_occurrence": row.get("next_occurrence"),
+            "phase": row.get("phase"),
             "track": track,
             "verdict": row.get("verdict"),
             "primary_reason": row.get("primary_reason"),

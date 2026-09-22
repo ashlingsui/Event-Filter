@@ -62,5 +62,16 @@ Python entry points execute a file-backed pipeline rooted at the repository:
   - For local preview, `.claude/launch.json` runs `python3 -m http.server` over `app/` — that
     server is a development convenience only, not a product requirement; the shipped page
     still opens directly from disk with no server.
+  - `app/scoring.js` is a faithful client-side port of `score/scorer.py`'s VALUE formula only
+    (not `score/verdicts.py`'s weekly ranking/quota logic, which needs every other candidate
+    that week and isn't safe to reproduce from one event in the browser). It powers the event
+    detail page's live recompute when the ride/companion/warm-hook context strip changes. If
+    `scorer.py`'s formula changes, this file needs the same change — nothing enforces that they
+    stay in sync.
+  - `app/intent_store.js` persists Want/Pass + context-strip answers to `localStorage`, keyed
+    per event id. This is explicitly NOT the real capture layer (`capture/` +
+    `data/outcomes.json`) — there is no server for a static page to write to, so it's a
+    per-device stand-in, and the UI says so. Real capture into the pipeline is a separate,
+    later step.
 - `supabase/` contains a SQL schema and Python REST/onboarding/migration helpers for a future
   hosted backend. The local pipeline does not depend on a live Supabase connection.
