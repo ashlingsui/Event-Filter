@@ -304,8 +304,8 @@
         ${markers}
       </svg>
       <div class="map-legend">
-        <span><i></i>Go / Part</span>
-        <span><i class="part"></i>Go if / conditional</span>
+        <span><i></i>Go</span>
+        <span><i class="part"></i>Part / go if</span>
         <span><i class="social"></i>Social / cohort</span>
         <span><i class="skip"></i>Skip</span>
       </div>
@@ -393,11 +393,11 @@
     });
     const legend = document.createElement("div");
     legend.className = "map-legend";
-    legend.innerHTML = `<span><i></i>Go / Part</span><span><i class="part"></i>Go if / conditional</span><span><i class="social"></i>Social / cohort</span><span><i class="skip"></i>Skip</span>`;
+    legend.innerHTML = `<span><i></i>Go</span><span><i class="part"></i>Part / go if</span><span><i class="social"></i>Social / cohort</span><span><i class="skip"></i>Skip</span>`;
     eventMap.appendChild(legend);
     const caption = document.createElement("div");
     caption.className = "map-caption";
-    caption.innerHTML = `<span><b>Dot size scales with P.</b> Go and go-if pulse on their own — those are the actual picks. Hover for a name, click for the decision. A labeled tag means several events share one address.</span>`;
+    caption.innerHTML = `<span><b>Dot size scales with P.</b> Go, part, and go-if pulse on their own — every professional decision made this week. Hover for a name, click for the decision. A labeled tag means several events share one address.</span>`;
     eventMap.appendChild(caption);
     hoverTooltip = makeHoverTooltip();
     hoverTooltip.setMap(googleMap);
@@ -503,12 +503,12 @@
       googleOverlays.push({ marker, event: e });
       llBounds.extend(position);
 
-      // GO and GO_IF pulse always, not just when selected — they're the actual picks for the
-      // week, and the whole point is that they should stand out on their own when scanning a
-      // busy map, not only after you've already clicked something (Ashling's framing: "so many
-      // events going on... the highlighted ones are the ones that you picked out"). PART stays
-      // click-only — it's a lesser recommendation and doesn't compete for that attention.
-      const isPick = e.verdict === "go" || e.verdict === "go_if";
+      // GO, PART, and GO_IF all pulse always, not just when selected — they're every
+      // professional decision the board actually made this week, and the point is that they
+      // should stand out on their own when scanning a busy map, not only after you've already
+      // clicked something (Ashling's framing: "so many events going on... the highlighted ones
+      // are the ones that you picked out"). Only SKIP and SOCIAL/COHORT stay click-only.
+      const isPick = e.verdict === "go" || e.verdict === "go_if" || e.verdict === "part";
       if (isPick) {
         const halo = makeHalo();
         halo.setMap(googleMap);
