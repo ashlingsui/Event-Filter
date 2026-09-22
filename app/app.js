@@ -18,7 +18,6 @@
   const suppressedDetail = document.getElementById("suppressedDetail");
   const toggleSkips = document.getElementById("toggleSkips");
   const skipDrawer = document.getElementById("skipDrawer");
-  const sourceButton = document.getElementById("sourceButton");
 
   let currentWeekIndex = Math.max(0, weeks.findIndex((w) => w.key === TODAY_WEEK_KEY));
   let selectedId = null;
@@ -31,7 +30,45 @@
   let mapModeNote = "";
   let googleMap = null;
   let googleOverlays = []; // {circle, marker}
-  let hoverInfoWindow = null;
+  let hoverTooltip = null;
+
+  // A custom OverlayView instead of google.maps.InfoWindow — the default InfoWindow renders as
+  // a white rounded card with its own chrome (close button, pointer tail) that Google doesn't
+  // expose a clean styling API for, and it clashed badly with the dark theme. This is a plain
+  // div positioned via the map's projection, styled entirely by our own CSS (.map-hover-tooltip).
+  function makeHoverTooltip() {
+    class HoverTooltip extends google.maps.OverlayView {
+      onAdd() {
+        this.div = document.createElement("div");
+        this.div.className = "map-hover-tooltip";
+        this.getPanes().floatPane.appendChild(this.div);
+      }
+      draw() {
+        if (!this.position || !this.div) return;
+        const point = this.getProjection().fromLatLngToDivPixel(this.position);
+        if (point) {
+          this.div.style.left = `${point.x}px`;
+          this.div.style.top = `${point.y}px`;
+        }
+      }
+      show(position, name, stateLabel) {
+        this.position = position instanceof google.maps.LatLng ? position : new google.maps.LatLng(position.lat, position.lng);
+        if (this.div) {
+          this.div.innerHTML = `<b>${escapeHtml(name)}</b><small>${escapeHtml(stateLabel)}</small>`;
+          this.div.style.display = "block";
+        }
+        this.draw();
+      }
+      hide() {
+        if (this.div) this.div.style.display = "none";
+      }
+      onRemove() {
+        if (this.div && this.div.parentNode) this.div.parentNode.removeChild(this.div);
+        this.div = null;
+      }
+    }
+    return new HoverTooltip();
+  }
 
   const PROFESSIONAL_VERDICTS = new Set(["go", "part", "go_if", "wildcard"]);
   const PROF_STATE_LABEL = { go: "GO", part: "PART", go_if: "GO IF", wildcard: "WILDCARD" };
@@ -265,7 +302,8 @@
     caption.className = "map-caption";
     caption.innerHTML = `<span><b>Radius scales with P.</b> Hover for the name, click for the decision.</span>`;
     eventMap.appendChild(caption);
-    hoverInfoWindow = new google.maps.InfoWindow({ disableAutoPan: true });
+    hoverTooltip = makeHoverTooltip();
+    hoverTooltip.setMap(googleMap);
     return googleMap;
   }
 
@@ -327,11 +365,8 @@
       });
       const onSelect = () => selectEvent(e.id);
       const stateLabel = kind === "social_cohort" ? "Social / cohort" : kind === "skip" ? "Skip" : (PROF_STATE_LABEL[e.verdict] || e.verdict);
-      const onHover = () => {
-        hoverInfoWindow.setContent(`<div style="font:12px/1.3 sans-serif;color:#111;max-width:220px"><b>${escapeHtml(e.name)}</b><br><span style="color:#555">${escapeHtml(stateLabel)}</span></div>`);
-        hoverInfoWindow.open({ map: googleMap, anchor: marker });
-      };
-      const onUnhover = () => hoverInfoWindow.close();
+      const onHover = () => hoverTooltip.show(position, e.name, stateLabel);
+      const onUnhover = () => hoverTooltip.hide();
       [circle, marker].forEach((overlay) => {
         overlay.addListener("click", onSelect);
         overlay.addListener("mouseover", onHover);
@@ -526,17 +561,6 @@
     const open = skipDrawer.classList.toggle("open");
     toggleSkips.setAttribute("aria-expanded", String(open));
     toggleSkips.textContent = open ? "Hide suppressed events" : "Show suppressed events";
-  });
-  sourceButton.addEventListener("click", () => {
-    const generatedAt = DataAccess.getGeneratedAt();
-    const scoredAt = DataAccess.getSourceScoredAt();
-    window.alert(
-      "Data source: data/events.json + data/score_summary.json (local pipeline, not Supabase).\n" +
-      `Pipeline last scored: ${scoredAt}\n` +
-      `Frontend snapshot built: ${generatedAt}\n` +
-      `Map: ${mapMode === "google" ? "Google Maps (app/maps_key.local.js)" : "schematic fallback (no key configured, or Google failed to load)"}\n` +
-      "Regenerate with: python3 app/build_data.py"
-    );
   });
 
   function boot() {
