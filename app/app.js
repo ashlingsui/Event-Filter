@@ -31,6 +31,7 @@
   let googleOverlays = []; // {marker, event}
   let clusterBadgeOverlays = []; // one per real-world cluster with 2+ events
   let selectionHalo = null; // one reusable DOM overlay, shown around whichever marker is selected
+  let standingHaloOverlays = []; // one per GO/GO_IF event — these pulse always, not just on selection
   let hoverTooltip = null;
 
   // A custom OverlayView instead of google.maps.InfoWindow — the default InfoWindow renders as
@@ -77,8 +78,8 @@
   // itself isn't moving and the marker alone could get lost in a cluster. Respects
   // prefers-reduced-motion (DESIGN_BRIEF.md baseline requirement) by falling back to a static
   // ring rather than disabling the indicator entirely.
-  function makeSelectionHalo() {
-    class SelectionHalo extends google.maps.OverlayView {
+  function makeHalo() {
+    class Halo extends google.maps.OverlayView {
       // setMap() schedules onAdd() asynchronously — it does NOT run synchronously before the
       // next line executes. The very first renderMapGoogle() call runs show() immediately after
       // ensureGoogleMap()'s setMap(), so this.div was reliably still null at that point: the
@@ -125,7 +126,7 @@
         this.div = null;
       }
     }
-    return new SelectionHalo();
+    return new Halo();
   }
 
   // A small persistent (not hover-only) badge at a real cluster's true center, tallying what's
@@ -396,11 +397,11 @@
     eventMap.appendChild(legend);
     const caption = document.createElement("div");
     caption.className = "map-caption";
-    caption.innerHTML = `<span><b>Dot size scales with P.</b> Hover for the name, click for the decision. A labeled tag means several events share one address.</span>`;
+    caption.innerHTML = `<span><b>Dot size scales with P.</b> Go and go-if pulse on their own — those are the actual picks. Hover for a name, click for the decision. A labeled tag means several events share one address.</span>`;
     eventMap.appendChild(caption);
     hoverTooltip = makeHoverTooltip();
     hoverTooltip.setMap(googleMap);
-    selectionHalo = makeSelectionHalo();
+    selectionHalo = makeHalo();
     selectionHalo.setMap(googleMap);
     return googleMap;
   }
@@ -450,6 +451,8 @@
     googleOverlays = [];
     clusterBadgeOverlays.forEach((b) => b.setMap(null));
     clusterBadgeOverlays = [];
+    standingHaloOverlays.forEach((h) => h.setMap(null));
+    standingHaloOverlays = [];
     selectionHalo.hide();
     let selectedShown = false;
 
@@ -500,7 +503,19 @@
       googleOverlays.push({ marker, event: e });
       llBounds.extend(position);
 
-      if (isSelected) {
+      // GO and GO_IF pulse always, not just when selected — they're the actual picks for the
+      // week, and the whole point is that they should stand out on their own when scanning a
+      // busy map, not only after you've already clicked something (Ashling's framing: "so many
+      // events going on... the highlighted ones are the ones that you picked out"). PART stays
+      // click-only — it's a lesser recommendation and doesn't compete for that attention.
+      const isPick = e.verdict === "go" || e.verdict === "go_if";
+      if (isPick) {
+        const halo = makeHalo();
+        halo.setMap(googleMap);
+        halo.show(position, color);
+        standingHaloOverlays.push(halo);
+      }
+      if (isSelected && !isPick) {
         selectionHalo.show(position, color);
         selectedShown = true;
       }
