@@ -607,15 +607,16 @@
 
     selectedEventEl.innerHTML = `
       <div class="selected-state">${stateLabel} · SELECTED</div>
-      <h2>${escapeHtml(e.name)}</h2>
+      <h2><button type="button" class="selected-title-link" data-open-detail="${e.id}">${escapeHtml(e.name)}</button></h2>
       <div class="selected-address">${escapeHtml(e.address)} · ${escapeHtml(fmtTime(e.start))}</div>
       <p class="selected-line">${escapeHtml(e.decision_line)}</p>
       ${scoreBlock}
       ${dupNote}
       <div class="selected-actions">
         ${e.url ? `<a href="${escapeAttr(e.url)}" target="_blank" rel="noopener">EVENT LISTING ↗</a>` : `<span class="selected-note">No listing URL recorded.</span>`}
-        <button type="button" data-open-detail="${e.id}">OPEN DETAILS →</button>
       </div>`;
+    // Same pattern as the board title/detail title elsewhere: the title itself is the primary
+    // link, here into this event's detail page — not a separate "open details" button.
     const openBtn = selectedEventEl.querySelector("[data-open-detail]");
     if (openBtn) openBtn.addEventListener("click", () => openDetail(e.id));
   }

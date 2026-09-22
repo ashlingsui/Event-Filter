@@ -96,6 +96,8 @@ a{color:inherit}
 .signal-side{border-top:1px solid var(--line)}
 .selected-event{padding:16px 0 19px;border-bottom:1px solid var(--line)}
 .selected-event h2{font-size:21px;line-height:1.16;font-weight:500;margin:7px 0 10px;letter-spacing:-.02em}
+.selected-title-link{border:0;background:transparent;padding:0;margin:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.selected-title-link:hover{text-decoration:underline;text-decoration-color:var(--go)}
 .selected-state{font:11px var(--mono);letter-spacing:.08em;color:var(--go)}
 .selected-event.part .selected-state,.selected-event.go_if .selected-state{color:var(--part)}
 .selected-event.social_cohort .selected-state{color:var(--blue)}
