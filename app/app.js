@@ -310,6 +310,35 @@
     return googleMap;
   }
 
+  // Real campus venues repeat the exact same lat/lng (one building hosts many club events) —
+  // confirmed live: 10 plottable events this week share one Haas coordinate, including every
+  // social/cohort event. Without spreading them apart, every marker stacks on one pixel and only
+  // whichever one happens to draw last is visible — which is why the blue social markers were
+  // invisible, not filtered out. Same technique as the schematic SVG's clustering, done in real
+  // lat/lng degrees instead of pixels so it still plots at an honest, traceable location.
+  function spreadOverlappingPositions(events) {
+    const clusters = [];
+    events.forEach((e) => {
+      const hit = clusters.find((c) => Math.abs(c.lat - e.lat) < 0.0002 && Math.abs(c.lng - e.lng) < 0.0002);
+      if (hit) hit.items.push(e);
+      else clusters.push({ lat: e.lat, lng: e.lng, items: [e] });
+    });
+    const out = [];
+    clusters.forEach((c) => {
+      const n = c.items.length;
+      const ringM = n > 1 ? Math.min(220, 70 + n * 20) : 0;
+      const latDegPerM = 1 / 111320;
+      const lngDegPerM = 1 / (111320 * Math.cos((c.lat * Math.PI) / 180));
+      c.items.forEach((e, i) => {
+        const angle = (2 * Math.PI * i) / n - Math.PI / 2;
+        const lat = n > 1 ? c.lat + ringM * Math.cos(angle) * latDegPerM : c.lat;
+        const lng = n > 1 ? c.lng + ringM * Math.sin(angle) * lngDegPerM : c.lng;
+        out.push({ event: e, lat, lng });
+      });
+    });
+    return out;
+  }
+
   function renderMapGoogle(weekEvents) {
     ensureGoogleMap();
     googleOverlays.forEach(({ circle, marker }) => {
@@ -326,7 +355,7 @@
     }
 
     const llBounds = new google.maps.LatLngBounds();
-    plottable.forEach((e) => {
+    spreadOverlappingPositions(plottable).forEach(({ event: e, lat, lng }) => {
       const kind = rowKind(e);
       // "Skips remain quiet" (DESIGN_V12_HANDOFF.md) means lower-contrast, not invisible. Two
       // rounds of tuning: a dark-grey/22%-opacity circle was invisible against dark map tiles;
@@ -340,7 +369,7 @@
       else if (kind === "skip") { radiusM = 140; fillOpacity = 0.4; strokeOpacity = 0.9; }
       else radiusM = 120 + 700 * (e.predicted_p || 0);
       const color = KIND_HEX[kind] || "#7e8782";
-      const position = { lat: e.lat, lng: e.lng };
+      const position = { lat, lng };
       const isSelected = e.id === selectedId;
 
       const circle = new google.maps.Circle({
