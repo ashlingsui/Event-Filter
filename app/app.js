@@ -99,7 +99,12 @@
     const defaultPick = professional.find((e) => e.verdict === "go") || professional[0] || social[0] || skip[0] || null;
     selectedId = defaultPick ? defaultPick.id : null;
 
-    if (mapMode === "google" && googleMap) renderMapGoogle(events);
+    // Bug fixed 2026-09-22: this used to also require `googleMap` truthy, but googleMap only
+    // becomes truthy INSIDE renderMapGoogle (via ensureGoogleMap) — so the very first render
+    // after Google's script loads always failed this check and silently fell back to the
+    // schematic map, even though google.maps had loaded correctly. mapMode alone is the right
+    // gate; renderMapGoogle creates the map lazily on its own first call.
+    if (mapMode === "google") renderMapGoogle(events);
     else renderMapSchematic(events);
     renderSelected(selectedId ? DataAccess.getEvent(selectedId) : null);
     renderInventory(professional, social, skip);
@@ -448,7 +453,7 @@
       const btn = row.querySelector("button.event-name");
       row.classList.toggle("selected", btn && btn.dataset.id === id);
     });
-    if (mapMode === "google" && googleMap) {
+    if (mapMode === "google") {
       renderMapGoogle(DataAccess.getEventsForWeek(currentWeek().key));
     } else {
       document.querySelectorAll(".map-point").forEach((node) => {
