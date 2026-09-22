@@ -1,0 +1,10 @@
+{
+  "_note": "DRAFT — unreviewed by Ashling. score/verdicts.py has no field distinguishing a social/cohort plan from an ordinary low-scoring professional event, and a per-club rule doesn't work (the same club hosts both kinds of event — see DESIGN_V12_HANDOFF review, 2026-09-21). This file is a manual, per-event allowlist so the board can still show a Social/Cohort lane without inventing a classification. Every id below is Claude's best guess from the event name alone, not a confirmed fact — confirm or edit each entry before trusting the lane. Unlisted events are never auto-classified; they keep their real pipeline verdict.",
+  "schema_version": 1,
+  "social_cohort_event_ids": {
+    "campusgroups:2251370": "Yom Kippur Break-the-Fast Potluck — guess: religious/cultural communal meal, not a networking format",
+    "campusgroups:2251366": "ABC Mid-Autumn Festival Picnic — guess: cultural celebration",
+    "campusgroups:2251331": "LAHBA BBQ — First of the Year! — guess: affinity-club social",
+    "campusgroups:2251350": "FTMBA Alumni Mixer — SPEC.md §2 explicitly calls FTMBA events cohort events"
+  }
+}

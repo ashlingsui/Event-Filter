@@ -13,6 +13,11 @@ supabase/.temp/
 data/outcomes.json
 data/contacts*
 data/pending_hypotheses.json
+# Generated from the two files above by app/build_data.py — same privacy boundary applies.
+app/generated/private_data.js
+
+# --- Google Maps API key (client-side key, but still: your own key, your own config) ---
+app/maps_key.local.js
 
 # --- Python ---
 __pycache__/
