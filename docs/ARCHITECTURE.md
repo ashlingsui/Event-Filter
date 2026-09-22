@@ -83,5 +83,13 @@ Python entry points execute a file-backed pipeline rooted at the repository:
     `data/outcomes.json`. The read-back view reads `data/outcomes.json` and
     `data/pending_hypotheses.json` directly (via `private_data.js`, gitignored) — real, sensitive,
     named-people data, never the committed `data.js`.
+  - `app/local_outcomes_store.js` covers events the local pipeline never scored at all — one
+    Ashling reaches by pasting a link into the read-back view's "Add an event by link" form.
+    These can never become real `data/outcomes.json` rows (no server for a static page to write
+    to), so they live entirely in `localStorage`, are always labeled "Added by you," and only
+    collect what SPEC.md §1's T+0/T+1 capture point actually defines: `felt_score` (0-10) + one
+    free-text line. They deliberately don't collect s1-s4/`hit` — those need the T+7 recognition
+    method (show the scraped names, ask "any of these?"), which has no meaning for an event this
+    page never scraped anything about.
 - `supabase/` contains a SQL schema and Python REST/onboarding/migration helpers for a future
   hosted backend. The local pipeline does not depend on a live Supabase connection.

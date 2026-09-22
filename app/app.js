@@ -941,6 +941,14 @@
     return outcomes && outcomes.rows ? outcomes.rows : [];
   }
 
+  // Real pipeline rows first, then anything added by link (LocalOutcomeStore) — sorted newest
+  // first within each group so a just-added event is easy to find.
+  function readbackAllRows() {
+    const real = readbackOutcomeRows().slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+    const local = LocalOutcomeStore.getAll().slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+    return [...real, ...local];
+  }
+
   const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   function fmtDateShort(dateStr) {
     if (!dateStr) return "Unknown date";
@@ -968,20 +976,36 @@
 
   function populateReadbackSelect() {
     const select = document.getElementById("readbackEvent");
-    const rows = readbackOutcomeRows();
+    const rows = readbackAllRows();
     select.innerHTML = rows.length
-      ? rows.map((r) => `<option value="${escapeAttr(r.event_id)}">${escapeHtml(fmtDateShort(r.date))} · ${escapeHtml(r.name)} · ${escapeHtml(readbackStatusLabel(r))}</option>`).join("")
+      ? rows.map((r) => `<option value="${escapeAttr(r.event_id)}">${escapeHtml(fmtDateShort(r.date))} · ${escapeHtml(r.name)} · ${escapeHtml(r.local ? "Added by you" : readbackStatusLabel(r))}</option>`).join("")
       : `<option value="">No attended events recorded yet</option>`;
   }
 
   function renderRecordedFacts(row) {
     const container = document.getElementById("recordedFacts");
     const notesContainer = document.getElementById("pendingNotesList");
+    const sourceEl = document.getElementById("recordedSource");
     if (!row) {
       container.innerHTML = `<p class="recorded-empty">No attended events yet.</p>`;
       notesContainer.innerHTML = "";
+      sourceEl.textContent = "facts · from data/outcomes.json";
       return;
     }
+
+    if (row.local) {
+      // Added by link, not the pipeline — the only real "facts" are what she typed herself.
+      sourceEl.textContent = "facts · added by you, this device only";
+      const rows = [["date", fmtDateShort(row.date)]];
+      if (row.url) rows.push(["link", row.url]);
+      rows.push(["felt_score", row.felt_score != null ? String(row.felt_score) : "not set yet"]);
+      if (row.felt_note) rows.push(["felt_note", row.felt_note]);
+      container.innerHTML = rows.map(([k, v]) => `<div class="fact"><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`).join("");
+      notesContainer.innerHTML = "";
+      return;
+    }
+
+    sourceEl.textContent = "facts · from data/outcomes.json";
     const rows = [];
     rows.push(["attended", row.partial ? "true (partial)" : String(!!row.attended)]);
     if (row.felt_score != null) rows.push(["felt_score", String(row.felt_score)]);
@@ -1027,38 +1051,42 @@
 
   function selectReadbackEvent(eventId) {
     readbackEventId = eventId || null;
-    const row = readbackOutcomeRows().find((r) => r.event_id === eventId) || null;
+    const row = readbackAllRows().find((r) => r.event_id === eventId) || null;
     const select = document.getElementById("readbackEvent");
     if (eventId && select.value !== eventId) select.value = eventId;
 
     const statusEl = document.getElementById("readbackStatus");
     const promptEl = document.getElementById("readbackPrompt");
+    const feltInput = document.getElementById("feltScoreInput");
+    const feltRange = document.getElementById("feltScoreRange");
     if (!row) {
       statusEl.textContent = "";
       promptEl.textContent = "Tell me what happened";
+      feltInput.hidden = true;
     } else {
-      statusEl.textContent = `${row.name.toUpperCase()} · ${fmtDateShort(row.date).toUpperCase()} · ${readbackStatusLabel(row).toUpperCase()}`;
+      statusEl.textContent = `${row.name.toUpperCase()} · ${fmtDateShort(row.date).toUpperCase()} · ${(row.local ? "ADDED BY YOU" : readbackStatusLabel(row).toUpperCase())}`;
       promptEl.textContent = `Tell me what happened at ${row.name}`;
+      // Felt-score capture only makes sense for events added by link — a real outcomes.json row
+      // already has its own felt_score set by the actual T+0 capture; this page doesn't write
+      // back to that real record (no server to write it to).
+      feltInput.hidden = !row.local;
+      if (row.local) {
+        const val = row.felt_score != null ? row.felt_score : 5;
+        feltRange.value = val;
+        document.getElementById("feltScoreValue").textContent = String(val);
+      }
     }
     renderRecordedFacts(row);
     renderSuspectedHypotheses(row);
   }
 
   function renderReadback() {
-    const outcomes = DataAccess.getOutcomes();
-    if (!outcomes) {
-      document.getElementById("readbackEvent").innerHTML = `<option value="">No local outcomes data</option>`;
-      document.getElementById("readbackStatus").textContent = "app/generated/private_data.js is missing — run python3 app/build_data.py locally to populate it from data/outcomes.json.";
-      document.getElementById("readbackPrompt").textContent = "Tell me what happened";
-      document.getElementById("recordedFacts").innerHTML = "";
-      document.getElementById("pendingNotesList").innerHTML = "";
-      document.getElementById("suspectedHypotheses").innerHTML = "";
-      document.getElementById("awaitingNote").textContent = "";
-      return;
-    }
     populateReadbackSelect();
-    const rows = readbackOutcomeRows();
+    const rows = readbackAllRows();
     selectReadbackEvent(rows.length ? rows[0].event_id : null);
+    if (!DataAccess.getOutcomes()) {
+      showToast("No local pipeline outcomes (app/generated/private_data.js missing) — you can still add events by link below.");
+    }
   }
 
   document.getElementById("readbackEvent").addEventListener("change", (ev) => selectReadbackEvent(ev.target.value));
@@ -1066,10 +1094,52 @@
     const textarea = document.getElementById("readbackFeedback");
     const text = textarea.value.trim();
     if (!text || !readbackEventId) return;
-    ReadbackStore.addNote(readbackEventId, text);
+    const row = readbackAllRows().find((r) => r.event_id === readbackEventId);
+    if (row && row.local) {
+      LocalOutcomeStore.setFeeling(readbackEventId, { felt_note: text });
+      showToast("Saved on this device — your own note, not a scored or verified record.");
+    } else {
+      ReadbackStore.addNote(readbackEventId, text);
+      showToast("Saved on this device as a note — not yet a recorded fact. capture_feedback.py is still the real path into data/outcomes.json.");
+    }
     textarea.value = "";
-    renderRecordedFacts(readbackOutcomeRows().find((r) => r.event_id === readbackEventId) || null);
-    showToast("Saved on this device as a note — not yet a recorded fact. capture_feedback.py is still the real path into data/outcomes.json.");
+    renderRecordedFacts(readbackAllRows().find((r) => r.event_id === readbackEventId) || null);
+  });
+
+  const feltScoreRange = document.getElementById("feltScoreRange");
+  feltScoreRange.addEventListener("input", () => {
+    document.getElementById("feltScoreValue").textContent = feltScoreRange.value;
+  });
+  feltScoreRange.addEventListener("change", () => {
+    if (!readbackEventId) return;
+    LocalOutcomeStore.setFeeling(readbackEventId, { felt_score: Number(feltScoreRange.value) });
+    renderRecordedFacts(readbackAllRows().find((r) => r.event_id === readbackEventId) || null);
+  });
+
+  const toggleAddEvent = document.getElementById("toggleAddEvent");
+  const addEventForm = document.getElementById("addEventForm");
+  toggleAddEvent.addEventListener("click", () => {
+    const open = addEventForm.hidden;
+    addEventForm.hidden = !open;
+    toggleAddEvent.setAttribute("aria-expanded", String(open));
+    toggleAddEvent.textContent = open
+      ? "− Hide the add-event form"
+      : "+ Add an event by link — one the pipeline never scored";
+  });
+  addEventForm.addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    const url = document.getElementById("addEventUrl").value.trim();
+    const name = document.getElementById("addEventName").value.trim();
+    const date = document.getElementById("addEventDate").value;
+    if (!url || !name) return;
+    const row = LocalOutcomeStore.add({ url, name, date });
+    addEventForm.reset();
+    addEventForm.hidden = true;
+    toggleAddEvent.setAttribute("aria-expanded", "false");
+    toggleAddEvent.textContent = "+ Add an event by link — one the pipeline never scored";
+    populateReadbackSelect();
+    selectReadbackEvent(row.event_id);
+    showToast(`Added "${row.name}" — saved on this device. Set how it felt and add a note below.`);
   });
 
   // ---------- Routing ----------

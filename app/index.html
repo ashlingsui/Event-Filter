@@ -97,6 +97,33 @@
           </div>
           <p id="readbackStatus"></p>
         </div>
+
+        <button type="button" id="toggleAddEvent" class="link-btn" aria-expanded="false">+ Add an event by link — one the pipeline never scored</button>
+        <form id="addEventForm" class="add-event-form" hidden>
+          <div class="add-event-row">
+            <label for="addEventUrl">Event link</label>
+            <input type="url" id="addEventUrl" placeholder="https://…" required>
+          </div>
+          <div class="add-event-row">
+            <label for="addEventName">What was it called?</label>
+            <input type="text" id="addEventName" placeholder="Event name" required>
+          </div>
+          <div class="add-event-row">
+            <label for="addEventDate">Date</label>
+            <input type="date" id="addEventDate">
+          </div>
+          <button type="submit" class="primary">Add and record my feeling →</button>
+          <p class="add-event-help">Saved on this device only — this can never become a real row in <code>data/outcomes.json</code> (no server for a static page to write to). It's a place to jot your own reaction down before you forget it, not a scored or verified record.</p>
+        </form>
+
+        <div class="felt-score-input" id="feltScoreInput" hidden>
+          <label for="feltScoreRange">HOW DID IT FEEL? (0–10, your own T+0 read)</label>
+          <div class="felt-score-row">
+            <input type="range" id="feltScoreRange" min="0" max="10" step="1" value="5">
+            <output id="feltScoreValue" for="feltScoreRange">5</output>
+          </div>
+        </div>
+
         <label for="readbackFeedback" id="readbackPrompt">Tell me what happened</label>
         <textarea id="readbackFeedback" placeholder="e.g. The stage was weak, but I met someone in the line who runs a course with eight industry speakers."></textarea>
         <div class="say-foot">
@@ -107,7 +134,7 @@
 
       <div class="readback-flow">
         <section class="recorded" id="recordedPane">
-          <div class="pane-top"><h2>Recorded</h2><span>facts · from data/outcomes.json</span></div>
+          <div class="pane-top"><h2>Recorded</h2><span id="recordedSource">facts · from data/outcomes.json</span></div>
           <div id="recordedFacts"></div>
           <div id="pendingNotesList"></div>
         </section>
@@ -172,6 +199,7 @@
 <script src="scoring.js"></script>
 <script src="intent_store.js"></script>
 <script src="readback_store.js"></script>
+<script src="local_outcomes_store.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
