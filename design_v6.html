@@ -375,13 +375,15 @@
   .v5-plan h2{margin-top:38px}
   .section-note{font-family:var(--mono);font-size:11px;color:var(--dim);margin:10px 0 0;line-height:1.6;max-width:75ch}
   .plan-stack{margin-top:12px;border:2px solid var(--ink);background:var(--surface);padding-inline:16px}
-  .plan-row{display:grid;grid-template-columns:112px 1fr;gap:20px;padding:18px 0;border-bottom:2px solid var(--line-soft)}
+  .plan-row{display:grid;grid-template-columns:112px 1fr auto;gap:20px;padding:18px 0;border-bottom:2px solid var(--line-soft)}
   .plan-row:first-child{border-top:2px solid var(--line-soft)}.plan-row:last-child{border-bottom:0}
   .plan-label{font:600 12px var(--mono);letter-spacing:.1em;padding:5px 0 5px 12px;border-left:3px solid var(--line);color:var(--dim)}
   .plan-label.go{border-color:var(--go);color:var(--go-text)}.plan-label.part{border-color:var(--part);color:var(--part-text)}
   .plan-label.social{border-color:var(--data);color:var(--data-text)}.plan-label.skip{border-color:var(--line);color:var(--dim)}
   .plan-title{font-size:18px;line-height:1.25;font-weight:600;margin:0}.plan-title a{text-decoration:none}.plan-title a:hover{color:var(--data-text);text-decoration:underline;text-underline-offset:3px}
   .plan-meta{font:11px var(--mono);color:var(--dim);margin-top:5px}.plan-reason{font-size:14px;margin:5px 0 0;color:var(--muted);max-width:65ch}
+  .plan-score{font-family:var(--mono);text-align:right;min-width:56px;padding-top:2px}.plan-score b{display:block;font-size:22px;line-height:1;color:var(--text);letter-spacing:-.06em}.plan-score span{display:block;margin-top:5px;font-size:9px;letter-spacing:.1em;color:var(--dim)}
+  .plan-score.go b{color:var(--go-text)}.plan-score.part b{color:var(--part-text)}
   .social-band{margin-top:40px;background:var(--surface-2);border:2px solid var(--ink);padding:0 16px 16px}.social-band h2{margin-top:0;transform:translateY(-1px)}
   .social-band .plan-stack{margin-top:12px;border-color:var(--ink)}
   .social-band .plan-row{border-color:var(--line-soft)}
@@ -389,11 +391,14 @@
   .set-aside{margin-top:40px}.set-aside .plan-title{font-size:16px;font-weight:500}.set-aside .plan-row{padding-block:15px}
   .set-aside .plan-reason{font-size:13.5px}
   .learning-intro{max-width:72ch;margin-top:10px;padding:14px 16px;background:var(--surface-2);border-left:4px solid var(--data-text);font-size:14px;color:var(--muted)}
+  .about-page{max-width:880px}.about-page .panel{max-width:860px}.about-page h3{font:600 16px var(--mono);letter-spacing:-.03em;margin:0}.about-page .panel p{max-width:70ch;color:var(--muted)}
+  .loop{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--ink);border:2px solid var(--ink);margin-top:16px}.loop div{background:var(--surface);padding:15px;min-height:115px}.loop b{display:block;font:600 11px var(--mono);letter-spacing:.1em;color:var(--data-text)}.loop span{display:block;margin-top:8px;font-size:13px;line-height:1.4;color:var(--muted)}
   body.page-home .home{display:block}
   body.page-home .week,body.page-home .rail{display:none}
-  body.page-choose .readback-page,body.page-choose .learn-page{display:none}
-  body.page-readback .choose-page,body.page-readback .learn-page{display:none}
-  body.page-learn .choose-page,body.page-learn .readback-page{display:none}
+  body.page-choose .readback-page,body.page-choose .learn-page,body.page-choose .about-page{display:none}
+  body.page-readback .choose-page,body.page-readback .learn-page,body.page-readback .about-page{display:none}
+  body.page-learn .choose-page,body.page-learn .readback-page,body.page-learn .about-page{display:none}
+  body.page-about .choose-page,body.page-about .readback-page,body.page-about .learn-page{display:none}
   body.on-detail .home{display:none}
 
   /* ================= DETAIL SCREEN — same system, tighter focus =================
@@ -522,6 +527,8 @@
     .seg label{flex:1 1 0}
     .home{margin-left:0;padding:26px 16px 70px}.home-inner{padding-top:8px}
     .home-actions{grid-template-columns:1fr;margin-top:30px}.home-action{min-height:180px}
+    .plan-row{grid-template-columns:78px 1fr;gap:13px}.plan-score{grid-column:2;text-align:left;display:flex;gap:8px;align-items:baseline;padding-top:0}.plan-score span{margin:0}
+    .loop{grid-template-columns:1fr 1fr}.date-jump{align-items:flex-start;flex-wrap:wrap}.date-jump p{margin:0;flex-basis:100%}
     .week-picker{width:100%;flex-wrap:wrap}.week-picker>div{min-width:0;flex:1}
     .week-jump{min-height:42px;flex:1 1 50%;border-top:2px solid var(--ink);border-left:0}
   }
@@ -544,11 +551,13 @@
   <a href="#/learn" data-route="learn"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5a5 5 0 0 0-3 9v2h6v-2a5 5 0 0 0-3-9z"/><path d="M8 17h4"/></svg>
     <span class="badge" aria-hidden="true">5</span><span class="vh">Learn</span>
     <span class="tip" aria-hidden="true">Learn · 5 open</span></a>
+  <a href="#/about" data-route="about"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v5M10 6.2v.1"/></svg>
+    <span class="vh">Why this exists</span><span class="tip" aria-hidden="true">Why this exists</span></a>
 </nav>
 
 <main class="home" id="home" aria-label="Skip or Go home">
   <div class="home-inner">
-    <div class="eyebrow"><span class="tag">&#9622; DESIGN v5</span><span>&middot;</span><span>Mon Sep 21 2026</span></div>
+    <div class="eyebrow"><span class="tag">&#9622; DESIGN v6</span><span>&middot;</span><span>Mon Sep 21 2026</span></div>
     <h1>What do you need to do?</h1>
     <p class="thesis">Choose a schedule, or teach the system what happened. Nothing else needs your attention right now.</p>
     <div class="home-actions">
@@ -567,45 +576,45 @@
     <header>
       <div class="eyebrow"><span class="tag">&#9622; CHOOSE</span><span>&middot;</span><span>Plan by week</span></div>
       <h1>Choose your week</h1>
-      <p class="thesis">Pick a week first. Then keep career decisions, group plans, and easy no&rsquo;s in their own lanes.</p>
+      <p class="thesis">Watching people instead of watching events. Build your week around rooms that can change something.</p>
     </header>
 
     <section class="plan-calendar" aria-label="Plan week browser">
       <div class="calendar-top"><button class="calendar-arrow" type="button" aria-label="Previous month">&larr;</button><strong>September 2026</strong><button class="calendar-arrow" type="button" aria-label="Next month">&rarr;</button></div>
       <div class="week-options" role="group" aria-label="Nearby weeks">
-        <button class="week-choice" type="button" data-v5-week="Last week, Sep 14 to 20"><span>LAST WEEK</span><strong>Sep 14 &ndash; 20</strong></button>
-        <button class="week-choice on" type="button" data-v5-week="This week, Sep 21 to 27"><span>THIS WEEK</span><strong>Sep 21 &ndash; 27</strong></button>
-        <button class="week-choice" type="button" data-v5-week="Next week, Sep 28 to Oct 4"><span>NEXT WEEK</span><strong>Sep 28 &ndash; Oct 4</strong></button>
+        <button class="week-choice" type="button" data-v6-week="last"><span>LAST WEEK</span><strong>Sep 14 &ndash; 20</strong></button>
+        <button class="week-choice on" type="button" data-v6-week="current"><span>THIS WEEK</span><strong>Sep 21 &ndash; 27</strong></button>
+        <button class="week-choice" type="button" data-v6-week="next"><span>NEXT WEEK</span><strong>Sep 28 &ndash; Oct 4</strong></button>
       </div>
       <div class="date-jump"><label for="plan-date">Jump to any week</label><input id="plan-date" type="date" value="2026-09-21"><p id="v5Chosen">This week, Monday Sep 21 &ndash; Sunday Sep 27</p></div>
     </section>
 
-    <h2>Career / professional <span class="n">3 decisions</span></h2>
+    <h2 id="careerHeading">Career / professional <span class="n">3 decisions</span></h2>
     <p class="section-note">These are the only events that get a verdict and, when attended, an outcome check.</p>
-    <div class="plan-stack">
-      <article class="plan-row"><div class="plan-label go">GO</div><div><h3 class="plan-title"><a href="#/e/cc-sf">Claude Code Workshop with Provectus</a></h3><div class="plan-meta">MON SEP 21 &middot; 13:00 &middot; SAN FRANCISCO</div><p class="plan-reason">You would be doing the thing, not watching it. The RSVP is closed, so treat this as one workshop decision with the duplicate listing below it.</p></div></article>
-      <article class="plan-row"><div class="plan-label go">GO</div><div><h3 class="plan-title"><a href="#/e/cw-sf">Claude Workshop with Provectus</a></h3><div class="plan-meta">MON SEP 21 &middot; 13:00 &middot; SAN FRANCISCO</div><p class="plan-reason">Same host, same time, same opportunity. It should not consume a second place in your head.</p></div></article>
-      <article class="plan-row"><div class="plan-label part">PART</div><div><h3 class="plan-title"><a href="#/e/waymo">-1 to Waymo with Dmitri Dolgov</a></h3><div class="plan-meta">MON SEP 21 &middot; 14:30 &middot; SAN FRANCISCO</div><p class="plan-reason">The room is relevant; the talk is spectator. Go for the twenty minutes after it ends, not the programme.</p></div></article>
+    <div class="plan-stack" id="careerStack">
+      <article class="plan-row"><div class="plan-label go">GO</div><div><h3 class="plan-title"><a href="#/e/cc-sf">Claude Code Workshop with Provectus</a></h3><div class="plan-meta">MON SEP 21 &middot; 13:00 &middot; SAN FRANCISCO</div><p class="plan-reason">You would be doing the thing, not watching it. The RSVP is closed, so treat this as one workshop decision with the duplicate listing below it.</p></div><div class="plan-score go"><b>0.40</b><span>SCORE</span></div></article>
+      <article class="plan-row"><div class="plan-label go">GO</div><div><h3 class="plan-title"><a href="#/e/cw-sf">Claude Workshop with Provectus</a></h3><div class="plan-meta">MON SEP 21 &middot; 13:00 &middot; SAN FRANCISCO</div><p class="plan-reason">Same host, same time, same opportunity. It should not consume a second place in your head.</p></div><div class="plan-score go"><b>0.40</b><span>SCORE</span></div></article>
+      <article class="plan-row"><div class="plan-label part">PART</div><div><h3 class="plan-title"><a href="#/e/waymo">-1 to Waymo with Dmitri Dolgov</a></h3><div class="plan-meta">MON SEP 21 &middot; 14:30 &middot; SAN FRANCISCO</div><p class="plan-reason">The room is relevant; the talk is spectator. Go for the twenty minutes after it ends, not the programme.</p></div><div class="plan-score part"><b>0.17</b><span>SCORE</span></div></article>
     </div>
 
-    <section class="social-band" aria-labelledby="social-title">
+    <section class="social-band" id="socialSection" aria-labelledby="social-title">
       <h2 id="social-title">Social / cohort <span class="n">for the group</span></h2>
       <p class="section-note">These are plans for fun, belonging, and showing up. They are not career bets, so there is no score and no read-back.</p>
-      <div class="plan-stack">
-        <article class="plan-row"><div class="plan-label social">SOCIAL</div><div><h3 class="plan-title">EWMBAA East Bay Fall Social</h3><div class="plan-meta">SAT SEP 26 &middot; 18:00 &middot; EMERYVILLE</div><p class="plan-reason">For your cohort on a Saturday night. Put it on the plan if you want the group time; nothing needs to be proved afterward.</p></div></article>
-        <article class="plan-row"><div class="plan-label social">SOCIAL</div><div><h3 class="plan-title">ABC Mid-Autumn Festival Picnic</h3><div class="plan-meta">THU SEP 24 &middot; 16:30 &middot; BAY AREA</div><p class="plan-reason">A community plan, not a networking calculation.</p></div></article>
-        <article class="plan-row"><div class="plan-label social">SOCIAL</div><div><h3 class="plan-title">FTMBA Alumni Mixer</h3><div class="plan-meta">SAT SEP 26 &middot; 17:00 &middot; BAY AREA</div><p class="plan-reason">Go only if the group energy sounds good. No contact target, no follow-up ledger.</p></div></article>
+      <div class="plan-stack" id="socialStack">
+        <article class="plan-row"><div class="plan-label social">SOCIAL</div><div><h3 class="plan-title"><a href="https://haas.campusgroups.com/rsvp_boot?id=2251308" target="_blank" rel="noreferrer">EWMBAA East Bay Fall Social</a></h3><div class="plan-meta">SAT SEP 26 &middot; 18:00 &middot; EMERYVILLE</div><p class="plan-reason">For your cohort on a Saturday night. Put it on the plan if you want the group time; nothing needs to be proved afterward.</p></div></article>
+        <article class="plan-row"><div class="plan-label social">SOCIAL</div><div><h3 class="plan-title"><a href="https://haas.campusgroups.com/rsvp_boot?id=2251366" target="_blank" rel="noreferrer">ABC Mid-Autumn Festival Picnic</a></h3><div class="plan-meta">THU SEP 24 &middot; 16:30 &middot; BAY AREA</div><p class="plan-reason">A community plan, not a networking calculation.</p></div></article>
+        <article class="plan-row"><div class="plan-label social">SOCIAL</div><div><h3 class="plan-title"><a href="https://haas.campusgroups.com/rsvp_boot?id=2251350" target="_blank" rel="noreferrer">FTMBA Alumni Mixer</a></h3><div class="plan-meta">SAT SEP 26 &middot; 17:00 &middot; BAY AREA</div><p class="plan-reason">Go only if the group energy sounds good. No contact target, no follow-up ledger.</p></div></article>
       </div>
     </section>
 
-    <section class="set-aside" aria-labelledby="aside-title">
+    <section class="set-aside" id="asideSection" aria-labelledby="aside-title">
       <h2 id="aside-title">Set aside <span class="n">14 events</span></h2>
       <p class="section-note">A decision has already been made. They use the same readable row as a Go, so the reason is visible without opening an audit trail.</p>
-      <div class="plan-stack">
-        <article class="plan-row"><div class="plan-label skip">SKIP</div><div><h3 class="plan-title">Codex Community Meetup &mdash; San Francisco</h3><div class="plan-meta">TUE SEP 22 &middot; 18:00</div><p class="plan-reason">Below the bar: participant room, on-target people, but 394 RSVPs dilute the chance of a useful conversation.</p></div></article>
-        <article class="plan-row"><div class="plan-label skip">SKIP</div><div><h3 class="plan-title">Speak with Nnamdi Iregbulem, Partner at Lightspeed Ventures</h3><div class="plan-meta">WED SEP 23 &middot; 16:30</div><p class="plan-reason">Spectator format. The seniority of the speaker does not make the room participatory.</p></div></article>
-        <article class="plan-row"><div class="plan-label skip">SKIP</div><div><h3 class="plan-title">Alumni Chat with Matt Friend, former CFO of Nike</h3><div class="plan-meta">THU SEP 24 &middot; 13:30 &middot; HAAS</div><p class="plan-reason">Spectator format. Interesting is not enough to take a limited professional slot.</p></div></article>
-        <article class="plan-row"><div class="plan-label skip">SKIP</div><div><h3 class="plan-title">New York | Building with Claude: AI for Impact &amp; Climate</h3><div class="plan-meta">TUE SEP 22 &middot; 09:30</div><p class="plan-reason">Quota full. The listing also lacks location data, so it was incorrectly allowed to compete for a Bay Area slot.</p></div></article>
+      <div class="plan-stack" id="asideStack">
+        <article class="plan-row"><div class="plan-label skip">SKIP</div><div><h3 class="plan-title"><a href="https://lu.ma/5cewfkx1" target="_blank" rel="noreferrer">Codex Community Meetup &mdash; San Francisco</a></h3><div class="plan-meta">TUE SEP 22 &middot; 18:00</div><p class="plan-reason">Below the bar: participant room, on-target people, but 394 RSVPs dilute the chance of a useful conversation.</p></div></article>
+        <article class="plan-row"><div class="plan-label skip">SKIP</div><div><h3 class="plan-title"><a href="https://haas.campusgroups.com/rsvp_boot?id=2251378" target="_blank" rel="noreferrer">Speak with Nnamdi Iregbulem, Partner at Lightspeed Ventures</a></h3><div class="plan-meta">WED SEP 23 &middot; 16:30</div><p class="plan-reason">Spectator format. The seniority of the speaker does not make the room participatory.</p></div></article>
+        <article class="plan-row"><div class="plan-label skip">SKIP</div><div><h3 class="plan-title"><a href="https://haas.campusgroups.com/rsvp_boot?id=2251379" target="_blank" rel="noreferrer">Alumni Chat with Matt Friend, former CFO of Nike</a></h3><div class="plan-meta">THU SEP 24 &middot; 13:30 &middot; HAAS</div><p class="plan-reason">Spectator format. Interesting is not enough to take a limited professional slot.</p></div></article>
+        <article class="plan-row"><div class="plan-label skip">SKIP</div><div><h3 class="plan-title"><a href="https://lu.ma/claude-av7h" target="_blank" rel="noreferrer">New York | Building with Claude: AI for Impact &amp; Climate</a></h3><div class="plan-meta">TUE SEP 22 &middot; 09:30</div><p class="plan-reason">Quota full. The listing also lacks location data, so it was incorrectly allowed to compete for a Bay Area slot.</p></div></article>
       </div>
     </section>
   </div>
@@ -768,6 +777,22 @@
     a week a fitted model would be theatre. Every number on this page is read from
     data/events.json, data/outcomes.json, data/pending_hypotheses.json and data/score_summary.json;
     nothing here is invented, and where something is missing it says so.</p>
+</section>
+
+<section class="about-page page" aria-labelledby="about-title">
+  <div class="eyebrow"><span class="tag">&#9622; WHY THIS EXISTS</span><span>&middot;</span><span>THE METHOD, IN PLAIN VIEW</span></div>
+  <h1 id="about-title">A calendar is not the point.</h1>
+  <p class="thesis">This is a personal decision system for protecting attention: watch people and rooms with real possibility, not every event that arrives.</p>
+
+  <h2>Vision</h2>
+  <div class="panel"><h3>Permission to say no</h3><p>Most event tools optimize for discovery. This one optimizes for a smaller, more deliberate week. It makes the trade-off visible: a room can be interesting and still not be worth one of the limited professional slots.</p></div>
+
+  <h2>Scoring engine</h2>
+  <div class="panel"><h3>A transparent v0, not a magic recommendation</h3><p>Each professional event receives a score from its format, whether you can participate, proximity to the people you want to meet, prior hooks, cohort saturation, group context, size, and travel cost. The score leads to a plain verdict: GO, PART, SKIP, or GO IF. Social plans deliberately sit outside this engine.</p><p class="counts">The number is a stated bet, not a claim of certainty. Every event can be opened to inspect the evidence behind it.</p></div>
+
+  <h2>Why read-back matters</h2>
+  <div class="loop" aria-label="Self-evolving decision loop"><div><b>01 / CHOOSE</b><span>Score the room before going, while the prediction can still be wrong.</span></div><div><b>02 / ATTEND</b><span>Show up with a reason, not a vague hope of networking.</span></div><div><b>03 / READ-BACK</b><span>Record what actually happened in your own words, at T+0, T+7, and T+30.</span></div><div><b>04 / LEARN</b><span>Let repeated evidence propose changes; a single good night changes nothing.</span></div></div>
+  <p class="learning-intro"><b>Read-back is the hinge.</b> Without an outcome record, the score is only taste. Read-back separates facts from inference, protects the calibration record, and lets the system learn from repeated evidence rather than the feeling of one memorable room.</p>
 </section>
 
 </div>
@@ -1268,7 +1293,7 @@ function recompute(e,ctx){
 /* ---------- routing: opening the product is a choice, not a long scroll ---------- */
 var lastRoute=null;
 function setPage(page){
-  document.body.classList.remove("page-home","page-choose","page-readback","page-learn");
+  document.body.classList.remove("page-home","page-choose","page-readback","page-learn","page-about");
   document.body.classList.add("page-"+page);
   document.querySelectorAll(".rail a[data-route]").forEach(function(a){
     a.classList.toggle("on",a.dataset.route===page);
@@ -1285,7 +1310,7 @@ function route(){
       detail.innerHTML=renderDetail(e);
       wireDetail(e);
       document.body.classList.add("on-detail");
-      document.body.classList.remove("page-home","page-choose","page-readback","page-learn");
+      document.body.classList.remove("page-home","page-choose","page-readback","page-learn","page-about");
       document.title=e.name+" — Skip or Go";
       var t=document.getElementById("dTitle");if(t)t.focus();
       window.scrollTo(0,0);
@@ -1295,7 +1320,7 @@ function route(){
   document.body.classList.remove("on-detail");
   detail.innerHTML="";
   document.title="Skip or Go";
-  var page=key==="#/choose"?"choose":key==="#/readback"?"readback":key==="#/learn"?"learn":"home";
+  var page=key==="#/choose"?"choose":key==="#/readback"?"readback":key==="#/learn"?"learn":key==="#/about"?"about":"home";
   setPage(page);
   window.scrollTo(0,0);
 }
@@ -1306,20 +1331,55 @@ document.addEventListener("click",function(ev){
   var a=ev.target.closest&&ev.target.closest('a[href^="#"]');
   if(a) setTimeout(route,0);
 });
-/* The week browser is deliberately a light planning control in this design
-   pass: it makes the chosen date explicit even before every historical scan
-   is wired into the schedule renderer. */
-document.querySelectorAll("[data-v5-week]").forEach(function(button){
-  button.addEventListener("click",function(){
-    document.querySelectorAll("[data-v5-week]").forEach(function(b){b.classList.remove("on");});
-    button.classList.add("on");
-    document.getElementById("v5Chosen").textContent=button.dataset.v5Week;
-  });
-});
+/* The plan view changes with the selected week. Only saved scans are rendered;
+   choosing another date makes that absence explicit instead of reusing the
+   current week's events under a different label. */
+var PLAN_WEEKS={
+  current:{label:"This week, Monday Sep 21 – Sunday Sep 27",career:[
+    ["GO","go","Claude Code Workshop with Provectus","#/e/cc-sf","MON SEP 21 · 13:00 · SAN FRANCISCO","You would be doing the thing, not watching it. The RSVP is closed, so treat this as one workshop decision with the duplicate listing below it.","0.40"],
+    ["GO","go","Claude Workshop with Provectus","#/e/cw-sf","MON SEP 21 · 13:00 · SAN FRANCISCO","Same host, same time, same opportunity. It should not consume a second place in your head.","0.40"],
+    ["PART","part","-1 to Waymo with Dmitri Dolgov","#/e/waymo","MON SEP 21 · 14:30 · SAN FRANCISCO","The room is relevant; the talk is spectator. Go for the twenty minutes after it ends, not the programme.","0.17"]
+  ],social:[
+    ["EWMBAA East Bay Fall Social","https://haas.campusgroups.com/rsvp_boot?id=2251308","SAT SEP 26 · 18:00 · EMERYVILLE","For your cohort on a Saturday night. Put it on the plan if you want the group time; nothing needs to be proved afterward."],
+    ["ABC Mid-Autumn Festival Picnic","https://haas.campusgroups.com/rsvp_boot?id=2251366","THU SEP 24 · 16:30 · BAY AREA","A community plan, not a networking calculation."],
+    ["FTMBA Alumni Mixer","https://haas.campusgroups.com/rsvp_boot?id=2251350","SAT SEP 26 · 17:00 · BAY AREA","Go only if the group energy sounds good. No contact target, no follow-up ledger."]
+  ],aside:[
+    ["Codex Community Meetup — San Francisco","https://lu.ma/5cewfkx1","TUE SEP 22 · 18:00","Below the bar: participant room, on-target people, but 394 RSVPs dilute the chance of a useful conversation."],
+    ["Speak with Nnamdi Iregbulem, Partner at Lightspeed Ventures","https://haas.campusgroups.com/rsvp_boot?id=2251378","WED SEP 23 · 16:30","Spectator format. The seniority of the speaker does not make the room participatory."],
+    ["Alumni Chat with Matt Friend, former CFO of Nike","https://haas.campusgroups.com/rsvp_boot?id=2251379","THU SEP 24 · 13:30 · HAAS","Spectator format. Interesting is not enough to take a limited professional slot."],
+    ["New York | Building with Claude: AI for Impact & Climate","https://lu.ma/claude-av7h","TUE SEP 22 · 09:30","Quota full. The listing also lacks location data, so it was incorrectly allowed to compete for a Bay Area slot."]
+  ]},
+  next:{label:"Next week, Monday Sep 28 – Sunday Oct 4",career:[
+    ["PART","part","How AI Models Learn to Do Real Work","#/e/openrouter-oct","WED SEP 30 · 17:30 · SAN FRANCISCO","The topic and room are relevant; the panel is still spectator. Go for the conversation around it, not the programme.","0.20"]
+  ],social:[],aside:[
+    ["The Philosopher CEO: Becoming a Wise Leader in the Age of AI","https://haas.campusgroups.com/rsvp_boot?id=2251390","WED SEP 30 · 11:00","Spectator format."],
+    ["Crypto & Venture Capital with Ani Pai","https://haas.campusgroups.com/rsvp_boot?id=2251393","WED SEP 30 · 16:30","Below the bar."],
+    ["Property & Pints","https://haas.campusgroups.com/rsvp_boot?id=2251383","WED SEP 30 · 17:00","Spectator format."],
+    ["IB Chat with Haas alumnus Jeff Chang from Qatalyst","https://haas.campusgroups.com/rsvp_boot?id=2251381","THU OCT 1 · 13:00","Spectator format."],
+    ["The Future of Finance Summit","https://haas.campusgroups.com/rsvp_boot?id=2251389","FRI OCT 2 · 08:30","Spectator format."],
+    ["costco hotdog run 🌭","https://partiful.com/e/niZdDIpgOIp7FKdOSg9j","SAT OCT 3 · 10:30","Below the bar."]
+  ]},
+  last:{label:"Last week, Monday Sep 14 – Sunday Sep 20",career:[],social:[],aside:[]}
+};
+function external(url){return url.indexOf("#/")===0?url:'<a href="'+url+'" target="_blank" rel="noreferrer">';}
+function closeLink(url){return url.indexOf("#/")===0?"</a>":"</a>";}
+function rowCareer(r){return '<article class="plan-row"><div class="plan-label '+r[1]+'">'+r[0]+'</div><div><h3 class="plan-title"><a href="'+r[3]+'">'+r[2]+'</a></h3><div class="plan-meta">'+r[4]+'</div><p class="plan-reason">'+r[5]+'</p></div><div class="plan-score '+r[1]+'"><b>'+r[6]+'</b><span>SCORE</span></div></article>';}
+function rowPlain(r,label,kind){return '<article class="plan-row"><div class="plan-label '+kind+'">'+label+'</div><div><h3 class="plan-title"><a href="'+r[1]+'" target="_blank" rel="noreferrer">'+r[0]+'</a></h3><div class="plan-meta">'+r[2]+'</div><p class="plan-reason">'+r[3]+'</p></div></article>';}
+function emptyPlan(message){return '<article class="plan-row"><div class="plan-label skip">—</div><div><h3 class="plan-title">No saved scan</h3><p class="plan-reason">'+message+'</p></div></article>';}
+function renderPlanWeek(key){
+  var w=PLAN_WEEKS[key]||PLAN_WEEKS.last;
+  document.getElementById("v5Chosen").textContent=w.label;
+  document.getElementById("careerHeading").innerHTML='Career / professional <span class="n">'+w.career.length+' decision'+(w.career.length===1?"":"s")+'</span>';
+  document.getElementById("careerStack").innerHTML=w.career.length?w.career.map(rowCareer).join(""):emptyPlan("There is no saved professional-event scan for this week yet.");
+  document.getElementById("socialStack").innerHTML=w.social.length?w.social.map(function(r){return rowPlain(r,"SOCIAL","social");}).join(""):emptyPlan("No social plans are saved for this week.");
+  document.getElementById("asideStack").innerHTML=w.aside.length?w.aside.map(function(r){return rowPlain(r,"SKIP","skip");}).join(""):emptyPlan("No set-aside events are saved for this week.");
+}
+document.querySelectorAll("[data-v6-week]").forEach(function(button){button.addEventListener("click",function(){
+  document.querySelectorAll("[data-v6-week]").forEach(function(b){b.classList.remove("on");});button.classList.add("on");renderPlanWeek(button.dataset.v6Week);
+});});
 document.getElementById("plan-date").addEventListener("change",function(ev){
-  var d=new Date(ev.target.value+"T12:00:00");
-  if(!isNaN(d)) document.getElementById("v5Chosen").textContent="Week containing "
-    +d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+  var d=new Date(ev.target.value+"T12:00:00"),key=d>=new Date("2026-09-28T12:00:00")&&d<new Date("2026-10-05T12:00:00")?"next":d>=new Date("2026-09-21T12:00:00")&&d<new Date("2026-09-28T12:00:00")?"current":"last";
+  document.querySelectorAll("[data-v6-week]").forEach(function(b){b.classList.toggle("on",b.dataset.v6Week===key);});renderPlanWeek(key);
 });
 route();
 })();
