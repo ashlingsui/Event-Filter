@@ -533,3 +533,128 @@ ship light structure first and add extraction once there is usage.
 
 (2) does not depend on (1). Ship the read-only demo whenever the design lands; build the
 multi-user app on its own timeline.
+
+---
+
+## §3b SCORING MODEL — segment revision, 2026-09-22
+
+Not frozen (§3). Documented here rather than left in a prompt, because each rule below looks
+arbitrary without its reason and will otherwise be "cleaned up" by a future agent.
+
+**Trigger, not justification.** The Codex Community Meetup (lu.ma/5cewfkx1, 2026-09-22) scored
+~0.17 and was skipped, when it was in fact a strong candidate. Each change below stands on its
+own reasoning; none of the constants may be adjusted to make that event pass. Tuning to a single
+data point is the failure `LESSONS.md` #13 exists to prevent.
+
+### The bug: format was read from the title, not the agenda
+
+"Codex Community Meetup" classified as `mixer`, which scores **0** on build — so S3 collapsed
+despite the description stating: *"first 30 minutes hanging out and meeting people, then about
+an hour of live demos."* A title is marketing copy. The agenda is usually in
+`description_mirror`. **Classify from the described agenda.**
+
+### Events have segments
+
+One `format` enum cannot describe 30 minutes of social followed by 60 minutes of demos. It forces
+a wrong answer either way, and averaging destroys the half that carried the value.
+
+```
+segments[]  { kind, duration_min, source }   source = described | inferred
+```
+
+Top-level `format` remains, as the dominant segment.
+
+Segments pay for themselves twice: **the prep value-window falls out for free** (see
+`PREP_SPEC.md` §1) — "30 min social, then 60 min demos" *is* the answer to when to arrive.
+
+### Revised model
+
+```
+S3 = max over segments of FORMAT_S3_POINTS[kind] * min(1.0, duration_min / 45)
+     gated by participant
+
+S2 = TARGET_PROXIMITY_POINTS[target_proximity]
+     * social_opportunity(segments)
+     * COHORT_SATURATION_MULT[cohort_saturation]
+
+value = (S3 + S2) * PRIOR_HOOK_MULT * COMPANIONS_MULT
+p     = min(0.95, value / VALUE_TO_P_DIVISOR)
+```
+
+**S3 takes the max, not the sum.** Two demo blocks are not twice the inspiration.
+
+### Why S2 is now gated on social opportunity
+
+The previous model let contact value depend only on *who* is in the room. But **you cannot talk
+to anyone during a lecture.** A talk attended by 384 target-company PMs with no mingle block
+yields zero contacts. Proximity says who is there; segments say whether you can reach them.
+
+```
+social_opportunity = min(1.0, social_minutes / 45), FLOORED AT 0.25
+```
+
+**The 0.25 floor is not a fudge factor.** It is arrival, queue and departure, and it is the one
+thing in this dataset we know from direct evidence: the entire payoff of the 2026-09-18 OpenRouter
+event — meeting the Engineering 198 instructor, and the offer to take over the course — happened
+**in the queue, before the doors opened**. See `LESSONS.md` #25. Do not remove this floor.
+
+### Cohort saturation is S2-only
+
+`cohort_saturation` was previously a global multiplier. That is wrong: a room full of her own
+classmates does not make a demo less instructive. Apply it to S2 only — the same principle as the
+sponsorship rule (§4): **a factor goes on the stream it actually affects, never globally.**
+
+### Size: RETRACTED the same day it was written — record it, weight it ZERO
+
+An earlier version of this section added `size_factor` (<=50 -> 1.0, 51-150 -> 0.7, >150 -> 0.4)
+to S2. **Removed 2026-09-22, before it was ever built.** It was wrong, and how it was wrong is
+worth keeping.
+
+The evidence was two events, both fully confounded. Founder & Funder (200, zero contacts) also had
+`wrong_ladder`, high cohort saturation, and spectator format — any of those explains the null.
+Grok Bot (small, produced a contact and a tool) also had participant, `prior_hook = person`, zero
+saturation, and a tier-1 host. Size was simply the variable that got named. A coefficient was
+derived from n=2 with four confounds each — the exact error `LESSONS.md` #9 records, committed one
+day after writing the rule against it.
+
+Ashling's objections are stronger than that evidence:
+
+1. **Small events are gated** — selective, hard to get into. A size penalty fights the `gated`
+   field, which is meant to mark quality. The model cannot coherently reward selectivity and
+   punish smallness.
+2. **Good hosts draw crowds.** The Codex meetup is 384 people *because* WorkOS and Parallel put on
+   something worth attending. Penalizing size penalizes host quality, backwards.
+
+And structurally: everything size was assumed to proxy for is now modeled **directly** —
+talk time is `social_opportunity`, composition is `target_proximity` + `cohort_saturation`,
+structure is segments. Keeping size on top double-counts all three.
+
+The one residual argument — competition for a specific speaker's attention — does not apply to
+her. Her record shows she does not work speakers (no follow-up with Zara Zhang) and her contacts
+come from ambient encounters. She met the Engineering 198 instructor **in a queue at a 384-person
+event**.
+
+So: `size` is recorded on every event and **weighted zero**, exactly like `host_tier`. It earns a
+weight from outcomes or not at all.
+
+**Open hypothesis, logged not encoded:** `gated` may be a *quality* signal (curated room, less
+attention competition), not only the latency signal it is today. Needs support across >=3 events
+before it touches the score.
+
+### prior_hook becomes detectable
+
+```
+profiles.tools_used text[]   -- "products or tools you actually use", asked once at onboarding
+```
+
+Matched against event title/description -> `prior_hook = 'topic'`, with the matched term stored as
+evidence. She uses Codex; the model had no way to know, and `prior_hook` defaulting to null is a
+leading suspect in the 0.20-vs-0.60 miss on the OpenRouter event. This is the first of the three
+un-scrapable fields to become scrapable.
+
+### Re-scoring rules
+
+`event_scores` is append-only, so re-scoring creates new rows — expected. Bump `model_version`.
+**`outcomes.predicted_p_locked` is immutable** and the database trigger will reject any change to
+it. A model revision must never be able to rewrite a prediction that was already recorded against
+an outcome.

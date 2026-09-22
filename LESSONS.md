@@ -382,3 +382,33 @@ held on the first real test.
 
 Confirms #12 on live data: scoring picks the room, but the brief is what converts it. If I had
 shown up at 12:00 sharp I would have met nobody.
+
+---
+
+## 27. I wrote the rule, then broke it the next day.
+
+Lesson #13 says: at my sample size, fitting coefficients is theater. Lesson #9 says: when one
+example "proves" a theory, check what else was true about that example.
+
+Then I added a three-bucket size penalty to the scoring model on the strength of **two events**.
+
+Founder & Funder: 200 people, zero contacts. Grok Bot: small, produced a contact and a tool I
+still use. Looks like size. But the first was *also* a VC/founder room, *also* full of my own
+class, *also* an event I was a spectator at. The second was *also* hands-on, *also* an event I
+arrived at with a hook, *also* hosted by a16z. Four confounds each. Size was just the variable I
+happened to name out loud.
+
+What caught it wasn't the framework. It was asking a plain question: *how much does size actually
+matter to me?* — and noticing two things the model couldn't see. Small events are small because
+they're **gated**, so penalizing size fights the field that marks selectivity. And good hosts draw
+crowds, so penalizing size penalizes host quality.
+
+> A rule you wrote does not protect you from the error it describes. Nothing does, except someone
+> asking whether the number is real.
+
+The structural tell, once I looked: everything size was supposedly proxying for — talk time, room
+composition, event structure — had *already* been modeled directly. The new coefficient wasn't
+adding information, it was triple-counting information the model already had.
+
+Size is now recorded and weighted zero, like host prestige. It earns a weight from outcomes or it
+doesn't get one.
