@@ -28,7 +28,8 @@
   let mapMode = "schematic";
   let mapModeNote = "";
   let googleMap = null;
-  let googleOverlays = []; // {circle, marker}
+  let googleOverlays = []; // {marker, event}
+  let selectionHalo = null; // the one Circle overlay, drawn only around the selected marker
   let hoverTooltip = null;
 
   // A custom OverlayView instead of google.maps.InfoWindow — the default InfoWindow renders as
@@ -326,7 +327,10 @@
     const out = [];
     clusters.forEach((c) => {
       const n = c.items.length;
-      const ringM = n > 1 ? Math.min(220, 70 + n * 20) : 0;
+      // Markers are now small fixed-pixel dots, not meter-radius circles (see renderMapGoogle),
+      // so a tight ring is enough to separate them — a wide spread just made a crowded building
+      // look like it was scattered across three neighborhoods, which was its own kind of wrong.
+      const ringM = n > 1 ? Math.min(85, 26 + n * 8) : 0;
       const latDegPerM = 1 / 111320;
       const lngDegPerM = 1 / (111320 * Math.cos((c.lat * Math.PI) / 180));
       c.items.forEach((e, i) => {
@@ -341,11 +345,9 @@
 
   function renderMapGoogle(weekEvents) {
     ensureGoogleMap();
-    googleOverlays.forEach(({ circle, marker }) => {
-      circle.setMap(null);
-      marker.setMap(null);
-    });
+    googleOverlays.forEach(({ marker }) => marker.setMap(null));
     googleOverlays = [];
+    if (selectionHalo) { selectionHalo.setMap(null); selectionHalo = null; }
 
     const plottable = plottableEvents(weekEvents);
     if (!plottable.length) {
@@ -354,59 +356,60 @@
       return;
     }
 
+    // Real venues repeating the same building coordinate (confirmed live: up to 10 events on
+    // one Haas geocode) made full meter-radius Circle overlays overlap into an unreadable blob
+    // the moment more than 2-3 shared a spot — bigger P meant a bigger circle meant MORE overlap,
+    // exactly backwards. Switched to compact icon markers whose SIZE IS IN FIXED SCREEN PIXELS,
+    // not real-world meters: P still drives size for professional events, but a crowded building
+    // now reads as a small tidy cluster of dots instead of stacked translucent haze. The one
+    // exception is the selected event, which gets a single real Circle "halo" — there's only
+    // ever one of those on screen at a time, so it can't crowd anything.
     const llBounds = new google.maps.LatLngBounds();
     spreadOverlappingPositions(plottable).forEach(({ event: e, lat, lng }) => {
       const kind = rowKind(e);
-      // "Skips remain quiet" (DESIGN_V12_HANDOFF.md) means lower-contrast, not invisible. Two
-      // rounds of tuning: a dark-grey/22%-opacity circle was invisible against dark map tiles;
-      // this pass lightens the color itself (see KIND_HEX) and raises fill so the whole field of
-      // "everything else going on this week" reads as a visible texture behind the highlighted
-      // picks, not a hidden layer — while staying small/dim relative to GO/PART/social.
-      let radiusM = 120;
-      let fillOpacity = 0.22;
-      let strokeOpacity = 1;
-      if (kind === "social_cohort") radiusM = 180;
-      else if (kind === "skip") { radiusM = 140; fillOpacity = 0.4; strokeOpacity = 0.9; }
-      else radiusM = 120 + 700 * (e.predicted_p || 0);
+      let scale = 5;
+      if (kind === "social_cohort") scale = 7;
+      else if (kind === "skip") scale = 4;
+      else scale = 5 + 9 * (e.predicted_p || 0); // ~5-13.5px, P drives it without touching real distance
       const color = KIND_HEX[kind] || "#7e8782";
       const position = { lat, lng };
       const isSelected = e.id === selectedId;
 
-      const circle = new google.maps.Circle({
-        map: googleMap,
-        center: position,
-        radius: radiusM,
-        strokeColor: color,
-        strokeOpacity,
-        strokeWeight: isSelected ? 3 : 2,
-        fillColor: color,
-        fillOpacity,
-        clickable: true,
-      });
       const marker = new google.maps.Marker({
         map: googleMap,
         position,
         title: `${e.name} — ${kind}`,
+        zIndex: isSelected ? 999 : undefined,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
-          scale: kind === "skip" ? 3.5 : 4.5,
+          scale,
           fillColor: color,
           fillOpacity: 1,
-          strokeColor: "#0b0d0d",
-          strokeWeight: 1,
+          strokeColor: isSelected ? "#f4f2ea" : "#0b0d0d",
+          strokeWeight: isSelected ? 2 : 1,
         },
       });
       const onSelect = () => selectEvent(e.id);
       const stateLabel = kind === "social_cohort" ? "Social / cohort" : kind === "skip" ? "Skip" : (PROF_STATE_LABEL[e.verdict] || e.verdict);
-      const onHover = () => hoverTooltip.show(position, e.name, stateLabel);
-      const onUnhover = () => hoverTooltip.hide();
-      [circle, marker].forEach((overlay) => {
-        overlay.addListener("click", onSelect);
-        overlay.addListener("mouseover", onHover);
-        overlay.addListener("mouseout", onUnhover);
-      });
-      googleOverlays.push({ circle, marker, event: e });
+      marker.addListener("click", onSelect);
+      marker.addListener("mouseover", () => hoverTooltip.show(position, e.name, stateLabel));
+      marker.addListener("mouseout", () => hoverTooltip.hide());
+      googleOverlays.push({ marker, event: e });
       llBounds.extend(position);
+
+      if (isSelected) {
+        selectionHalo = new google.maps.Circle({
+          map: googleMap,
+          center: position,
+          radius: 90,
+          strokeColor: color,
+          strokeOpacity: 0.9,
+          strokeWeight: 2,
+          fillColor: color,
+          fillOpacity: 0.15,
+          clickable: false,
+        });
+      }
     });
 
     if (plottable.length === 1) {
