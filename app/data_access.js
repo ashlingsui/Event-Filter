@@ -57,6 +57,12 @@ const DataAccess = (() => {
     return raw().source_scored_at;
   }
 
+  // The week key the board should default to, derived in app/build_data.py from the pipeline's
+  // own scored_at timestamp — not a hardcoded constant that goes stale after the next run.
+  function getCurrentWeekKey() {
+    return raw().current_week_key;
+  }
+
   function getSocialCohortNote() {
     return raw().social_cohort_overrides_note;
   }
@@ -90,6 +96,7 @@ const DataAccess = (() => {
     getPendingHypotheses,
     getGeneratedAt,
     getSourceScoredAt,
+    getCurrentWeekKey,
     getSocialCohortNote,
     getMapBounds,
     getMapReferenceCities,

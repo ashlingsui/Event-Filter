@@ -299,9 +299,19 @@ def build():
     # into the drawer can actually show.
     ca_suppressed_total = sum(1 for e in out_events if e["verdict"] == "suppressed")
 
+    # The week the board should default to on load. Derived from the pipeline's own scored_at
+    # timestamp (not "today" on whatever machine runs this script) so it always matches the run
+    # that actually produced the data, and re-running the pipeline on a later date moves the
+    # default forward automatically — no hardcoded week key to remember to update by hand.
+    current_week_key = None
+    scored_at = _parse_dt(score_summary.get("scored_at"))
+    if scored_at:
+        current_week_key = _week_key(_pacific(scored_at))
+
     public_payload = {
         "generated_at": dt.datetime.utcnow().isoformat() + "Z",
         "source_scored_at": score_summary.get("scored_at"),
+        "current_week_key": current_week_key,
         "events": out_events,
         "weeks": [{"key": k, "label": v} for k, v in sorted(week_meta.items())],
         "score_summary": score_summary,

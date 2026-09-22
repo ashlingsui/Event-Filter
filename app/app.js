@@ -1,8 +1,6 @@
 (() => {
   "use strict";
 
-  const TODAY_WEEK_KEY = "2026-W39"; // matches data/score_summary.json scored_at (2026-09-21)
-
   const weeks = DataAccess.getWeeks();
   const bounds = DataAccess.getMapBounds();
   const referenceCities = DataAccess.getMapReferenceCities() || [];
@@ -19,7 +17,8 @@
   const toggleSkips = document.getElementById("toggleSkips");
   const skipDrawer = document.getElementById("skipDrawer");
 
-  let currentWeekIndex = Math.max(0, weeks.findIndex((w) => w.key === TODAY_WEEK_KEY));
+  const currentWeekKey = DataAccess.getCurrentWeekKey();
+  let currentWeekIndex = Math.max(0, weeks.findIndex((w) => w.key === currentWeekKey));
   let selectedId = null;
 
   // 'schematic' (default, no external dependency) or 'google' (this account's own Maps API key,
@@ -72,7 +71,11 @@
 
   const PROFESSIONAL_VERDICTS = new Set(["go", "part", "go_if", "wildcard"]);
   const PROF_STATE_LABEL = { go: "GO", part: "PART", go_if: "GO IF", wildcard: "WILDCARD" };
-  const KIND_HEX = { go: "#00b94f", part: "#ffc400", go_if: "#ffc400", wildcard: "#00b94f", social_cohort: "#189fd8", skip: "#7e8782" };
+  // Skip's map color is deliberately lighter than the grey used for its text/badges elsewhere
+  // (--faint #7e8782) — on a real, visually dark map style, a dark-grey dot on dark-grey tiles
+  // has almost no contrast to register as a point at all, "quiet" or not. A light neutral grey
+  // reads clearly against the dark basemap while still staying desaturated/calm, never a color.
+  const KIND_HEX = { go: "#00b94f", part: "#ffc400", go_if: "#ffc400", wildcard: "#00b94f", social_cohort: "#189fd8", skip: "#cfd2cb" };
 
   function fmtTime(iso) {
     if (!iso) return "Date unknown";
@@ -325,15 +328,16 @@
     const llBounds = new google.maps.LatLngBounds();
     plottable.forEach((e) => {
       const kind = rowKind(e);
-      // "Skips remain quiet" (DESIGN_V12_HANDOFF.md) means lower-contrast, not invisible — a
-      // 90m/22%-opacity grey circle on a real, visually busy street map was effectively
-      // impossible to see. Bumped enough to actually register while staying the smallest,
-      // dimmest marker on the board.
+      // "Skips remain quiet" (DESIGN_V12_HANDOFF.md) means lower-contrast, not invisible. Two
+      // rounds of tuning: a dark-grey/22%-opacity circle was invisible against dark map tiles;
+      // this pass lightens the color itself (see KIND_HEX) and raises fill so the whole field of
+      // "everything else going on this week" reads as a visible texture behind the highlighted
+      // picks, not a hidden layer — while staying small/dim relative to GO/PART/social.
       let radiusM = 120;
       let fillOpacity = 0.22;
       let strokeOpacity = 1;
       if (kind === "social_cohort") radiusM = 180;
-      else if (kind === "skip") { radiusM = 150; fillOpacity = 0.35; strokeOpacity = 0.85; }
+      else if (kind === "skip") { radiusM = 140; fillOpacity = 0.4; strokeOpacity = 0.9; }
       else radiusM = 120 + 700 * (e.predicted_p || 0);
       const color = KIND_HEX[kind] || "#7e8782";
       const position = { lat: e.lat, lng: e.lng };

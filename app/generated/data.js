@@ -1,6 +1,7 @@
 window.EVENT_FILTER_DATA = {
-  "generated_at": "2026-09-22T06:52:25.852249Z",
+  "generated_at": "2026-09-22T07:37:00.431203Z",
   "source_scored_at": "2026-09-21T07:40:45.990196Z",
+  "current_week_key": "2026-W39",
   "events": [
     {
       "id": "luma:evt-wH6f1yBeClyzUMy",
