@@ -647,8 +647,13 @@
         </div>
       </section>`).join("");
 
+    // Clicking an event's title on the board goes straight to its detail page (Ashling's call,
+    // 2026-09-22) — select it first so the side panel/map stay in sync once the overlay closes.
     inventoryStack.querySelectorAll("button.event-name").forEach((btn) => {
-      btn.addEventListener("click", () => selectEvent(btn.dataset.id));
+      btn.addEventListener("click", () => {
+        selectEvent(btn.dataset.id);
+        openDetail(btn.dataset.id);
+      });
     });
   }
 
@@ -832,6 +837,9 @@
     detailSheet.style.setProperty("--detail-glow", DETAIL_GLOW[kind] || DETAIL_GLOW.skip);
     document.getElementById("detailSource").textContent = e.source ? `${e.source} · listing` : "Source unknown";
     document.getElementById("detailTitle").textContent = e.name;
+    const titleLink = document.getElementById("detailTitleLink");
+    if (e.url) titleLink.setAttribute("href", e.url);
+    else titleLink.removeAttribute("href"); // no href = CSS hides it (see .detail-title-link[href])
     document.getElementById("detailWhen").textContent = fmtTime(e.start);
     document.getElementById("detailPlace").textContent = e.address;
 

@@ -165,7 +165,13 @@ a{color:inherit}
 .close-detail:hover{color:var(--ink)}
 .detail-source{font:11px var(--mono);color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
 .detail-kicker{margin-top:6px;font:500 13px var(--sans);color:var(--blue)}
-.detail-sheet h1{font-size:clamp(30px,5.5vw,54px);line-height:1;letter-spacing:-.045em;margin:14px 0 16px;font-weight:500;max-width:620px}
+.detail-title-link{display:block;color:inherit;text-decoration:none;margin:14px 0 16px;pointer-events:none}
+.detail-title-link[href]{pointer-events:auto;cursor:pointer}
+.detail-sheet h1{font-size:clamp(30px,5.5vw,54px);line-height:1;letter-spacing:-.045em;margin:0;font-weight:500;max-width:640px}
+.detail-title-link[href]:hover h1{color:var(--blue)}
+.detail-title-link[href]:after{content:"Click title to open the original listing ↗";display:block;margin-top:10px;font:11px var(--mono);color:var(--muted);letter-spacing:.03em}
+.detail-title-link[href]:hover:after{color:var(--blue)}
+.detail-title-link:focus-visible{outline:2px solid var(--blue);outline-offset:4px}
 .detail-when{font:500 18px var(--mono);color:var(--ink)}
 .detail-place{margin:8px 0 24px;color:var(--muted)}
 .decision-banner{border-left:3px solid var(--go);background:rgba(0,185,79,.08);padding:16px;margin:24px 0}
