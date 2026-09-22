@@ -4,6 +4,8 @@
   const TODAY_WEEK_KEY = "2026-W39"; // matches data/score_summary.json scored_at (2026-09-21)
 
   const weeks = DataAccess.getWeeks();
+  const bounds = DataAccess.getMapBounds();
+  const referenceCities = DataAccess.getMapReferenceCities() || [];
   const weekSelect = document.getElementById("weekSelect");
   const weekPrev = document.getElementById("weekPrev");
   const weekNext = document.getElementById("weekNext");
@@ -21,8 +23,18 @@
   let currentWeekIndex = Math.max(0, weeks.findIndex((w) => w.key === TODAY_WEEK_KEY));
   let selectedId = null;
 
+  // 'schematic' (default, no external dependency) or 'google' (this account's own Maps API key,
+  // see app/maps_key.example.js). Falls back to schematic if no key is configured or the Google
+  // script fails to load — DESIGN_BRIEF.md's "no server, opens anywhere" baseline has to hold
+  // even without a key or a network connection.
+  let mapMode = "schematic";
+  let mapModeNote = "";
+  let googleMap = null;
+  let googleOverlays = []; // {circle, marker}
+
   const PROFESSIONAL_VERDICTS = new Set(["go", "part", "go_if", "wildcard"]);
   const PROF_STATE_LABEL = { go: "GO", part: "PART", go_if: "GO IF", wildcard: "WILDCARD" };
+  const KIND_HEX = { go: "#00b94f", part: "#ffc400", go_if: "#ffc400", wildcard: "#00b94f", social_cohort: "#189fd8", skip: "#7e8782" };
 
   function fmtTime(iso) {
     if (!iso) return "Date unknown";
@@ -48,6 +60,10 @@
     if (e.track === "social_cohort") return "social_cohort";
     if (e.verdict === "suppressed" || e.verdict === "blocked") return "skip";
     return e.verdict; // go | part | go_if | wildcard | skip
+  }
+
+  function plottableEvents(weekEvents) {
+    return weekEvents.filter((e) => e.map_bucket === "bay_area" && e.map_xy && e.verdict !== "suppressed" && e.verdict !== "blocked");
   }
 
   function populateWeekSelect() {
@@ -83,17 +99,22 @@
     const defaultPick = professional.find((e) => e.verdict === "go") || professional[0] || social[0] || skip[0] || null;
     selectedId = defaultPick ? defaultPick.id : null;
 
-    renderMap(events);
+    if (mapMode === "google" && googleMap) renderMapGoogle(events);
+    else renderMapSchematic(events);
     renderSelected(selectedId ? DataAccess.getEvent(selectedId) : null);
     renderInventory(professional, social, skip);
-    renderSuppressed(week, suppressed, skip);
+    renderSuppressed(week, suppressed);
     renderCoverageLine(week, suppressed);
   }
 
-  function renderMap(weekEvents) {
-    const plottable = weekEvents.filter((e) => e.map_bucket === "bay_area" && e.map_xy && e.verdict !== "suppressed" && e.verdict !== "blocked");
+  // ---------- Schematic fallback map (no external dependency, no network required) ----------
+
+  function renderMapSchematic(weekEvents) {
+    const plottable = plottableEvents(weekEvents);
+    const backdrop = schematicBackdrop();
+
     if (!plottable.length) {
-      eventMap.innerHTML = `<div class="map-empty">No plottable Bay Area events this week. Every listing is still in the inventory below.</div>`;
+      eventMap.innerHTML = `${mapModeNoteHtml()}<div class="map-empty">No plottable Bay Area events this week. Every listing is still in the inventory below.</div>`;
       return;
     }
 
@@ -137,8 +158,9 @@
     }).join("");
 
     eventMap.innerHTML = `
-      <svg viewBox="0 0 600 480" role="group" aria-label="Bay Area event map">
-        <rect x="0" y="0" width="600" height="480" fill="#101414"></rect>
+      ${mapModeNoteHtml()}
+      <svg viewBox="0 0 600 480" role="group" aria-label="Schematic Bay Area event map — not to scale">
+        ${backdrop}
         ${markers}
       </svg>
       <div class="map-legend">
@@ -148,7 +170,7 @@
         <span><i class="skip"></i>Skip</span>
       </div>
       <div class="map-caption">
-        <span><b>Radius scales with P.</b> Hover or select a dot for its name; a ring of dots shares one real address.</span>
+        <span><b>Radius scales with P.</b> Hover or select a dot for its name; a ring of dots shares one real address. Schematic, not to scale.</span>
       </div>`;
 
     eventMap.querySelectorAll(".map-point").forEach((node) => {
@@ -161,6 +183,149 @@
       });
     });
   }
+
+  function mapModeNoteHtml() {
+    return mapModeNote ? `<div class="map-note-banner">${escapeHtml(mapModeNote)}</div>` : "";
+  }
+
+  // A schematic (not-to-scale) Bay-Area backdrop: water down the middle, land on both sides,
+  // closing at the south where the peninsula and East Bay actually connect. Built once from
+  // real reference-city coordinates (app/build_data.py projects them through the same lat/lng
+  // formula as event markers) rather than hand-fit to any particular week's events, so it stays
+  // correct as the selected week changes.
+  function schematicBackdrop() {
+    const cityLabels = referenceCities.filter((c) => c.xy).map((c) => (
+      `<text class="map-city" x="${c.xy[0] + 8}" y="${c.xy[1] + 3}">${escapeXml(c.name.toUpperCase())}</text>
+       <circle class="map-city-dot" cx="${c.xy[0]}" cy="${c.xy[1]}" r="2.5"></circle>`
+    )).join("");
+
+    return `
+      <rect class="map-water" x="0" y="0" width="600" height="480"></rect>
+      <path class="map-land" d="M0 0H150C130 60 150 120 118 190C95 250 100 330 70 410C55 445 30 465 0 480H0Z"></path>
+      <path class="map-land" d="M260 0H600V480H320C300 400 270 340 240 280C205 210 215 150 245 95C265 58 262 25 260 0Z"></path>
+      <path class="map-bart-line" d="M40 470C90 400 110 330 100 250C95 190 130 140 175 95C210 60 230 30 245 5"></path>
+      <text class="map-note" x="16" y="22">BAY AREA · SCHEMATIC, NOT TO SCALE</text>
+      ${cityLabels}`;
+  }
+
+  // ---------- Google Maps (this session's own API key, see app/maps_key.example.js) ----------
+
+  function loadGoogleMaps(apiKey, onReady, onError) {
+    if (window.google && window.google.maps) {
+      onReady();
+      return;
+    }
+    window.__onGoogleMapsReady = onReady;
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&callback=__onGoogleMapsReady&loading=async`;
+    script.async = true;
+    script.onerror = onError;
+    document.head.appendChild(script);
+  }
+
+  const DARK_MAP_STYLE = [
+    { elementType: "geometry", stylers: [{ color: "#121515" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#a9aaa6" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#0b0d0d" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#0a1011" }] },
+    { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#171b1a" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#2a302e" }] },
+    { featureType: "poi", stylers: [{ visibility: "off" }] },
+    { featureType: "transit", elementType: "geometry", stylers: [{ color: "#189fd8" }, { visibility: "simplified" }] },
+    { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#2a302e" }] },
+  ];
+
+  function ensureGoogleMap() {
+    if (googleMap) return googleMap;
+    const canvas = document.createElement("div");
+    canvas.id = "googleMapCanvas";
+    canvas.style.cssText = "width:100%;height:500px;min-height:500px";
+    eventMap.innerHTML = "";
+    eventMap.appendChild(canvas);
+    googleMap = new google.maps.Map(canvas, {
+      center: { lat: (bounds.lat_min + bounds.lat_max) / 2, lng: (bounds.lng_min + bounds.lng_max) / 2 },
+      zoom: 12,
+      styles: DARK_MAP_STYLE,
+      disableDefaultUI: true,
+      zoomControl: true,
+      streetViewControl: false,
+      mapTypeControl: false,
+    });
+    const legend = document.createElement("div");
+    legend.className = "map-legend";
+    legend.innerHTML = `<span><i></i>Go / Part</span><span><i class="part"></i>Go if / conditional</span><span><i class="social"></i>Social / cohort</span><span><i class="skip"></i>Skip</span>`;
+    eventMap.appendChild(legend);
+    const caption = document.createElement("div");
+    caption.className = "map-caption";
+    caption.innerHTML = `<span><b>Radius scales with P.</b> Click a circle for its name and decision.</span>`;
+    eventMap.appendChild(caption);
+    return googleMap;
+  }
+
+  function renderMapGoogle(weekEvents) {
+    ensureGoogleMap();
+    googleOverlays.forEach(({ circle, marker }) => {
+      circle.setMap(null);
+      marker.setMap(null);
+    });
+    googleOverlays = [];
+
+    const plottable = plottableEvents(weekEvents);
+    if (!plottable.length) {
+      googleMap.setCenter({ lat: (bounds.lat_min + bounds.lat_max) / 2, lng: (bounds.lng_min + bounds.lng_max) / 2 });
+      googleMap.setZoom(11);
+      return;
+    }
+
+    const llBounds = new google.maps.LatLngBounds();
+    plottable.forEach((e) => {
+      const kind = rowKind(e);
+      let radiusM = 120;
+      if (kind === "social_cohort") radiusM = 180;
+      else if (kind === "skip") radiusM = 90;
+      else radiusM = 120 + 700 * (e.predicted_p || 0);
+      const color = KIND_HEX[kind] || "#7e8782";
+      const position = { lat: e.lat, lng: e.lng };
+
+      const circle = new google.maps.Circle({
+        map: googleMap,
+        center: position,
+        radius: radiusM,
+        strokeColor: color,
+        strokeWeight: e.id === selectedId ? 3 : 2,
+        fillColor: color,
+        fillOpacity: 0.22,
+        clickable: true,
+      });
+      const marker = new google.maps.Marker({
+        map: googleMap,
+        position,
+        title: `${e.name} — ${kind}`,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 4,
+          fillColor: color,
+          fillOpacity: 1,
+          strokeColor: "#0b0d0d",
+          strokeWeight: 1,
+        },
+      });
+      const onSelect = () => selectEvent(e.id);
+      circle.addListener("click", onSelect);
+      marker.addListener("click", onSelect);
+      googleOverlays.push({ circle, marker });
+      llBounds.extend(position);
+    });
+
+    if (plottable.length === 1) {
+      googleMap.setCenter(llBounds.getCenter());
+      googleMap.setZoom(14);
+    } else {
+      googleMap.fitBounds(llBounds, 48);
+    }
+  }
+
+  // ---------- Shared rendering (selected panel, inventory, suppressed summary) ----------
 
   function renderSelected(e) {
     if (!e) {
@@ -231,24 +396,29 @@
     });
   }
 
-  function renderSuppressed(week, suppressed, skip) {
-    suppressedHeadline.textContent = `${skip.length} skipped this week · ${suppressed.length} suppressed this week`;
+  // Suppressed events ONLY — skip events are already fully enumerated above in the
+  // "SET ASIDE / SKIP" inventory group with their own reason line, so they don't belong here
+  // too. Suppressed rows are deliberately kept OUT of the main inventory (SPEC.md: "~60
+  // events/week are suppressed... shown as a single honest line, never as 60 rows"), so this
+  // block — count + reason breakdown + an optional per-row drawer — is their only home.
+  function renderSuppressed(week, suppressed) {
+    suppressedHeadline.textContent = `${suppressed.length} suppressed this week`;
     const reasonCounts = {};
-    skip.concat(suppressed).forEach((e) => {
+    suppressed.forEach((e) => {
       const r = e.primary_reason || "unspecified";
       reasonCounts[r] = (reasonCounts[r] || 0) + 1;
     });
     const parts = Object.entries(reasonCounts).map(([r, n]) => `${n} ${r}`).join(", ");
     suppressedDetail.textContent = parts
       ? `Reasons: ${parts}. Suppressed means unreachable and outside this week's top 3 — not silently absent.`
-      : "Nothing set aside this week.";
+      : "Nothing suppressed this week.";
 
-    const drawerItems = skip.concat(suppressed).map((e) => `
+    const drawerItems = suppressed.map((e) => `
       <div class="skip-row">
-        <b>${e.verdict === "suppressed" ? "SUPPRESSED" : "SKIP"}</b>
+        <b>SUPPRESSED</b>
         <div>${escapeHtml(e.name)}<br><span>${escapeHtml(e.decision_line)}</span></div>
       </div>`).join("");
-    skipDrawer.innerHTML = drawerItems || `<div class="skip-row"><span>Nothing set aside this week.</span></div>`;
+    skipDrawer.innerHTML = drawerItems || `<div class="skip-row"><span>Nothing suppressed this week.</span></div>`;
   }
 
   function renderCoverageLine(week, weekSuppressed) {
@@ -270,9 +440,15 @@
       const btn = row.querySelector("button.event-name");
       row.classList.toggle("selected", btn && btn.dataset.id === id);
     });
-    document.querySelectorAll(".map-point").forEach((node) => {
-      node.classList.toggle("selected", node.dataset.id === id);
-    });
+    if (mapMode === "google" && googleMap) {
+      renderMapGoogle(DataAccess.getEventsForWeek(currentWeek().key));
+    } else {
+      document.querySelectorAll(".map-point").forEach((node) => {
+        node.classList.toggle("selected", node.dataset.id === id);
+      });
+      // Re-render so the newly-selected marker gets its label in the schematic view.
+      renderMapSchematic(DataAccess.getEventsForWeek(currentWeek().key));
+    }
   }
 
   function escapeHtml(str) {
@@ -289,7 +465,7 @@
   toggleSkips.addEventListener("click", () => {
     const open = skipDrawer.classList.toggle("open");
     toggleSkips.setAttribute("aria-expanded", String(open));
-    toggleSkips.textContent = open ? "Hide set-aside events" : "Show set-aside events";
+    toggleSkips.textContent = open ? "Hide suppressed events" : "Show suppressed events";
   });
   sourceButton.addEventListener("click", () => {
     const generatedAt = DataAccess.getGeneratedAt();
@@ -298,10 +474,24 @@
       "Data source: data/events.json + data/score_summary.json (local pipeline, not Supabase).\n" +
       `Pipeline last scored: ${scoredAt}\n` +
       `Frontend snapshot built: ${generatedAt}\n` +
+      `Map: ${mapMode === "google" ? "Google Maps (app/maps_key.local.js)" : "schematic fallback (no key configured, or Google failed to load)"}\n` +
       "Regenerate with: python3 app/build_data.py"
     );
   });
 
-  populateWeekSelect();
-  setWeek(currentWeekIndex);
+  function boot() {
+    populateWeekSelect();
+    const key = window.GOOGLE_MAPS_API_KEY;
+    if (key) {
+      loadGoogleMaps(
+        key,
+        () => { mapMode = "google"; setWeek(currentWeekIndex); },
+        () => { mapMode = "schematic"; mapModeNote = "Google Maps failed to load — showing the schematic fallback."; setWeek(currentWeekIndex); }
+      );
+    } else {
+      setWeek(currentWeekIndex);
+    }
+  }
+
+  boot();
 })();

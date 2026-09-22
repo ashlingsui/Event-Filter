@@ -1,5 +1,5 @@
 window.EVENT_FILTER_DATA = {
-  "generated_at": "2026-09-22T06:37:34.849188Z",
+  "generated_at": "2026-09-22T06:41:52.261864Z",
   "source_scored_at": "2026-09-21T07:40:45.990196Z",
   "events": [
     {
@@ -17,8 +17,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.389217,
       "map_bucket": "bay_area",
       "map_xy": [
-        321.5,
-        256.4
+        88.5,
+        128.2
       ],
       "bart_walk_min": 20,
       "reachable": true,
@@ -135,8 +135,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.39147426304413,
       "map_bucket": "bay_area",
       "map_xy": [
-        320.7,
-        252.3
+        85.7,
+        115.6
       ],
       "bart_walk_min": 8,
       "reachable": true,
@@ -174,8 +174,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.39222006716028,
       "map_bucket": "bay_area",
       "map_xy": [
-        320.4,
-        252.6
+        84.7,
+        116.5
       ],
       "bart_walk_min": 6,
       "reachable": true,
@@ -213,8 +213,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.39315146622917,
       "map_bucket": "bay_area",
       "map_xy": [
-        320.1,
-        255.3
+        83.6,
+        125.0
       ],
       "bart_walk_min": 12,
       "reachable": true,
@@ -368,8 +368,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -637,8 +637,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -678,8 +678,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.40132828034454,
       "map_bucket": "bay_area",
       "map_xy": [
-        317.2,
-        254.4
+        73.3,
+        122.0
       ],
       "bart_walk_min": 3,
       "reachable": true,
@@ -719,8 +719,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.38286930000001,
       "map_bucket": "bay_area",
       "map_xy": [
-        323.7,
-        282.9
+        96.4,
+        210.2
       ],
       "bart_walk_min": 50,
       "reachable": false,
@@ -988,8 +988,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.39438488357641,
       "map_bucket": "bay_area",
       "map_xy": [
-        319.6,
-        255.3
+        82.0,
+        125.0
       ],
       "bart_walk_min": 11,
       "reachable": true,
@@ -1067,8 +1067,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -1110,8 +1110,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.38986341171645,
       "map_bucket": "bay_area",
       "map_xy": [
-        321.2,
-        256.0
+        87.7,
+        127.2
       ],
       "bart_walk_min": 18,
       "reachable": true,
@@ -1152,8 +1152,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -1194,8 +1194,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -1349,8 +1349,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -1429,8 +1429,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -1660,8 +1660,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.41885459574364,
       "map_bucket": "bay_area",
       "map_xy": [
-        311.0,
-        257.6
+        51.4,
+        132.1
       ],
       "bart_walk_min": 11,
       "reachable": true,
@@ -1891,8 +1891,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -1932,8 +1932,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -1973,8 +1973,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -2358,8 +2358,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -2399,8 +2399,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -2440,8 +2440,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -2482,8 +2482,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.40341881710792,
       "map_bucket": "bay_area",
       "map_xy": [
-        316.4,
-        253.9
+        70.7,
+        120.5
       ],
       "bart_walk_min": 3,
       "reachable": true,
@@ -2523,8 +2523,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -2564,8 +2564,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -2605,8 +2605,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.3934746,
       "map_bucket": "bay_area",
       "map_xy": [
-        320.0,
-        252.4
+        83.2,
+        116.1
       ],
       "bart_walk_min": 5,
       "reachable": true,
@@ -2760,8 +2760,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.39454243260293,
       "map_bucket": "bay_area",
       "map_xy": [
-        319.6,
-        256.1
+        81.8,
+        127.4
       ],
       "bart_walk_min": 15,
       "reachable": true,
@@ -2801,8 +2801,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.397348,
       "map_bucket": "bay_area",
       "map_xy": [
-        318.6,
-        252.6
+        78.3,
+        116.6
       ],
       "bart_walk_min": 3,
       "reachable": true,
@@ -2881,8 +2881,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -2960,8 +2960,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2718801,
       "map_bucket": "bay_area",
       "map_xy": [
-        362.9,
-        249.9
+        235.1,
+        108.1
       ],
       "bart_walk_min": 4,
       "reachable": true,
@@ -3039,8 +3039,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -3080,8 +3080,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.40132333122932,
       "map_bucket": "bay_area",
       "map_xy": [
-        317.2,
-        254.4
+        73.3,
+        122.0
       ],
       "bart_walk_min": 3,
       "reachable": true,
@@ -3121,8 +3121,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.39536524578432,
       "map_bucket": "bay_area",
       "map_xy": [
-        319.3,
-        255.4
+        80.8,
+        125.3
       ],
       "bart_walk_min": 11,
       "reachable": true,
@@ -3200,8 +3200,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -3241,8 +3241,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.1636799,
       "map_bucket": "bay_area",
       "map_xy": [
-        401.1,
-        332.6
+        370.4,
+        363.5
       ],
       "bart_walk_min": 257,
       "reachable": false,
@@ -3282,8 +3282,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2868641,
       "map_bucket": "bay_area",
       "map_xy": [
-        357.6,
-        240.7
+        216.4,
+        79.9
       ],
       "bart_walk_min": 20,
       "reachable": true,
@@ -3399,8 +3399,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.39602074038247,
       "map_bucket": "bay_area",
       "map_xy": [
-        319.1,
-        255.7
+        80.0,
+        126.1
       ],
       "bart_walk_min": 12,
       "reachable": true,
@@ -3478,8 +3478,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -3519,8 +3519,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -3636,8 +3636,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -3715,8 +3715,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -3794,8 +3794,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.40356236471928,
       "map_bucket": "bay_area",
       "map_xy": [
-        316.4,
-        253.6
+        70.5,
+        119.8
       ],
       "bart_walk_min": 3,
       "reachable": true,
@@ -3911,8 +3911,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -3952,8 +3952,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.0357862415077,
       "map_bucket": "bay_area",
       "map_xy": [
-        446.2,
-        350.4
+        530.3,
+        418.6
       ],
       "bart_walk_min": 170,
       "reachable": false,
@@ -3993,8 +3993,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.42172744835405,
       "map_bucket": "bay_area",
       "map_xy": [
-        310.0,
-        257.4
+        47.8,
+        131.4
       ],
       "bart_walk_min": 12,
       "reachable": true,
@@ -4032,8 +4032,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -4073,8 +4073,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -4114,8 +4114,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -4155,8 +4155,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -4196,8 +4196,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -4237,8 +4237,8 @@ window.EVENT_FILTER_DATA = {
       "lng": -122.2537582,
       "map_bucket": "bay_area",
       "map_xy": [
-        369.3,
-        235.0
+        257.8,
+        62.2
       ],
       "bart_walk_min": 16,
       "reachable": true,
@@ -4361,5 +4361,58 @@ window.EVENT_FILTER_DATA = {
       }
     }
   },
-  "social_cohort_overrides_note": "DRAFT \u2014 unreviewed by Ashling. score/verdicts.py has no field distinguishing a social/cohort plan from an ordinary low-scoring professional event, and a per-club rule doesn't work (the same club hosts both kinds of event \u2014 see DESIGN_V12_HANDOFF review, 2026-09-21). This file is a manual, per-event allowlist so the board can still show a Social/Cohort lane without inventing a classification. Every id below is Claude's best guess from the event name alone, not a confirmed fact \u2014 confirm or edit each entry before trusting the lane. Unlisted events are never auto-classified; they keep their real pipeline verdict."
+  "social_cohort_overrides_note": "DRAFT \u2014 unreviewed by Ashling. score/verdicts.py has no field distinguishing a social/cohort plan from an ordinary low-scoring professional event, and a per-club rule doesn't work (the same club hosts both kinds of event \u2014 see DESIGN_V12_HANDOFF review, 2026-09-21). This file is a manual, per-event allowlist so the board can still show a Social/Cohort lane without inventing a classification. Every id below is Claude's best guess from the event name alone, not a confirmed fact \u2014 confirm or edit each entry before trusting the lane. Unlisted events are never auto-classified; they keep their real pipeline verdict.",
+  "map_bounds": {
+    "lat_min": 37.28,
+    "lat_max": 37.96,
+    "lng_min": -122.46,
+    "lng_max": -121.98
+  },
+  "map_reference_cities": [
+    {
+      "name": "San Francisco",
+      "lat": 37.7749,
+      "lng": -122.4194,
+      "xy": [
+        50.7,
+        130.7
+      ]
+    },
+    {
+      "name": "Berkeley",
+      "lat": 37.8715,
+      "lng": -122.273,
+      "xy": [
+        233.8,
+        62.5
+      ]
+    },
+    {
+      "name": "Oakland",
+      "lat": 37.8044,
+      "lng": -122.2712,
+      "xy": [
+        236.0,
+        109.8
+      ]
+    },
+    {
+      "name": "Emeryville",
+      "lat": 37.8313,
+      "lng": -122.2852,
+      "xy": [
+        218.5,
+        90.8
+      ]
+    },
+    {
+      "name": "Palo Alto",
+      "lat": 37.4419,
+      "lng": -122.143,
+      "xy": [
+        396.2,
+        365.7
+      ]
+    }
+  ]
 };

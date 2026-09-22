@@ -61,6 +61,14 @@ const DataAccess = (() => {
     return raw().social_cohort_overrides_note;
   }
 
+  function getMapBounds() {
+    return raw().map_bounds;
+  }
+
+  function getMapReferenceCities() {
+    return raw().map_reference_cities;
+  }
+
   return {
     getEvents,
     getEvent,
@@ -72,5 +80,7 @@ const DataAccess = (() => {
     getGeneratedAt,
     getSourceScoredAt,
     getSocialCohortNote,
+    getMapBounds,
+    getMapReferenceCities,
   };
 })();

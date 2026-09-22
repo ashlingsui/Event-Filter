@@ -21,7 +21,24 @@ APP_DIR = Path(__file__).parent
 OUT_PATH = APP_DIR / "generated" / "data.js"
 PRIVATE_OUT_PATH = APP_DIR / "generated" / "private_data.js"
 
-BAY_AREA_BOUNDS = {"lat_min": 36.8, "lat_max": 38.9, "lng_min": -123.3, "lng_max": -121.6}
+# Tight to where the real event data actually lives (checked live 2026-09-21: 51 of 108 rows
+# fall inside SF/Berkeley/Oakland/Emeryville plus a couple South Bay points; the rest are a
+# global Claude Community calendar spanning Barcelona/Tokyo/Sydney/etc — genuinely elsewhere,
+# not a geocoding error). A loose box just wastes canvas on empty ocean/Central Valley and
+# shrinks the real cluster to a speck. Anything outside this box is "outside_bay_area", not
+# silently reprojected into it.
+BAY_AREA_BOUNDS = {"lat_min": 37.28, "lat_max": 37.96, "lng_min": -122.46, "lng_max": -121.98}
+
+# Real, published city coordinates — used only to orient the schematic fallback map (labels),
+# never to place an event. Projected through the same _project() function as event markers so
+# a label and a real nearby event marker land in a consistent relative position.
+REFERENCE_CITIES = {
+    "San Francisco": (37.7749, -122.4194),
+    "Berkeley": (37.8715, -122.2730),
+    "Oakland": (37.8044, -122.2712),
+    "Emeryville": (37.8313, -122.2852),
+    "Palo Alto": (37.4419, -122.1430),
+}
 
 REASON_SENTENCES = {
     "not_reachable": "Not BART-reachable, and didn't rank in this week's top 3 to justify the ride.",
@@ -212,6 +229,11 @@ def build():
     # file is committed (so the shipped static page works without a rebuild) and is meant to be
     # safe to hand to a recruiter or make public. Outcomes/hypotheses go in a SEPARATE generated
     # file that .gitignore excludes too, for Ashling's own local read-back/learning views only.
+    reference_cities = []
+    for name, (lat, lng) in REFERENCE_CITIES.items():
+        xy = _project({"lat": lat, "lng": lng}, "bay_area")
+        reference_cities.append({"name": name, "lat": lat, "lng": lng, "xy": xy})
+
     public_payload = {
         "generated_at": dt.datetime.utcnow().isoformat() + "Z",
         "source_scored_at": score_summary.get("scored_at"),
@@ -219,6 +241,8 @@ def build():
         "weeks": [{"key": k, "label": v} for k, v in sorted(week_meta.items())],
         "score_summary": score_summary,
         "social_cohort_overrides_note": overrides_doc.get("_note"),
+        "map_bounds": BAY_AREA_BOUNDS,
+        "map_reference_cities": reference_cities,
     }
     private_payload = {
         "generated_at": public_payload["generated_at"],

@@ -51,8 +51,15 @@ a{color:inherit}
 .week-nav:disabled{color:var(--faint);border-color:var(--line);cursor:not-allowed}
 .week-select{background:#0d1010;border:1px solid var(--line);color:var(--ink);font:12px var(--mono);padding:8px}
 
-.event-map{position:relative;min-height:500px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(circle at 18% 73%,rgba(0,185,79,.11),transparent 25%),#101414}
+.event-map{position:relative;min-height:500px;overflow:hidden;border:1px solid var(--line);background:#101414}
 .event-map svg{display:block;width:100%;height:auto;min-height:500px}
+.map-water{fill:#0a1011}
+.map-land{fill:#171b1a;stroke:#3a4540;stroke-width:1.5}
+.map-bart-line{fill:none;stroke:var(--blue);stroke-width:2.5;stroke-linecap:round;opacity:.55}
+.map-city{font:11px var(--mono);fill:#8e9893;letter-spacing:.05em}
+.map-city-dot{fill:#57615b}
+.map-note{font:10px var(--mono);fill:#69736f;letter-spacing:.08em}
+.map-note-banner{position:absolute;top:0;left:0;right:0;z-index:1;padding:8px 14px;background:rgba(255,196,0,.12);border-bottom:1px solid var(--line);color:var(--part);font:11px var(--mono)}
 .map-point circle{fill:var(--ground);stroke:var(--go);stroke-width:4;transition:r .18s}
 .map-point.part circle,.map-point.go_if circle{stroke:var(--part)}
 .map-point.social_cohort circle{stroke:var(--blue)}
