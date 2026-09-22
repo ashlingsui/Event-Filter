@@ -31,6 +31,7 @@
   let mapModeNote = "";
   let googleMap = null;
   let googleOverlays = []; // {circle, marker}
+  let hoverInfoWindow = null;
 
   const PROFESSIONAL_VERDICTS = new Set(["go", "part", "go_if", "wildcard"]);
   const PROF_STATE_LABEL = { go: "GO", part: "PART", go_if: "GO IF", wildcard: "WILDCARD" };
@@ -262,8 +263,9 @@
     eventMap.appendChild(legend);
     const caption = document.createElement("div");
     caption.className = "map-caption";
-    caption.innerHTML = `<span><b>Radius scales with P.</b> Click a circle for its name and decision.</span>`;
+    caption.innerHTML = `<span><b>Radius scales with P.</b> Hover for the name, click for the decision.</span>`;
     eventMap.appendChild(caption);
+    hoverInfoWindow = new google.maps.InfoWindow({ disableAutoPan: true });
     return googleMap;
   }
 
@@ -285,21 +287,29 @@
     const llBounds = new google.maps.LatLngBounds();
     plottable.forEach((e) => {
       const kind = rowKind(e);
+      // "Skips remain quiet" (DESIGN_V12_HANDOFF.md) means lower-contrast, not invisible — a
+      // 90m/22%-opacity grey circle on a real, visually busy street map was effectively
+      // impossible to see. Bumped enough to actually register while staying the smallest,
+      // dimmest marker on the board.
       let radiusM = 120;
+      let fillOpacity = 0.22;
+      let strokeOpacity = 1;
       if (kind === "social_cohort") radiusM = 180;
-      else if (kind === "skip") radiusM = 90;
+      else if (kind === "skip") { radiusM = 150; fillOpacity = 0.35; strokeOpacity = 0.85; }
       else radiusM = 120 + 700 * (e.predicted_p || 0);
       const color = KIND_HEX[kind] || "#7e8782";
       const position = { lat: e.lat, lng: e.lng };
+      const isSelected = e.id === selectedId;
 
       const circle = new google.maps.Circle({
         map: googleMap,
         center: position,
         radius: radiusM,
         strokeColor: color,
-        strokeWeight: e.id === selectedId ? 3 : 2,
+        strokeOpacity,
+        strokeWeight: isSelected ? 3 : 2,
         fillColor: color,
-        fillOpacity: 0.22,
+        fillOpacity,
         clickable: true,
       });
       const marker = new google.maps.Marker({
@@ -308,7 +318,7 @@
         title: `${e.name} — ${kind}`,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
-          scale: 4,
+          scale: kind === "skip" ? 3.5 : 4.5,
           fillColor: color,
           fillOpacity: 1,
           strokeColor: "#0b0d0d",
@@ -316,9 +326,18 @@
         },
       });
       const onSelect = () => selectEvent(e.id);
-      circle.addListener("click", onSelect);
-      marker.addListener("click", onSelect);
-      googleOverlays.push({ circle, marker });
+      const stateLabel = kind === "social_cohort" ? "Social / cohort" : kind === "skip" ? "Skip" : (PROF_STATE_LABEL[e.verdict] || e.verdict);
+      const onHover = () => {
+        hoverInfoWindow.setContent(`<div style="font:12px/1.3 sans-serif;color:#111;max-width:220px"><b>${escapeHtml(e.name)}</b><br><span style="color:#555">${escapeHtml(stateLabel)}</span></div>`);
+        hoverInfoWindow.open({ map: googleMap, anchor: marker });
+      };
+      const onUnhover = () => hoverInfoWindow.close();
+      [circle, marker].forEach((overlay) => {
+        overlay.addListener("click", onSelect);
+        overlay.addListener("mouseover", onHover);
+        overlay.addListener("mouseout", onUnhover);
+      });
+      googleOverlays.push({ circle, marker, event: e });
       llBounds.extend(position);
     });
 
@@ -349,14 +368,16 @@
       scoreBlock = `
         <div class="selected-score muted-score">
           <b>${pText(e)}</b>
-          <span>Pipeline's professional P, shown for transparency — not why this is on your plan. It never becomes a read-back.</span>
-        </div>`;
+          <span>PIPELINE'S P</span>
+        </div>
+        <p class="p-score-help">Shown for transparency, not why this is on your plan — the pipeline scores every row the same way, and this one just isn't a professional bet. It never becomes a read-back.</p>`;
     } else {
       scoreBlock = `
         <div class="selected-score">
           <b>${pText(e)}</b>
-          <span>P(contact ∪ build) — pre-event chance of a traceable contact or build, not a fun/prestige score.</span>
-        </div>`;
+          <span>P(contact ∪ build)</span>
+        </div>
+        <p class="p-score-help">Pre-event chance of a traceable contact or build, not a fun/prestige score.</p>`;
     }
 
     const dupNote = e.duplicate_of_name
@@ -372,7 +393,33 @@
       ${dupNote}
       <div class="selected-actions">
         ${e.url ? `<a href="${escapeAttr(e.url)}" target="_blank" rel="noopener">EVENT LISTING ↗</a>` : `<span class="selected-note">No listing URL recorded.</span>`}
-      </div>`;
+      </div>
+      ${moreDetailBlock(e, kind)}`;
+  }
+
+  // A compact stand-in for the full event-detail page (step 2, not built yet). Board-scoped:
+  // more of the facts already in the data, not the Want/Pass workflow or context-strip inputs,
+  // which belong to that step. Native <details> keeps it keyboard/screen-reader accessible with
+  // no extra JS.
+  function moreDetailBlock(e, kind) {
+    const rows = [
+      ["Host", e.host_display || "Not listed"],
+      ["Format", e.format || "Unknown"],
+      ["Source", e.source || "Unknown"],
+      ["RSVP state", e.rsvp_state || "none"],
+    ];
+    if (kind !== "social_cohort") {
+      rows.push(["Cost blocks", e.cost_blocks != null ? String(e.cost_blocks) : "Unknown"]);
+      rows.push(["BART walk", e.bart_walk_min != null ? `${e.bart_walk_min} min` : "Unknown"]);
+      if (e.why_raw) rows.push(["Score factors (raw)", e.why_raw]);
+    }
+    return `
+      <details class="more-detail">
+        <summary>More detail</summary>
+        <div class="detail-facts">
+          ${rows.map(([k, v]) => `<div><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`).join("")}
+        </div>
+      </details>`;
   }
 
   function inventoryRow(e) {

@@ -88,12 +88,20 @@ a{color:inherit}
 .selected-line{font-size:14px;line-height:1.42;color:var(--muted);margin:13px 0}
 .selected-score{display:flex;justify-content:space-between;align-items:end;gap:10px}
 .selected-score b{display:block;font:500 29px var(--mono);letter-spacing:-.07em}
-.selected-score span{font:10px var(--mono);color:var(--muted);text-align:right;max-width:180px}
+.selected-score span{font:10px var(--mono);color:var(--muted);text-align:right}
 .selected-score.muted-score b{color:var(--faint);font-size:22px}
+.p-score-help{margin:7px 0 0;font-size:12px;line-height:1.4;color:var(--muted)}
 .selected-actions{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap}
 .selected-actions a{border:1px solid var(--line);padding:7px 9px;text-decoration:none;font:11px var(--mono);color:var(--ink)}
 .selected-actions a:hover{border-color:var(--blue);color:var(--blue)}
 .selected-note{font:11px var(--mono);color:var(--faint);margin-top:10px}
+.more-detail{margin-top:14px}
+.more-detail summary{cursor:pointer;font:11px var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.more-detail summary:hover{color:var(--ink)}
+.more-detail .detail-facts{margin-top:10px;border-top:1px solid var(--line)}
+.more-detail .detail-facts div{padding:9px 0;border-bottom:1px solid var(--line);font-size:12px;display:grid;grid-template-columns:110px 1fr;gap:10px}
+.more-detail .detail-facts b{font:11px var(--mono);color:var(--muted)}
+.more-detail .detail-facts span{color:#d3d9d4;word-break:break-word}
 .side-block{padding:16px 0;border-bottom:1px solid var(--line)}
 .side-block h2{font:500 12px var(--mono);letter-spacing:.07em;margin:0 0 8px}
 .honest-line{color:var(--muted);font-size:13px;margin:0}
