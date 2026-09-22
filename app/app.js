@@ -29,7 +29,8 @@
   let mapModeNote = "";
   let googleMap = null;
   let googleOverlays = []; // {marker, event}
-  let selectionHalo = null; // the one Circle overlay, drawn only around the selected marker
+  let clusterBadgeOverlays = []; // one per real-world cluster with 2+ events
+  let selectionHalo = null; // one reusable DOM overlay, shown around whichever marker is selected
   let hoverTooltip = null;
 
   // A custom OverlayView instead of google.maps.InfoWindow — the default InfoWindow renders as
@@ -68,6 +69,97 @@
       }
     }
     return new HoverTooltip();
+  }
+
+  // The "halo" around the selected marker, brought back as a DOM overlay instead of a static
+  // google.maps.Circle so it can carry a real CSS pulse animation — two staggered expanding
+  // rings plus a solid glowing core, so it reads clearly even at a zoom level where the map
+  // itself isn't moving and the marker alone could get lost in a cluster. Respects
+  // prefers-reduced-motion (DESIGN_BRIEF.md baseline requirement) by falling back to a static
+  // ring rather than disabling the indicator entirely.
+  function makeSelectionHalo() {
+    class SelectionHalo extends google.maps.OverlayView {
+      // setMap() schedules onAdd() asynchronously — it does NOT run synchronously before the
+      // next line executes. The very first renderMapGoogle() call runs show() immediately after
+      // ensureGoogleMap()'s setMap(), so this.div was reliably still null at that point: the
+      // style-setting silently no-op'd, while this.position (set unconditionally) got picked up
+      // later by Maps' automatic draw() calls during fitBounds — which is why the halo div was
+      // positioned correctly but never actually visible. Desired state now lives on the instance
+      // (_visible/_color) independent of whether the div exists yet, and onAdd re-applies it.
+      onAdd() {
+        this.div = document.createElement("div");
+        this.div.className = "map-selection-halo";
+        this.div.innerHTML = `<div class="ring"></div><div class="ring ring-2"></div><div class="core"></div>`;
+        this.getPanes().floatPane.appendChild(this.div);
+        this._applyState();
+      }
+      draw() {
+        if (!this.position || !this.div) return;
+        const point = this.getProjection().fromLatLngToDivPixel(this.position);
+        if (point) {
+          this.div.style.left = `${point.x}px`;
+          this.div.style.top = `${point.y}px`;
+        }
+      }
+      _applyState() {
+        if (!this.div) return;
+        this.div.style.display = this._visible ? "block" : "none";
+        if (this._visible && this._color) {
+          this.div.style.color = this._color;
+          this.div.querySelectorAll(".ring").forEach((r) => { r.style.background = this._color; });
+        }
+      }
+      show(position, colorHex) {
+        this.position = position instanceof google.maps.LatLng ? position : new google.maps.LatLng(position.lat, position.lng);
+        this._visible = true;
+        this._color = colorHex;
+        this._applyState();
+        this.draw();
+      }
+      hide() {
+        this._visible = false;
+        this._applyState();
+      }
+      onRemove() {
+        if (this.div && this.div.parentNode) this.div.parentNode.removeChild(this.div);
+        this.div = null;
+      }
+    }
+    return new SelectionHalo();
+  }
+
+  // A small persistent (not hover-only) badge at a real cluster's true center, tallying what's
+  // there by kind — "so many events this week, here's what's under that one dot when you're
+  // zoomed out." Unlike the hover tooltip and halo, one of these exists per cluster, rebuilt
+  // every render since composition changes week to week.
+  function makeClusterBadge(position, countsByKind) {
+    class ClusterBadge extends google.maps.OverlayView {
+      onAdd() {
+        this.div = document.createElement("div");
+        this.div.className = "map-cluster-badge";
+        this.div.innerHTML = countsByKind.map(([kind, n]) => (
+          `<span><i style="background:${KIND_HEX[kind] || "#7e8782"}"></i>${n}</span>`
+        )).join("");
+        this.div.style.display = "block";
+        this.getPanes().floatPane.appendChild(this.div);
+      }
+      draw() {
+        if (!this.div) return;
+        const point = this.getProjection().fromLatLngToDivPixel(this.position);
+        if (point) {
+          this.div.style.left = `${point.x}px`;
+          this.div.style.top = `${point.y}px`;
+        }
+      }
+      onRemove() {
+        if (this.div && this.div.parentNode) this.div.parentNode.removeChild(this.div);
+        this.div = null;
+      }
+    }
+    const overlay = new ClusterBadge();
+    overlay.position = position instanceof google.maps.LatLng ? position : new google.maps.LatLng(position.lat, position.lng);
+    overlay.setMap(googleMap);
+    return overlay;
   }
 
   const PROFESSIONAL_VERDICTS = new Set(["go", "part", "go_if", "wildcard"]);
@@ -304,10 +396,12 @@
     eventMap.appendChild(legend);
     const caption = document.createElement("div");
     caption.className = "map-caption";
-    caption.innerHTML = `<span><b>Radius scales with P.</b> Hover for the name, click for the decision.</span>`;
+    caption.innerHTML = `<span><b>Dot size scales with P.</b> Hover for the name, click for the decision. A labeled tag means several events share one address.</span>`;
     eventMap.appendChild(caption);
     hoverTooltip = makeHoverTooltip();
     hoverTooltip.setMap(googleMap);
+    selectionHalo = makeSelectionHalo();
+    selectionHalo.setMap(googleMap);
     return googleMap;
   }
 
@@ -317,19 +411,26 @@
   // whichever one happens to draw last is visible — which is why the blue social markers were
   // invisible, not filtered out. Same technique as the schematic SVG's clustering, done in real
   // lat/lng degrees instead of pixels so it still plots at an honest, traceable location.
-  function spreadOverlappingPositions(events) {
+  function groupByProximity(events) {
     const clusters = [];
     events.forEach((e) => {
       const hit = clusters.find((c) => Math.abs(c.lat - e.lat) < 0.0002 && Math.abs(c.lng - e.lng) < 0.0002);
       if (hit) hit.items.push(e);
       else clusters.push({ lat: e.lat, lng: e.lng, items: [e] });
     });
-    const out = [];
+    return clusters;
+  }
+
+  // Returns {positioned, clusters}: positioned is every event with its spread-apart lat/lng
+  // (small ring around clusters of 2+, since markers are now compact fixed-pixel dots — a wide
+  // spread just made a crowded building look scattered across three neighborhoods); clusters is
+  // the raw grouping, used separately to render a count-by-kind badge at each real cluster's
+  // true center once zoomed out far enough that even the spread ring collapses back to one dot.
+  function spreadOverlappingPositions(events) {
+    const clusters = groupByProximity(events);
+    const positioned = [];
     clusters.forEach((c) => {
       const n = c.items.length;
-      // Markers are now small fixed-pixel dots, not meter-radius circles (see renderMapGoogle),
-      // so a tight ring is enough to separate them — a wide spread just made a crowded building
-      // look like it was scattered across three neighborhoods, which was its own kind of wrong.
       const ringM = n > 1 ? Math.min(85, 26 + n * 8) : 0;
       const latDegPerM = 1 / 111320;
       const lngDegPerM = 1 / (111320 * Math.cos((c.lat * Math.PI) / 180));
@@ -337,17 +438,20 @@
         const angle = (2 * Math.PI * i) / n - Math.PI / 2;
         const lat = n > 1 ? c.lat + ringM * Math.cos(angle) * latDegPerM : c.lat;
         const lng = n > 1 ? c.lng + ringM * Math.sin(angle) * lngDegPerM : c.lng;
-        out.push({ event: e, lat, lng });
+        positioned.push({ event: e, lat, lng });
       });
     });
-    return out;
+    return { positioned, clusters };
   }
 
   function renderMapGoogle(weekEvents) {
     ensureGoogleMap();
     googleOverlays.forEach(({ marker }) => marker.setMap(null));
     googleOverlays = [];
-    if (selectionHalo) { selectionHalo.setMap(null); selectionHalo = null; }
+    clusterBadgeOverlays.forEach((b) => b.setMap(null));
+    clusterBadgeOverlays = [];
+    selectionHalo.hide();
+    let selectedShown = false;
 
     const plottable = plottableEvents(weekEvents);
     if (!plottable.length) {
@@ -361,11 +465,10 @@
     // the moment more than 2-3 shared a spot — bigger P meant a bigger circle meant MORE overlap,
     // exactly backwards. Switched to compact icon markers whose SIZE IS IN FIXED SCREEN PIXELS,
     // not real-world meters: P still drives size for professional events, but a crowded building
-    // now reads as a small tidy cluster of dots instead of stacked translucent haze. The one
-    // exception is the selected event, which gets a single real Circle "halo" — there's only
-    // ever one of those on screen at a time, so it can't crowd anything.
+    // now reads as a small tidy cluster of dots instead of stacked translucent haze.
+    const { positioned, clusters } = spreadOverlappingPositions(plottable);
     const llBounds = new google.maps.LatLngBounds();
-    spreadOverlappingPositions(plottable).forEach(({ event: e, lat, lng }) => {
+    positioned.forEach(({ event: e, lat, lng }) => {
       const kind = rowKind(e);
       let scale = 5;
       if (kind === "social_cohort") scale = 7;
@@ -398,18 +501,21 @@
       llBounds.extend(position);
 
       if (isSelected) {
-        selectionHalo = new google.maps.Circle({
-          map: googleMap,
-          center: position,
-          radius: 90,
-          strokeColor: color,
-          strokeOpacity: 0.9,
-          strokeWeight: 2,
-          fillColor: color,
-          fillOpacity: 0.15,
-          clickable: false,
-        });
+        selectionHalo.show(position, color);
+        selectedShown = true;
       }
+    });
+    if (!selectedShown) selectionHalo.hide();
+
+    // Cluster badges: "6 blue, 4 white, 1 yellow" at a glance, at the cluster's TRUE (unspread)
+    // coordinate — zoomed out far enough, even the small spread ring collapses back into what
+    // looks like one dot, and this is what tells you it isn't.
+    clusters.filter((c) => c.items.length > 1).forEach((c) => {
+      const counts = {};
+      c.items.forEach((e) => { const k = rowKind(e); counts[k] = (counts[k] || 0) + 1; });
+      const order = ["go", "part", "go_if", "wildcard", "social_cohort", "skip"];
+      const countsByKind = order.filter((k) => counts[k]).map((k) => [k, counts[k]]);
+      clusterBadgeOverlays.push(makeClusterBadge({ lat: c.lat, lng: c.lng }, countsByKind));
     });
 
     if (plottable.length === 1) {
