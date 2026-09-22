@@ -73,5 +73,15 @@ Python entry points execute a file-backed pipeline rooted at the repository:
     `data/outcomes.json`) — there is no server for a static page to write to, so it's a
     per-device stand-in, and the UI says so. Real capture into the pipeline is a separate,
     later step.
+  - `app/readback_store.js` is the same per-device-localStorage pattern applied to the read-back
+    view's free-text notes. There is no live extraction anywhere on this page: turning a note
+    into a Recorded fact or a Suspected hypothesis needs a real model call, which needs a server
+    holding an API key — a static page has neither, and unlike the Google Maps key, an LLM key
+    is a real secret that must never sit in client-side code. SPEC.md §5 already names the real
+    fix (a serverless function) for when this moves off local-only; until then a saved note stays
+    exactly what was typed, and `capture_feedback.py` remains the real path into
+    `data/outcomes.json`. The read-back view reads `data/outcomes.json` and
+    `data/pending_hypotheses.json` directly (via `private_data.js`, gitignored) — real, sensitive,
+    named-people data, never the committed `data.js`.
 - `supabase/` contains a SQL schema and Python REST/onboarding/migration helpers for a future
   hosted backend. The local pipeline does not depend on a live Supabase connection.

@@ -26,8 +26,14 @@ Updated: 2026-09-21
   warm-hook context strip with a live P recompute (`app/scoring.js`, a faithful port of
   `score/scorer.py`'s value formula — the verdict itself stays authoritative from the next real
   pipeline run), why-grid/facts/provenance from real fields, and per-device intent persistence
-  (`app/intent_store.js`, localStorage — explicitly not the real `capture/` layer). Steps 3–4
-  (read-back, then prep/learn/about/intake) are not built yet.
+  (`app/intent_store.js`, localStorage — explicitly not the real `capture/` layer). Step 3
+  (read-back, `#/readback`, reachable from the rail nav — real hash routing now exists between
+  views) is built too: choose an attended event from `data/outcomes.json`, its real Recorded
+  facts and the Suspected hypotheses that name it as supporting evidence
+  (`data/pending_hypotheses.json`) display side by side, and free text saves as a note
+  (`app/readback_store.js`, localStorage) rather than being auto-extracted — there is no live
+  LLM extraction anywhere in this build; that needs a server-held API key, which a static page
+  can't safely hold (SPEC.md §5). Step 4 (prep/learn/about/intake) is not built yet.
   Two conflicts were surfaced and resolved with Ashling before building: `quota_full` renders
   as "lost its slot to `<event>`", never a capacity meter; the SPEC/brief principle lines stay
   as the board headline + Learning/About material, and the handoff's four decision-tier lines

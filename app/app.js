@@ -925,6 +925,171 @@
   function escapeAttr(str) { return escapeHtml(str); }
   function escapeXml(str) { return escapeHtml(str); }
 
+  // ---------- Read-back (step 3) ----------
+  // No live free-text extraction anywhere on this page — turning a note into a Recorded fact or
+  // a Suspected hypothesis needs a real model call, which needs a server holding an API key. A
+  // static page has no server, and unlike the Google Maps key, an LLM key is a real secret that
+  // must never be embedded in client-side code anyone can view-source (SPEC.md §5 already names
+  // the real fix — a serverless function — for when this moves off local-only). So a saved note
+  // stays exactly what she typed; capture_feedback.py remains the real, reviewable path from a
+  // note to a recorded fact.
+
+  let readbackEventId = null;
+
+  function readbackOutcomeRows() {
+    const outcomes = DataAccess.getOutcomes();
+    return outcomes && outcomes.rows ? outcomes.rows : [];
+  }
+
+  const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function fmtDateShort(dateStr) {
+    if (!dateStr) return "Unknown date";
+    // Plain "YYYY-MM-DD" (outcomes.json's date/t7_due fields) has no time component, but
+    // `new Date("2026-09-18")` parses it as UTC midnight — formatting that back with
+    // toLocaleDateString() uses the LOCAL timezone, which rolls it back to Sep 17 anywhere west
+    // of UTC (confirmed live: Pacific showed "Sep 17"/"Sep 24" for dates that are really the
+    // 18th/25th). Read the calendar digits directly instead of going through Date/timezone
+    // conversion at all for this format.
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateStr);
+    if (m) return `${SHORT_MONTHS[parseInt(m[2], 10) - 1]} ${parseInt(m[3], 10)}`;
+    const d = new Date(dateStr);
+    return Number.isNaN(d.getTime()) ? dateStr : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  }
+
+  function readbackStatusLabel(row) {
+    if (row.label_status === "labeled") return "Labelled";
+    if (row.t7_due) {
+      const due = new Date(row.t7_due);
+      const now = new Date();
+      return due > now ? `T+7 due ${fmtDateShort(row.t7_due)}` : `T+7 due ${fmtDateShort(row.t7_due)} — overdue`;
+    }
+    return "Unknown";
+  }
+
+  function populateReadbackSelect() {
+    const select = document.getElementById("readbackEvent");
+    const rows = readbackOutcomeRows();
+    select.innerHTML = rows.length
+      ? rows.map((r) => `<option value="${escapeAttr(r.event_id)}">${escapeHtml(fmtDateShort(r.date))} · ${escapeHtml(r.name)} · ${escapeHtml(readbackStatusLabel(r))}</option>`).join("")
+      : `<option value="">No attended events recorded yet</option>`;
+  }
+
+  function renderRecordedFacts(row) {
+    const container = document.getElementById("recordedFacts");
+    const notesContainer = document.getElementById("pendingNotesList");
+    if (!row) {
+      container.innerHTML = `<p class="recorded-empty">No attended events yet.</p>`;
+      notesContainer.innerHTML = "";
+      return;
+    }
+    const rows = [];
+    rows.push(["attended", row.partial ? "true (partial)" : String(!!row.attended)]);
+    if (row.felt_score != null) rows.push(["felt_score", String(row.felt_score)]);
+    if (row.companions && row.companions.length) rows.push(["companions", row.companions.join(", ")]);
+    if (row.trip_chained != null) rows.push(["trip_chained", String(row.trip_chained)]);
+    if (row.cost_blocks != null) rows.push(["cost_blocks", String(row.cost_blocks)]);
+    ["s1_pov", "s2_contact", "s3_build", "s4_cohort"].forEach((k) => {
+      if (row[k] !== undefined) rows.push([k, String(row[k])]);
+    });
+    if (row.hit !== undefined) rows.push(["hit", String(row.hit)]);
+    if (row.felt_note) rows.push(["felt_note", row.felt_note]);
+    container.innerHTML = rows.map(([k, v]) => `<div class="fact"><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`).join("");
+
+    const notes = ReadbackStore.getNotes(row.event_id);
+    notesContainer.innerHTML = notes.length
+      ? notes.map((n) => `<div class="pending-note"><b>YOUR NOTE · SAVED ON THIS DEVICE · ${escapeHtml(new Date(n.saved_at).toLocaleString())}</b>${escapeHtml(n.text)}</div>`).join("")
+      : "";
+  }
+
+  function renderSuspectedHypotheses(row) {
+    const container = document.getElementById("suspectedHypotheses");
+    const awaiting = document.getElementById("awaitingNote");
+    if (!row) {
+      container.innerHTML = "";
+      awaiting.textContent = "";
+      return;
+    }
+    const hyps = DataAccess.getPendingHypotheses();
+    const all = hyps && hyps.hypotheses ? Object.values(hyps.hypotheses) : [];
+    const relevant = all.filter((h) => (h.supporting_events || []).includes(row.event_id));
+    if (!relevant.length) {
+      container.innerHTML = `<p class="suspected-empty">No pending hypothesis names this event as supporting evidence yet.</p>`;
+      awaiting.textContent = "";
+      return;
+    }
+    container.innerHTML = relevant.map((h) => {
+      const n = (h.supporting_events || []).length;
+      const pct = Math.min(100, Math.round((n / 3) * 100));
+      return `<div class="hypothesis"><b>${escapeHtml(h.hypothesis)}</b><p>${n} of 3 supporting events.</p><div class="progress"><i style="width:${pct}%"></i></div></div>`;
+    }).join("");
+    awaiting.textContent = "AWAITING 3 INDEPENDENT EVENTS BEFORE ANY WEIGHT CHANGE";
+  }
+
+  function selectReadbackEvent(eventId) {
+    readbackEventId = eventId || null;
+    const row = readbackOutcomeRows().find((r) => r.event_id === eventId) || null;
+    const select = document.getElementById("readbackEvent");
+    if (eventId && select.value !== eventId) select.value = eventId;
+
+    const statusEl = document.getElementById("readbackStatus");
+    const promptEl = document.getElementById("readbackPrompt");
+    if (!row) {
+      statusEl.textContent = "";
+      promptEl.textContent = "Tell me what happened";
+    } else {
+      statusEl.textContent = `${row.name.toUpperCase()} · ${fmtDateShort(row.date).toUpperCase()} · ${readbackStatusLabel(row).toUpperCase()}`;
+      promptEl.textContent = `Tell me what happened at ${row.name}`;
+    }
+    renderRecordedFacts(row);
+    renderSuspectedHypotheses(row);
+  }
+
+  function renderReadback() {
+    const outcomes = DataAccess.getOutcomes();
+    if (!outcomes) {
+      document.getElementById("readbackEvent").innerHTML = `<option value="">No local outcomes data</option>`;
+      document.getElementById("readbackStatus").textContent = "app/generated/private_data.js is missing — run python3 app/build_data.py locally to populate it from data/outcomes.json.";
+      document.getElementById("readbackPrompt").textContent = "Tell me what happened";
+      document.getElementById("recordedFacts").innerHTML = "";
+      document.getElementById("pendingNotesList").innerHTML = "";
+      document.getElementById("suspectedHypotheses").innerHTML = "";
+      document.getElementById("awaitingNote").textContent = "";
+      return;
+    }
+    populateReadbackSelect();
+    const rows = readbackOutcomeRows();
+    selectReadbackEvent(rows.length ? rows[0].event_id : null);
+  }
+
+  document.getElementById("readbackEvent").addEventListener("change", (ev) => selectReadbackEvent(ev.target.value));
+  document.getElementById("readbackSubmit").addEventListener("click", () => {
+    const textarea = document.getElementById("readbackFeedback");
+    const text = textarea.value.trim();
+    if (!text || !readbackEventId) return;
+    ReadbackStore.addNote(readbackEventId, text);
+    textarea.value = "";
+    renderRecordedFacts(readbackOutcomeRows().find((r) => r.event_id === readbackEventId) || null);
+    showToast("Saved on this device as a note — not yet a recorded fact. capture_feedback.py is still the real path into data/outcomes.json.");
+  });
+
+  // ---------- Routing ----------
+  const navLinks = document.querySelectorAll(".nav-link[data-view]");
+  function showView(viewId) {
+    document.querySelectorAll(".view").forEach((v) => v.classList.toggle("active", v.id === viewId));
+    navLinks.forEach((a) => a.classList.toggle("on", a.dataset.view === viewId));
+    if (viewId === "readback") {
+      document.getElementById("crumb").textContent = "READ-BACK";
+      renderReadback();
+    } else {
+      document.getElementById("crumb").textContent = `DECISION BOARD · ${currentWeek().label.toUpperCase()}`;
+    }
+  }
+  function routeFromHash() {
+    const id = location.hash.replace("#/", "") || "choose";
+    showView(id === "readback" ? "readback" : "choose");
+  }
+  window.addEventListener("hashchange", routeFromHash);
+
   weekPrev.addEventListener("click", () => setWeek(currentWeekIndex - 1));
   weekNext.addEventListener("click", () => setWeek(currentWeekIndex + 1));
   weekSelect.addEventListener("change", (ev) => setWeek(Number(ev.target.value)));
@@ -946,6 +1111,7 @@
     } else {
       setWeek(currentWeekIndex);
     }
+    routeFromHash();
   }
 
   boot();
