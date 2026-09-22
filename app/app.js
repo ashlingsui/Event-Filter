@@ -1065,7 +1065,7 @@
       feltInput.hidden = true;
     } else {
       statusEl.textContent = `${row.name.toUpperCase()} · ${fmtDateShort(row.date).toUpperCase()} · ${(row.local ? "ADDED BY YOU" : readbackStatusLabel(row).toUpperCase())}`;
-      promptEl.textContent = `Tell me what happened at ${row.name}`;
+      promptEl.textContent = row.local ? "What was your takeaway?" : `Tell me what happened at ${row.name}`;
       // Felt-score capture only makes sense for events added by link — a real outcomes.json row
       // already has its own felt_score set by the actual T+0 capture; this page doesn't write
       // back to that real record (no server to write it to).
@@ -1122,25 +1122,115 @@
     const open = addEventForm.hidden;
     addEventForm.hidden = !open;
     toggleAddEvent.setAttribute("aria-expanded", String(open));
-    toggleAddEvent.textContent = open
-      ? "− Hide the add-event form"
-      : "+ Add an event by link — one the pipeline never scored";
+    toggleAddEvent.textContent = open ? "− Hide the add-event form" : ADD_EVENT_LABEL;
   });
+  const ADD_EVENT_LABEL = "+ Add an event by link — to help me understand why you think the way you think about one event";
+
+  // Just the link — she doesn't want to also type a name/date. There's no server to fetch the
+  // URL and scrape its real title (cross-origin fetch to an arbitrary site would be blocked
+  // anyway), so this derives a short, honest stand-in label from the URL itself rather than
+  // inventing an event name. Date defaults to today (LocalOutcomeStore.add's own fallback).
+  function deriveNameFromUrl(url) {
+    try {
+      const u = new URL(url);
+      const host = u.hostname.replace(/^www\./, "");
+      const slug = u.pathname.replace(/\/$/, "").split("/").filter(Boolean).pop();
+      return slug ? `${host}/${slug}` : host;
+    } catch (err) {
+      return url;
+    }
+  }
+
   addEventForm.addEventListener("submit", (ev) => {
     ev.preventDefault();
     const url = document.getElementById("addEventUrl").value.trim();
-    const name = document.getElementById("addEventName").value.trim();
-    const date = document.getElementById("addEventDate").value;
-    if (!url || !name) return;
-    const row = LocalOutcomeStore.add({ url, name, date });
+    if (!url) return;
+    const row = LocalOutcomeStore.add({ url, name: deriveNameFromUrl(url) });
     addEventForm.reset();
     addEventForm.hidden = true;
     toggleAddEvent.setAttribute("aria-expanded", "false");
-    toggleAddEvent.textContent = "+ Add an event by link — one the pipeline never scored";
+    toggleAddEvent.textContent = ADD_EVENT_LABEL;
     populateReadbackSelect();
     selectReadbackEvent(row.event_id);
     showToast(`Added "${row.name}" — saved on this device. Set how it felt and add a note below.`);
   });
+
+  // ---------- Voice input for the read-back textarea ----------
+  // The browser's own SpeechRecognition, not a model call — no API key, nothing this app sends
+  // anywhere. In Chrome/Edge the transcription itself still happens via the browser vendor's own
+  // speech service (that's how their implementation works, on-device or not is up to them), which
+  // is worth being upfront about given read-back notes can mention real people. Firefox/Safari
+  // mostly don't implement this API at all, so the button only appears when it's actually usable.
+  (() => {
+    const voiceButton = document.getElementById("voiceButton");
+    const voiceButtonLabel = document.getElementById("voiceButtonLabel");
+    const voiceNote = document.getElementById("voiceNote");
+    const feedback = document.getElementById("readbackFeedback");
+    const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognitionCtor) return; // button/note stay hidden — no unsupported-browser dead end
+
+    voiceButton.hidden = false;
+    voiceNote.hidden = false;
+
+    const recognizer = new SpeechRecognitionCtor();
+    recognizer.continuous = true;
+    recognizer.interimResults = true;
+    recognizer.lang = "en-US";
+
+    let isRecording = false;
+    let baseText = "";
+
+    function setLabel(text) {
+      voiceButtonLabel.textContent = text;
+    }
+
+    function stopVoice() {
+      isRecording = false;
+      voiceButton.classList.remove("recording");
+      voiceButton.setAttribute("aria-pressed", "false");
+      setLabel("🎤 Speak instead of typing");
+      try { recognizer.stop(); } catch (err) { /* already stopped */ }
+    }
+
+    function startVoice() {
+      baseText = feedback.value.trim();
+      isRecording = true;
+      voiceButton.classList.add("recording");
+      voiceButton.setAttribute("aria-pressed", "true");
+      setLabel("⏺ Listening… click to stop");
+      try { recognizer.start(); } catch (err) { /* already running */ }
+    }
+
+    recognizer.addEventListener("result", (ev) => {
+      let finalChunk = "";
+      let interimChunk = "";
+      for (let i = ev.resultIndex; i < ev.results.length; i++) {
+        const transcript = ev.results[i][0].transcript;
+        if (ev.results[i].isFinal) finalChunk += transcript;
+        else interimChunk += transcript;
+      }
+      if (finalChunk) baseText = `${baseText} ${finalChunk}`.trim();
+      feedback.value = `${baseText} ${interimChunk}`.trim();
+    });
+    recognizer.addEventListener("error", (ev) => {
+      stopVoice();
+      if (ev.error !== "aborted" && ev.error !== "no-speech") {
+        showToast(`Voice input stopped (${ev.error}). You can still type, or try the mic again.`);
+      }
+    });
+    recognizer.addEventListener("end", () => {
+      // Chrome stops the recognizer after a silence gap even with continuous:true — restart
+      // automatically unless she actually clicked stop.
+      if (isRecording) {
+        try { recognizer.start(); } catch (err) { stopVoice(); }
+      }
+    });
+
+    voiceButton.addEventListener("click", () => {
+      if (isRecording) stopVoice();
+      else startVoice();
+    });
+  })();
 
   // ---------- Routing ----------
   const navLinks = document.querySelectorAll(".nav-link[data-view]");

@@ -98,34 +98,32 @@
           <p id="readbackStatus"></p>
         </div>
 
-        <button type="button" id="toggleAddEvent" class="link-btn" aria-expanded="false">+ Add an event by link — one the pipeline never scored</button>
+        <button type="button" id="toggleAddEvent" class="link-btn" aria-expanded="false">+ Add an event by link — to help me understand why you think the way you think about one event</button>
         <form id="addEventForm" class="add-event-form" hidden>
           <div class="add-event-row">
             <label for="addEventUrl">Event link</label>
             <input type="url" id="addEventUrl" placeholder="https://…" required>
           </div>
-          <div class="add-event-row">
-            <label for="addEventName">What was it called?</label>
-            <input type="text" id="addEventName" placeholder="Event name" required>
-          </div>
-          <div class="add-event-row">
-            <label for="addEventDate">Date</label>
-            <input type="date" id="addEventDate">
-          </div>
-          <button type="submit" class="primary">Add and record my feeling →</button>
-          <p class="add-event-help">Saved on this device only — this can never become a real row in <code>data/outcomes.json</code> (no server for a static page to write to). It's a place to jot your own reaction down before you forget it, not a scored or verified record.</p>
+          <button type="submit" class="primary">Add →</button>
+          <p class="add-event-help">Just the link — saved on this device only. This can never become a real row in <code>data/outcomes.json</code> (no server for a static page to write to); it's a place to jot your own reaction down before you forget it, not a scored or verified record.</p>
         </form>
 
         <div class="felt-score-input" id="feltScoreInput" hidden>
-          <label for="feltScoreRange">HOW DID IT FEEL? (0–10, your own T+0 read)</label>
+          <label for="feltScoreRange">HOW DID IT FEEL? (0–10)</label>
           <div class="felt-score-row">
             <input type="range" id="feltScoreRange" min="0" max="10" step="1" value="5">
             <output id="feltScoreValue" for="feltScoreRange">5</output>
           </div>
         </div>
 
-        <label for="readbackFeedback" id="readbackPrompt">Tell me what happened</label>
+        <div class="prompt-row">
+          <label for="readbackFeedback" id="readbackPrompt">Tell me what happened</label>
+          <button type="button" id="voiceButton" class="voice-btn" hidden aria-pressed="false">
+            <span id="voiceButtonLabel">🎤 Speak instead of typing</span>
+          </button>
+        </div>
         <textarea id="readbackFeedback" placeholder="e.g. The stage was weak, but I met someone in the line who runs a course with eight industry speakers."></textarea>
+        <p class="voice-note" id="voiceNote" hidden>Uses your browser's built-in speech recognition (Chrome/Edge) — audio is sent to your browser vendor's speech service to transcribe, the same as any other in-browser dictation. Nothing here sends it anywhere this app controls.</p>
         <div class="say-foot">
           <span id="readbackNote">Free text becomes a saved note for this event, on this device only. There is no live extraction here — turning it into a recorded fact or a suspected hypothesis is a separate, reviewable step (see the note below), not something this page does automatically.</span>
           <button class="primary" id="readbackSubmit" type="button">READ BACK WHAT I SAID →</button>
