@@ -22,11 +22,24 @@ def new_event():
         "city": None,
         "lat": None,
         "lng": None,
+        # Region classification at ingest time — see ingest/region.py. "in_region" | "out_of_region"
+        # | "unknown". A row reaching data/events.json should never be "out_of_region" (its
+        # calendar's filter should have dropped it) — app/build_data.py treats that as a bug
+        # signal, not something to quietly re-filter. Distinct from `reachable`, a BART-walk cost
+        # computed later in enrich/ — this is "is it even in California," not "can she get there."
+        "region_status": None,
         "bart_walk_min": None,
         "reachable": None,
         "host_names": [],
         "host_tier": None,
         "format": None,
+        # SPEC.md §3b — one format enum can't describe a mixed agenda ("first 30 minutes hanging
+        # out, then an hour of demos"). Top-level `format` remains the dominant segment; this is
+        # additive detail, RECORDED-BUT-UNWEIGHTED today (score/scorer.py's S3 still reads
+        # top-level `format` only — see that file for why wiring segments into the value formula
+        # is a separate, not-yet-built change). [{kind, duration_min, source}], source = described
+        # | inferred | rule.
+        "segments": [],
         "size": None,
 
         # speakers — added 2026-09-21, RECORDED-BUT-UNWEIGHTED (SPEC.md §1c "record early, weight
@@ -45,6 +58,10 @@ def new_event():
         "next_occurrence": None,
         "phase": None,
         "predicted_p": None,
+        # SPEC.md §3c — fraction of score/scorer.py's CONFIDENCE_FIELDS actually known on this
+        # row, set by score_row(). Low confidence routes to the `unscored` verdict (score/
+        # verdicts.py) instead of a confident go/skip computed from neutral priors.
+        "confidence": None,
         "is_exploration": False,
 
         # intent — SPEC.md §1b, added 2026-09-18. Her own want/pass judgment, captured at

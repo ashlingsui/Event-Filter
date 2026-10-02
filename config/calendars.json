@@ -1,18 +1,20 @@
 {
   "luma_calendars": [
-    {"id": "cal-cv816PW6bxfYMVP", "name": "OpenRouter Events", "tier": "participant"},
-    {"id": "cal-TOpA5LAFfuDeFpu", "name": "Claude Community Events", "tier": "participant"},
-    {"id": "cal-8ACK0vjqOfKpHXl", "name": "Claude Workshops", "tier": "participant"},
-    {"id": "cal-PKTAt8IpN9ZHTFK", "name": "Codex SF", "tier": "participant"},
-    {"id": "cal-Ve0M7LoDOpdnF3z", "name": "South Park Commons", "tier": "participant"},
-    {"id": "cal-8EtFfS1gDogglBc", "name": "Stripe Developer Meetups", "tier": "participant"},
-    {"id": "cal-0WfGKFnaMuZk0Oj", "name": "Berkeley SkyDeck Fund", "tier": "spectator"},
-    {"id": "cal-jG6uA6fcSEneQJB", "name": "Afore Events", "tier": "spectator"}
+    {"id": "cal-cv816PW6bxfYMVP", "name": "OpenRouter Events", "tier": "participant", "region_filter": "california"},
+    {"id": "cal-TOpA5LAFfuDeFpu", "name": "Claude Community Events", "tier": "participant", "region_filter": "california"},
+    {"id": "cal-8ACK0vjqOfKpHXl", "name": "Claude Workshops", "tier": "participant", "region_filter": "california"},
+    {"id": "cal-PKTAt8IpN9ZHTFK", "name": "Codex SF", "tier": "participant", "region_filter": "california"},
+    {"id": "cal-Ve0M7LoDOpdnF3z", "name": "South Park Commons", "tier": "participant", "region_filter": "california"},
+    {"id": "cal-8EtFfS1gDogglBc", "name": "Stripe Developer Meetups", "tier": "participant", "region_filter": "california"},
+    {"id": "cal-0WfGKFnaMuZk0Oj", "name": "Berkeley SkyDeck Fund", "tier": "spectator", "region_filter": "california"},
+    {"id": "cal-jG6uA6fcSEneQJB", "name": "Afore Events", "tier": "spectator", "region_filter": "california"}
   ],
+  "_region_filter_note": "Applied at ingest (ingest/region.py) — moved from app/build_data.py's old _in_california exclusion, not duplicated, so paying for enrich/score on a row that was always going to be thrown away stops happening. Set a calendar's region_filter to null/omit it to stop filtering that calendar; the geography itself (what counts as 'california') lives in ingest/region.py, not here. Unknown-location rows are never dropped, only flagged for review, regardless of this setting.",
   "campusgroups": {
     "endpoint": "https://haas.campusgroups.com/mobile_ws/v17/mobile_events_list",
-    "_note": "Feed returns all of Haas regardless of group filter. Tech Club / PM Club group ids still needed from her to route career vs. cohort in step 2 (Enrich) — see BUILD_HANDOFF.md."
+    "_note": "Feed returns all of Haas regardless of group filter. Tech Club / PM Club group ids still needed from her to route career vs. cohort in step 2 (Enrich) — see BUILD_HANDOFF.md. Always Berkeley; never region-filtered."
   },
   "partiful_urls": [],
+  "partiful_region_filter": "california",
   "_partiful_note": "No Luma-style feed exists for Partiful. Add event URLs here by hand as she finds them (Tech Week events live here)."
 }

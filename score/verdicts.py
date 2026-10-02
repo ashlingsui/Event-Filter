@@ -13,7 +13,10 @@ Precedence for primary_reason (highest first):
 quota_full is only ever assigned to a row that already cleared the value bar — an event that was
 never going to make it says why it's weak (below_bar, spectator, ...), not blames the quota.
 
-verdict values: go | part | wildcard | skip | blocked | go_if | suppressed.
+verdict values: go | part | wildcard | skip | blocked | go_if | suppressed | unscored.
+`unscored` added 2026-10-01 (SPEC.md §3c) — a new enum value, permitted by the §1 freeze rule
+(values may be added, never redefined). Means "not enough information to judge," distinct from
+`blocked` (can't even be dated) and `skip` (judged and found wanting) — see CONFIDENCE_THRESHOLD.
 
 ### Reachability is a cost, not a gate — SPEC.md, revised 2026-09-20
 
@@ -43,6 +46,12 @@ from collections import defaultdict
 from pathlib import Path
 
 from .scorer import COST_DOWNGRADES_TO_PART, GO_BAR, GO_PART_BAR
+
+# SPEC.md §3c: below this fraction of known judgment fields, route to `unscored` instead of
+# computing a tier off neutral priors. 0.5 — at least half of format/participant/target_proximity/
+# cohort_saturation/prior_hook actually known — is a declared threshold, not fit to any outcome
+# data; there isn't any outcome data on confidence yet to fit it to.
+CONFIDENCE_THRESHOLD = 0.5
 
 CONFIG_DIR = Path(__file__).parent.parent / "config"
 WEEKLY_QUOTA_PATH = CONFIG_DIR / "weekly_quota.json"
@@ -207,7 +216,7 @@ def _unblock_action(row, week_members):
 
 def resolve(rows):
     """Mutates every row in place: verdict, primary_reason, reasons (+ unblock_action on go_if
-    rows). Returns (skip_summary, blocked_summary, suppressed_summary)."""
+    rows). Returns (skip_summary, blocked_summary, suppressed_summary, unscored_summary)."""
     _mark_recurring(rows)
     overrides = _load_quota_overrides()
 
@@ -217,6 +226,14 @@ def resolve(rows):
             # The only remaining `blocked` case now that reachability is a cost, not a gate: a
             # row with no parseable date can't be ranked into any week at all.
             row["verdict"], row["primary_reason"], row["reasons"] = "blocked", None, []
+        elif (row.get("confidence") if row.get("confidence") is not None else 0.0) < CONFIDENCE_THRESHOLD:
+            # SPEC.md §3c: "an event the model knows nothing about must never receive a confident
+            # skip OR a confident go." Routed out before Pass 2 entirely — not ranked, not
+            # competing for a quota slot, not eligible for go_if — because none of those are
+            # meaningful conclusions to draw from a value computed off neutral priors. is_exploration
+            # does NOT override this: "wildcard" asserts the model made a low-confidence prediction
+            # and she tested it; there is no prediction to test here, only an absence of one.
+            row["verdict"], row["primary_reason"], row["reasons"] = "unscored", None, []
         else:
             scoreable.append(row)
 
@@ -356,4 +373,5 @@ def resolve(rows):
     skip_summary = summarize([r for r in rows if r["verdict"] == "skip"])
     blocked_summary = summarize([r for r in rows if r["verdict"] == "blocked"])
     suppressed_summary = summarize([r for r in rows if r["verdict"] == "suppressed"])
-    return skip_summary, blocked_summary, suppressed_summary
+    unscored_summary = summarize([r for r in rows if r["verdict"] == "unscored"])
+    return skip_summary, blocked_summary, suppressed_summary, unscored_summary

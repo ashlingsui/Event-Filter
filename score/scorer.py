@@ -31,6 +31,10 @@ FORMAT_S3_POINTS = {
     "mixer": 0.0,
     "lecture": 0.0,
     "class": 0.0,
+    # Added 2026-10-01 for Tier 1 rule-based classification (enrich/rules.py) — 1:1 or small-group
+    # Q&A, not hands-on building, same build-potential tier as the other spectator-adjacent
+    # formats until there's evidence to weight it differently.
+    "office_hours": 0.0,
 }
 
 # --- S2 (contact) potential by room composition. wrong_ladder scores the same as none (no target-
@@ -42,6 +46,30 @@ TARGET_PROXIMITY_POINTS = {
     "some": 1.0,
     "high": 2.0,
 }
+
+# --- SPEC.md §3c "Unknown is not zero". `.get(key, 0.0)` used to make an unknown format or an
+# unknown participant score identically to a confidently bad one — a null read as absence of
+# value, not absence of information. These are declared constants, NOT derived from the 21
+# currently-enriched rows (that sample is hand-picked and biased upward; fitting a prior to it
+# would bake the bias in). Each is the midpoint of its dimension's possible range — maximum
+# uncertainty, not an educated guess at the true distribution. Replace with a real base rate once
+# there's an unbiased sample to compute one from.
+NEUTRAL_PRIOR_S3 = 1.0  # midpoint of FORMAT_S3_POINTS' range [0.0, 2.0]
+NEUTRAL_PRIOR_S2 = 1.0  # midpoint of TARGET_PROXIMITY_POINTS' range [0.0, 2.0]
+# Unknown participant: neither "she can do the thing" (1.0) nor "she can't" (0.0) — halves
+# whatever format points apply, same midpoint-of-range logic as the two priors above.
+NEUTRAL_PARTICIPANT_MULT = 0.5
+
+# Scoring-relevant judgment fields — confidence (SPEC.md §3c) is the fraction of these actually
+# known on a given row, not a proxy for data completeness in general (host_tier, speakers, etc.
+# are recorded but don't drive the value formula, so they don't belong in this denominator).
+CONFIDENCE_FIELDS = ("format", "participant", "target_proximity", "cohort_saturation", "prior_hook")
+
+
+def confidence(row):
+    known = sum(1 for f in CONFIDENCE_FIELDS if row.get(f) is not None)
+    return round(known / len(CONFIDENCE_FIELDS), 2)
+
 
 # --- Multipliers. All positive-only except cohort_saturation and size, per BUILD_HANDOFF.md:
 # "Never frame going to events with friends as a cost. Companions are a positive." prior_hook
@@ -144,10 +172,31 @@ def score_row(row):
     enough to surface as `go_if`. Fixed: value is computed the same way regardless of reachability."""
     why = []
 
-    s3 = FORMAT_S3_POINTS.get(row.get("format"), 0.0) if row.get("participant") else 0.0
-    s2 = TARGET_PROXIMITY_POINTS.get(row.get("target_proximity"), 0.0)
-    why.append("S3(format={},participant={})={:.1f}".format(row.get("format"), row.get("participant"), s3))
-    why.append("S2(target_proximity={})={:.1f}".format(row.get("target_proximity"), s2))
+    # SPEC.md §3c: null is not 0. A format/participant/target_proximity we never looked at scores
+    # at its NEUTRAL_PRIOR, not at the floor — see the constants above for why these particular
+    # numbers and not a fitted one.
+    if row.get("format") is not None:
+        format_points = FORMAT_S3_POINTS.get(row["format"], 0.0)
+    else:
+        format_points = NEUTRAL_PRIOR_S3
+        why.append("format unknown -> neutral prior {:.1f}".format(NEUTRAL_PRIOR_S3))
+
+    if row.get("participant") is not None:
+        participant_mult = 1.0 if row["participant"] else 0.0
+    else:
+        participant_mult = NEUTRAL_PARTICIPANT_MULT
+        why.append("participant unknown -> neutral prior ×{:.2f}".format(NEUTRAL_PARTICIPANT_MULT))
+
+    s3 = format_points * participant_mult
+
+    if row.get("target_proximity") is not None:
+        s2 = TARGET_PROXIMITY_POINTS.get(row["target_proximity"], 0.0)
+    else:
+        s2 = NEUTRAL_PRIOR_S2
+        why.append("target_proximity unknown -> neutral prior {:.1f}".format(NEUTRAL_PRIOR_S2))
+
+    why.append("S3(format={},participant={})={:.2f}".format(row.get("format"), row.get("participant"), s3))
+    why.append("S2(target_proximity={})={:.2f}".format(row.get("target_proximity"), s2))
 
     hook_mult = PRIOR_HOOK_MULT.get(row.get("prior_hook"), 1.0)
     cohort_mult = COHORT_SATURATION_MULT.get(row.get("cohort_saturation"), 1.0)
@@ -167,6 +216,7 @@ def score_row(row):
     value = (s3 + s2) * hook_mult * cohort_mult * companion_mult * size_mult
     predicted_p = round(min(MAX_PREDICTED_P, value / VALUE_TO_P_DIVISOR), 2)
     row["predicted_p"] = predicted_p
+    row["confidence"] = confidence(row)
 
     if row.get("cost_blocks") is None:
         row["cost_blocks"] = _estimate_cost_blocks(row)

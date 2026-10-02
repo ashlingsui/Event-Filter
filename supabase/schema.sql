@@ -13,12 +13,18 @@
 
 create type source_kind     as enum ('luma','campusgroups','partiful','manual');
 create type event_format    as enum ('build_night','hackathon','demo_day','workshop',
-                                     'panel','fireside','mixer','lecture','class','unknown');
+                                     'panel','fireside','mixer','lecture','class','office_hours',
+                                     'unknown');
 create type host_tier       as enum ('tier1_vc','scaled_co','startup','student_club','unknown');
 create type proximity       as enum ('none','wrong_ladder','some','high');
 create type saturation      as enum ('none','some','high');
 create type hook_kind       as enum ('none','topic','person');
-create type verdict_kind    as enum ('go','part','go_if','wildcard','skip','suppressed','blocked');
+-- 'unscored' added 2026-10-01 (SPEC.md §3c) — "an event the model knows nothing about must never
+-- receive a confident skip OR a confident go." Values may be added to this enum, never redefined
+-- (SPEC.md §1 freeze rule) — if this schema is already live elsewhere, add it via
+-- `alter type verdict_kind add value 'unscored'` (see supabase/migrations/) rather than re-running
+-- this file, which is deliberately not idempotent.
+create type verdict_kind    as enum ('go','part','go_if','wildcard','skip','suppressed','blocked','unscored');
 create type reason_code     as enum ('not_reachable','conflict','quota_full','spectator',
                                      'wrong_ladder','recurring','off_phase','below_bar');
 create type intent_kind     as enum ('want','pass','undecided');
@@ -117,6 +123,10 @@ create table event_scores (
   model_version text not null,
 
   predicted_p   numeric(4,3) check (predicted_p between 0 and 1),
+  -- SPEC.md §3c — fraction of scoring-relevant judgment fields actually known. Drives the
+  -- `unscored` verdict gate in score/verdicts.py; stored so a past low-confidence score stays
+  -- explainable rather than looking like an ordinary, fully-informed one.
+  confidence    numeric(3,2) check (confidence between 0 and 1),
   verdict       verdict_kind not null,
   primary_reason reason_code,
   reasons       reason_code[] not null default '{}',

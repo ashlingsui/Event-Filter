@@ -44,5 +44,30 @@
   "1172 Ocean Ave, Emeryville, CA 94608": {
     "lat": 37.8468302,
     "lng": -122.2868641
+  },
+  "130 Webster St, Oakland, CA 94607": {
+    "lat": 37.794608,
+    "lng": -122.2742715
+  },
+  "2 Marina Blvd Bldg C, Unit 260, San Francisco, CA 94123": null,
+  "39 Grant Ave, San Francisco, CA 94108": {
+    "lat": 37.7873051,
+    "lng": -122.4052371
+  },
+  "1340 Fifth St, Berkeley, CA 94710": {
+    "lat": 37.877972,
+    "lng": -122.302321
+  },
+  "501 Stanyan St, San Francisco, CA 94117": {
+    "lat": 37.77276,
+    "lng": -122.454362
+  },
+  "2200 Broadway, Redwood City, CA 94063": {
+    "lat": 37.48655,
+    "lng": -122.229289
+  },
+  "2140 Mandela Pkwy, Oakland, CA 94607": {
+    "lat": 37.8161265,
+    "lng": -122.2893115
   }
 }

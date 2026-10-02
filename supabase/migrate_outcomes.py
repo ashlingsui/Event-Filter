@@ -78,7 +78,7 @@ def _resolve_or_create_event(svc, row):
 
 
 def _outcome_row(row, user_id, event_uuid):
-    label_source = "retrospective_backfill" if row.get("label_source") == "retrospective_backfill" else "prospective"
+    label_source = "retrospective_backfill" if str(row.get("label_source") or "").startswith("retrospective_backfill") else "prospective"
     predicted_p_locked = LOCKED_PREDICTIONS.get(row["event_id"])
 
     def as_bool_or_none(v):
@@ -104,9 +104,8 @@ def _outcome_row(row, user_id, event_uuid):
         "details": details,
         "label_status": row.get("label_status") or "unknown",
         "label_source": label_source,
+        "locked_at": row.get("date") if predicted_p_locked is not None else None,
     }
-    if predicted_p_locked is not None:
-        out["locked_at"] = row.get("date")
     return out
 
 

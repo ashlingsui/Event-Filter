@@ -48,7 +48,7 @@ target_proximity (one of: none, some, high, wrong_ladder): Density of people who
   the text gives no real signal.
 
 format (one of: build_night, hackathon, demo_day, workshop, panel, fireside, mixer, lecture,
-  class): Pick the single closest match from the event's name/description. Default "mixer" if
+  class, office_hours): Pick the single closest match from the event's name/description. Default "mixer" if
   genuinely ambiguous.
 
 cohort_saturation (one of: none, some, high): Share of the room Ashling would likely already know.
@@ -79,7 +79,7 @@ _VALID = {
     "target_proximity": {"none", "some", "high", "wrong_ladder"},
     "format": {
         "build_night", "hackathon", "demo_day", "workshop", "panel", "fireside", "mixer",
-        "lecture", "class",
+        "lecture", "class", "office_hours",
     },
     "cohort_saturation": {"none", "some", "high"},
     "prior_hook": {"none", "topic"},
@@ -200,11 +200,14 @@ def apply_manual(rows, judgments_path, source_tag):
 
 
 def enrich_all(rows, session=None, model=DEFAULT_MODEL):
+    """Returns (rows, ran, eligible_count). `ran` is False when ANTHROPIC_API_KEY was absent and
+    the LLM pass was skipped — the caller (enrich_events.py) decides what to do about that; this
+    function's job is only to report it accurately, not to decide whether skipping is fatal."""
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     eligible = [r for r in rows if r.get("reachable") is not False]
     if not api_key:
         print("  ANTHROPIC_API_KEY not set — skipping LLM pass ({} rows eligible, left null)".format(len(eligible)))
-        return rows
+        return rows, False, len(eligible)
 
     ok = 0
     for row in eligible:
@@ -214,4 +217,4 @@ def enrich_all(rows, session=None, model=DEFAULT_MODEL):
     print("  llm pass: {}/{} eligible rows classified ({} skipped as unreachable)".format(
         ok, len(eligible), len(rows) - len(eligible)
     ))
-    return rows
+    return rows, True, len(eligible)

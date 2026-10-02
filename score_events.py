@@ -35,15 +35,20 @@ def main():
     scorer.score_all(rows)
 
     print("Verdicts:")
-    skip_summary, blocked_summary, suppressed_summary = verdicts.resolve(rows)
+    skip_summary, blocked_summary, suppressed_summary, unscored_summary = verdicts.resolve(rows)
     print("  skip_summary:       {}".format(skip_summary))
     print("  blocked_summary:    {}".format(blocked_summary))
     print("  suppressed_summary: {}".format(suppressed_summary))
+    print("  unscored_summary:   {}".format(unscored_summary))
 
     verdict_counts = {}
     for r in rows:
         verdict_counts[r["verdict"]] = verdict_counts.get(r["verdict"], 0) + 1
     print("  verdicts: {}".format(verdict_counts))
+
+    confidences = [r["confidence"] for r in rows if r.get("confidence") is not None]
+    if confidences:
+        print("  mean confidence: {:.2f} ({} rows)".format(sum(confidences) / len(confidences), len(confidences)))
 
     # events.json stays a bare array — ingest/enrich already depend on that shape. Aggregates go
     # in their own file so the frontend has them precomputed without recomputing or reshaping
@@ -57,6 +62,7 @@ def main():
             "skip_summary": skip_summary,
             "blocked_summary": blocked_summary,
             "suppressed_summary": suppressed_summary,
+            "unscored_summary": unscored_summary,
         }, f, indent=2)
 
     print("\n{} rows written back to {}".format(len(rows), EVENTS_PATH))
