@@ -1,17 +1,18 @@
 {
-  "scored_at": "2026-10-02T01:56:09.901196Z",
+  "scored_at": "2026-10-02T02:24:33.894703Z",
   "verdict_counts": {
     "unscored": 77,
-    "go": 2,
-    "part": 10,
-    "skip": 24,
+    "go": 7,
+    "part": 7,
+    "skip": 22,
     "wildcard": 1,
     "suppressed": 1
   },
   "skip_summary": {
-    "total": 24,
+    "total": 22,
     "by_reason": {
-      "spectator": 24
+      "spectator": 19,
+      "quota_full": 3
     }
   },
   "blocked_summary": {

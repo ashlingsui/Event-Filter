@@ -1,6 +1,6 @@
 window.EVENT_FILTER_DATA = {
-  "generated_at": "2026-10-02T01:56:10.146584Z",
-  "source_scored_at": "2026-10-02T01:56:09.901196Z",
+  "generated_at": "2026-10-02T02:24:33.937864Z",
+  "source_scored_at": "2026-10-02T02:24:33.894703Z",
   "current_week_key": "2026-W40",
   "events": [
     {
@@ -4908,7 +4908,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "mixer",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -4928,9 +4928,9 @@ window.EVENT_FILTER_DATA = {
       ],
       "unblock_action": null,
       "predicted_p": 0.0,
-      "confidence": 0.8,
+      "confidence": 1.0,
       "cost_blocks": 1.5,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d70.25 social_opportunity)",
+      "why_raw": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Spectator format \u2014 you'd be watching, not doing.",
       "duplicate_of_name": null,
       "gated": false
@@ -4956,7 +4956,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "mixer",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -4969,17 +4969,17 @@ window.EVENT_FILTER_DATA = {
       "next_occurrence": null,
       "phase": "build",
       "track": "professional",
-      "verdict": "skip",
+      "verdict": "part",
       "primary_reason": "spectator",
       "reasons": [
         "spectator"
       ],
       "unblock_action": null,
-      "predicted_p": 0.04,
-      "confidence": 0.8,
+      "predicted_p": 0.17,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
-      "decision_line": "Spectator format \u2014 you'd be watching, not doing.",
+      "why_raw": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
+      "decision_line": "0.17 P(contact \u222a build), but spectator format \u2014 you'd be watching, not doing. Worth the part that's there, not the whole program.",
       "duplicate_of_name": null,
       "gated": true
     },
@@ -5004,7 +5004,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "fireside",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -5018,16 +5018,17 @@ window.EVENT_FILTER_DATA = {
       "phase": "build",
       "track": "professional",
       "verdict": "skip",
-      "primary_reason": "spectator",
+      "primary_reason": "quota_full",
       "reasons": [
-        "spectator"
+        "spectator",
+        "quota_full"
       ],
       "unblock_action": null,
-      "predicted_p": 0.08,
-      "confidence": 0.8,
+      "predicted_p": 0.33,
+      "confidence": 1.0,
       "cost_blocks": 1.5,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=high)=0.50 (\u00d70.25 social_opportunity)",
-      "decision_line": "Spectator format \u2014 you'd be watching, not doing.",
+      "why_raw": "S3(format=fireside,participant=False)=0.00 | S2(target_proximity=high)=2.00 (\u00d71.00 social_opportunity)",
+      "decision_line": "Cleared the bar at 0.33, but lost its slot to AI Agents Builder Night with PostHog, Convex, Elastic & Rootly, Camp AI: Production-Ready Agents, AI Heist Challenge with Cogent x Modal x LangChain, AI Tool Evaluations with ScaleKit, SafeMCP, Workato & AAIF, Love at First Slide with Gamma & Atlassian.",
       "duplicate_of_name": null,
       "gated": false
     },
@@ -5052,8 +5053,19 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
-      "segments": [],
+      "format": "panel",
+      "segments": [
+        {
+          "kind": "mixer",
+          "duration_min": 30,
+          "source": "described"
+        },
+        {
+          "kind": "panel",
+          "duration_min": 60,
+          "source": "described"
+        }
+      ],
       "size": null,
       "speakers": [],
       "participant": true,
@@ -5071,11 +5083,11 @@ window.EVENT_FILTER_DATA = {
         "below_bar"
       ],
       "unblock_action": null,
-      "predicted_p": 0.25,
-      "confidence": 0.8,
+      "predicted_p": 0.22,
+      "confidence": 1.0,
       "cost_blocks": 1.5,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=high)=0.50 (\u00d70.25 social_opportunity)",
-      "decision_line": "0.25 P(contact \u222a build), but didn't clear the bar on contact or build potential. Worth the part that's there, not the whole program.",
+      "why_raw": "S3(format=panel,participant=True)=0.00 | S2(target_proximity=high)=1.33 (\u00d70.67 social_opportunity)",
+      "decision_line": "0.22 P(contact \u222a build), but didn't clear the bar on contact or build potential. Worth the part that's there, not the whole program.",
       "duplicate_of_name": null,
       "gated": false
     },
@@ -5100,7 +5112,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "mixer",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -5113,17 +5125,17 @@ window.EVENT_FILTER_DATA = {
       "next_occurrence": null,
       "phase": "build",
       "track": "professional",
-      "verdict": "skip",
+      "verdict": "part",
       "primary_reason": "spectator",
       "reasons": [
         "spectator"
       ],
       "unblock_action": null,
-      "predicted_p": 0.04,
-      "confidence": 0.8,
+      "predicted_p": 0.17,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
-      "decision_line": "Spectator format \u2014 you'd be watching, not doing.",
+      "why_raw": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
+      "decision_line": "0.17 P(contact \u222a build), but spectator format \u2014 you'd be watching, not doing. Worth the part that's there, not the whole program.",
       "duplicate_of_name": null,
       "gated": false
     },
@@ -5148,7 +5160,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "fireside",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -5169,9 +5181,9 @@ window.EVENT_FILTER_DATA = {
       ],
       "unblock_action": null,
       "predicted_p": 0.0,
-      "confidence": 0.8,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "why_raw": "S3(format=fireside,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "decision_line": "Spectator format \u2014 you'd be watching, not doing.",
       "duplicate_of_name": null,
       "gated": false
@@ -5197,8 +5209,19 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
-      "segments": [],
+      "format": "build_night",
+      "segments": [
+        {
+          "kind": "mixer",
+          "duration_min": 30,
+          "source": "described"
+        },
+        {
+          "kind": "build_night",
+          "duration_min": 120,
+          "source": "described"
+        }
+      ],
       "size": null,
       "speakers": [],
       "participant": true,
@@ -5210,17 +5233,15 @@ window.EVENT_FILTER_DATA = {
       "next_occurrence": null,
       "phase": "build",
       "track": "professional",
-      "verdict": "part",
-      "primary_reason": "below_bar",
-      "reasons": [
-        "below_bar"
-      ],
+      "verdict": "go",
+      "primary_reason": null,
+      "reasons": [],
       "unblock_action": null,
-      "predicted_p": 0.21,
-      "confidence": 0.8,
+      "predicted_p": 0.5,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
-      "decision_line": "0.21 P(contact \u222a build), but didn't clear the bar on contact or build potential. Worth the part that's there, not the whole program.",
+      "why_raw": "S3(format=build_night,participant=True)=2.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
+      "decision_line": "Cleared the bar at 0.50 P(contact \u222a build). Go with intent.",
       "duplicate_of_name": null,
       "gated": true
     },
@@ -5245,7 +5266,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "workshop",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -5258,17 +5279,15 @@ window.EVENT_FILTER_DATA = {
       "next_occurrence": null,
       "phase": "build",
       "track": "professional",
-      "verdict": "part",
-      "primary_reason": "below_bar",
-      "reasons": [
-        "below_bar"
-      ],
+      "verdict": "go",
+      "primary_reason": null,
+      "reasons": [],
       "unblock_action": null,
-      "predicted_p": 0.21,
-      "confidence": 0.8,
+      "predicted_p": 0.33,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
-      "decision_line": "0.21 P(contact \u222a build), but didn't clear the bar on contact or build potential. Worth the part that's there, not the whole program.",
+      "why_raw": "S3(format=workshop,participant=True)=1.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
+      "decision_line": "Cleared the bar at 0.33 P(contact \u222a build). Go with intent.",
       "duplicate_of_name": null,
       "gated": true
     },
@@ -5293,8 +5312,14 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
-      "segments": [],
+      "format": "hackathon",
+      "segments": [
+        {
+          "kind": "hackathon",
+          "duration_min": 150,
+          "source": "described"
+        }
+      ],
       "size": null,
       "speakers": [],
       "participant": true,
@@ -5306,17 +5331,15 @@ window.EVENT_FILTER_DATA = {
       "next_occurrence": null,
       "phase": "build",
       "track": "professional",
-      "verdict": "part",
-      "primary_reason": "below_bar",
-      "reasons": [
-        "below_bar"
-      ],
+      "verdict": "go",
+      "primary_reason": null,
+      "reasons": [],
       "unblock_action": null,
-      "predicted_p": 0.25,
-      "confidence": 0.8,
+      "predicted_p": 0.67,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=high)=0.50 (\u00d70.25 social_opportunity)",
-      "decision_line": "0.25 P(contact \u222a build), but didn't clear the bar on contact or build potential. Worth the part that's there, not the whole program.",
+      "why_raw": "S3(format=hackathon,participant=True)=2.00 | S2(target_proximity=high)=2.00 (\u00d71.00 social_opportunity)",
+      "decision_line": "Cleared the bar at 0.67 P(contact \u222a build). Go with intent.",
       "duplicate_of_name": null,
       "gated": false
     },
@@ -5341,8 +5364,14 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
-      "segments": [],
+      "format": "hackathon",
+      "segments": [
+        {
+          "kind": "hackathon",
+          "duration_min": 240,
+          "source": "described"
+        }
+      ],
       "size": null,
       "speakers": [],
       "participant": true,
@@ -5354,15 +5383,17 @@ window.EVENT_FILTER_DATA = {
       "next_occurrence": null,
       "phase": "build",
       "track": "professional",
-      "verdict": "part",
-      "primary_reason": null,
-      "reasons": [],
+      "verdict": "skip",
+      "primary_reason": "quota_full",
+      "reasons": [
+        "quota_full"
+      ],
       "unblock_action": null,
-      "predicted_p": 0.3,
-      "confidence": 0.8,
+      "predicted_p": 0.8,
+      "confidence": 1.0,
       "cost_blocks": 1.5,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=high)=0.50 (\u00d70.25 social_opportunity) | \u00d71.20 prior_hook=topic",
-      "decision_line": "0.30 P(contact \u222a build) \u2014 interesting, but the outcome isn't clear enough to spend the whole slot.",
+      "why_raw": "S3(format=hackathon,participant=True)=2.00 | S2(target_proximity=high)=2.00 (\u00d71.00 social_opportunity) | \u00d71.20 prior_hook=topic",
+      "decision_line": "Cleared the bar at 0.80, but lost its slot to AI Agents Builder Night with PostHog, Convex, Elastic & Rootly, Camp AI: Production-Ready Agents, AI Heist Challenge with Cogent x Modal x LangChain, AI Tool Evaluations with ScaleKit, SafeMCP, Workato & AAIF, Love at First Slide with Gamma & Atlassian.",
       "duplicate_of_name": null,
       "gated": false
     },
@@ -5387,7 +5418,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "mixer",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -5408,9 +5439,9 @@ window.EVENT_FILTER_DATA = {
       ],
       "unblock_action": null,
       "predicted_p": 0.0,
-      "confidence": 0.8,
+      "confidence": 1.0,
       "cost_blocks": 1.5,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "why_raw": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "decision_line": "Spectator format \u2014 you'd be watching, not doing.",
       "duplicate_of_name": null,
       "gated": true
@@ -5436,8 +5467,14 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
-      "segments": [],
+      "format": "workshop",
+      "segments": [
+        {
+          "kind": "workshop",
+          "duration_min": 150,
+          "source": "described"
+        }
+      ],
       "size": null,
       "speakers": [],
       "participant": true,
@@ -5449,17 +5486,17 @@ window.EVENT_FILTER_DATA = {
       "next_occurrence": null,
       "phase": "build",
       "track": "professional",
-      "verdict": "part",
-      "primary_reason": "below_bar",
+      "verdict": "skip",
+      "primary_reason": "quota_full",
       "reasons": [
-        "below_bar"
+        "quota_full"
       ],
       "unblock_action": null,
-      "predicted_p": 0.21,
-      "confidence": 0.8,
+      "predicted_p": 0.33,
+      "confidence": 1.0,
       "cost_blocks": 1.5,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
-      "decision_line": "0.21 P(contact \u222a build), but didn't clear the bar on contact or build potential. Worth the part that's there, not the whole program.",
+      "why_raw": "S3(format=workshop,participant=True)=1.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
+      "decision_line": "Cleared the bar at 0.33, but lost its slot to AI Agents Builder Night with PostHog, Convex, Elastic & Rootly, Camp AI: Production-Ready Agents, AI Heist Challenge with Cogent x Modal x LangChain, AI Tool Evaluations with ScaleKit, SafeMCP, Workato & AAIF, Love at First Slide with Gamma & Atlassian.",
       "duplicate_of_name": null,
       "gated": false
     },
@@ -5484,7 +5521,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "workshop",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -5497,17 +5534,15 @@ window.EVENT_FILTER_DATA = {
       "next_occurrence": null,
       "phase": "build",
       "track": "professional",
-      "verdict": "part",
-      "primary_reason": "below_bar",
-      "reasons": [
-        "below_bar"
-      ],
+      "verdict": "go",
+      "primary_reason": null,
+      "reasons": [],
       "unblock_action": null,
-      "predicted_p": 0.21,
-      "confidence": 0.8,
+      "predicted_p": 0.33,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
-      "decision_line": "0.21 P(contact \u222a build), but didn't clear the bar on contact or build potential. Worth the part that's there, not the whole program.",
+      "why_raw": "S3(format=workshop,participant=True)=1.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
+      "decision_line": "Cleared the bar at 0.33 P(contact \u222a build). Go with intent.",
       "duplicate_of_name": null,
       "gated": true
     },
@@ -5532,8 +5567,14 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
-      "segments": [],
+      "format": "mixer",
+      "segments": [
+        {
+          "kind": "mixer",
+          "duration_min": 180,
+          "source": "described"
+        }
+      ],
       "size": null,
       "speakers": [],
       "participant": false,
@@ -5545,17 +5586,17 @@ window.EVENT_FILTER_DATA = {
       "next_occurrence": null,
       "phase": "build",
       "track": "professional",
-      "verdict": "skip",
+      "verdict": "part",
       "primary_reason": "spectator",
       "reasons": [
         "spectator"
       ],
       "unblock_action": null,
-      "predicted_p": 0.04,
-      "confidence": 0.8,
+      "predicted_p": 0.17,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
-      "decision_line": "Spectator format \u2014 you'd be watching, not doing.",
+      "why_raw": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
+      "decision_line": "0.17 P(contact \u222a build), but spectator format \u2014 you'd be watching, not doing. Worth the part that's there, not the whole program.",
       "duplicate_of_name": null,
       "gated": false
     },
@@ -5580,8 +5621,14 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
-      "segments": [],
+      "format": "mixer",
+      "segments": [
+        {
+          "kind": "mixer",
+          "duration_min": 180,
+          "source": "described"
+        }
+      ],
       "size": null,
       "speakers": [],
       "participant": false,
@@ -5594,15 +5641,16 @@ window.EVENT_FILTER_DATA = {
       "phase": "build",
       "track": "professional",
       "verdict": "wildcard",
-      "primary_reason": "spectator",
+      "primary_reason": "quota_full",
       "reasons": [
-        "spectator"
+        "spectator",
+        "quota_full"
       ],
       "unblock_action": null,
-      "predicted_p": 0.08,
-      "confidence": 0.8,
+      "predicted_p": 0.33,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=high)=0.50 (\u00d70.25 social_opportunity)",
+      "why_raw": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=high)=2.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Wildcard: scored low, going anyway \u2014 this is how the model finds out it's wrong.",
       "duplicate_of_name": null,
       "gated": false
@@ -5628,7 +5676,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "panel",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -5648,9 +5696,9 @@ window.EVENT_FILTER_DATA = {
       ],
       "unblock_action": null,
       "predicted_p": 0.04,
-      "confidence": 0.8,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
+      "why_raw": "S3(format=panel,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
       "decision_line": "Spectator format \u2014 you'd be watching, not doing.",
       "duplicate_of_name": null,
       "gated": false
@@ -5676,8 +5724,14 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
-      "segments": [],
+      "format": "mixer",
+      "segments": [
+        {
+          "kind": "mixer",
+          "duration_min": 180,
+          "source": "described"
+        }
+      ],
       "size": null,
       "speakers": [],
       "participant": false,
@@ -5697,9 +5751,9 @@ window.EVENT_FILTER_DATA = {
       ],
       "unblock_action": null,
       "predicted_p": 0.0,
-      "confidence": 0.8,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "why_raw": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "decision_line": "Spectator format \u2014 you'd be watching, not doing.",
       "duplicate_of_name": null,
       "gated": true
@@ -5725,7 +5779,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "mixer",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -5746,9 +5800,9 @@ window.EVENT_FILTER_DATA = {
       ],
       "unblock_action": null,
       "predicted_p": 0.0,
-      "confidence": 0.8,
+      "confidence": 1.0,
       "cost_blocks": 1.5,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "why_raw": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "decision_line": "Spectator format \u2014 you'd be watching, not doing.",
       "duplicate_of_name": null,
       "gated": false
@@ -5774,8 +5828,19 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
-      "segments": [],
+      "format": "demo_day",
+      "segments": [
+        {
+          "kind": "demo_day",
+          "duration_min": 90,
+          "source": "described"
+        },
+        {
+          "kind": "mixer",
+          "duration_min": 90,
+          "source": "described"
+        }
+      ],
       "size": null,
       "speakers": [],
       "participant": true,
@@ -5787,17 +5852,15 @@ window.EVENT_FILTER_DATA = {
       "next_occurrence": null,
       "phase": "build",
       "track": "professional",
-      "verdict": "part",
-      "primary_reason": "below_bar",
-      "reasons": [
-        "below_bar"
-      ],
+      "verdict": "go",
+      "primary_reason": null,
+      "reasons": [],
       "unblock_action": null,
-      "predicted_p": 0.21,
-      "confidence": 0.8,
+      "predicted_p": 0.42,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
-      "decision_line": "0.21 P(contact \u222a build), but didn't clear the bar on contact or build potential. Worth the part that's there, not the whole program.",
+      "why_raw": "S3(format=demo_day,participant=True)=1.50 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
+      "decision_line": "Cleared the bar at 0.42 P(contact \u222a build). Go with intent.",
       "duplicate_of_name": null,
       "gated": false
     },
@@ -5822,7 +5885,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "mixer",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -5835,17 +5898,17 @@ window.EVENT_FILTER_DATA = {
       "next_occurrence": null,
       "phase": "build",
       "track": "professional",
-      "verdict": "skip",
+      "verdict": "part",
       "primary_reason": "spectator",
       "reasons": [
         "spectator"
       ],
       "unblock_action": null,
-      "predicted_p": 0.04,
-      "confidence": 0.8,
+      "predicted_p": 0.17,
+      "confidence": 1.0,
       "cost_blocks": 1.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
-      "decision_line": "Spectator format \u2014 you'd be watching, not doing.",
+      "why_raw": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
+      "decision_line": "0.17 P(contact \u222a build), but spectator format \u2014 you'd be watching, not doing. Worth the part that's there, not the whole program.",
       "duplicate_of_name": null,
       "gated": false
     },
@@ -5870,7 +5933,7 @@ window.EVENT_FILTER_DATA = {
       "host_display": "Host not listed",
       "host_names": [],
       "host_tier": null,
-      "format": null,
+      "format": "mixer",
       "segments": [],
       "size": null,
       "speakers": [],
@@ -5892,9 +5955,9 @@ window.EVENT_FILTER_DATA = {
       ],
       "unblock_action": null,
       "predicted_p": 0.0,
-      "confidence": 0.8,
+      "confidence": 1.0,
       "cost_blocks": 2.0,
-      "why_raw": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "why_raw": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "decision_line": "Not BART-reachable, and didn't rank in this week's top 3 to justify the ride.",
       "duplicate_of_name": null,
       "gated": false
@@ -6015,19 +6078,20 @@ window.EVENT_FILTER_DATA = {
     }
   ],
   "score_summary": {
-    "scored_at": "2026-10-02T01:56:09.901196Z",
+    "scored_at": "2026-10-02T02:24:33.894703Z",
     "verdict_counts": {
       "unscored": 77,
-      "go": 2,
-      "part": 10,
-      "skip": 24,
+      "go": 7,
+      "part": 7,
+      "skip": 22,
       "wildcard": 1,
       "suppressed": 1
     },
     "skip_summary": {
-      "total": 24,
+      "total": 22,
       "by_reason": {
-        "spectator": 24
+        "spectator": 19,
+        "quota_full": 3
       }
     },
     "blocked_summary": {

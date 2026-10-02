@@ -6850,7 +6850,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "mixer",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -6881,7 +6881,7 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Hardware, not your domain. Coffee format, and you'd be a spectator.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
@@ -6893,7 +6893,7 @@
     ],
     "primary_reason": "spectator",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   },
   {
     "schema_version": 1,
@@ -6912,7 +6912,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "mixer",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -6925,7 +6925,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.04,
+    "predicted_p": 0.17,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -6943,19 +6943,19 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Huge kickoff mixer. Target-tier hosts, but attention is the scarce thing and there won't be any.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
       "cost_blocks_source": "manual"
     },
-    "verdict": "skip",
+    "verdict": "part",
     "reasons": [
       "spectator"
     ],
     "primary_reason": "spectator",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   },
   {
     "schema_version": 1,
@@ -6974,7 +6974,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "fireside",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -6987,7 +6987,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.08,
+    "predicted_p": 0.33,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7005,7 +7005,7 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=high)=0.50 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=fireside,participant=False)=0.00 | S2(target_proximity=high)=2.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Far-ahead tier. Inspiring, and you won't follow up \u2014 your record says you don't work speakers.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
@@ -7013,11 +7013,12 @@
     },
     "verdict": "skip",
     "reasons": [
-      "spectator"
+      "spectator",
+      "quota_full"
     ],
-    "primary_reason": "spectator",
+    "primary_reason": "quota_full",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   },
   {
     "schema_version": 1,
@@ -7036,7 +7037,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "panel",
     "size": null,
     "speakers": [],
     "participant": true,
@@ -7049,7 +7050,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.25,
+    "predicted_p": 0.22,
     "is_exploration": false,
     "intent": "want",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7067,7 +7068,7 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=high)=0.50 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=panel,participant=True)=0.00 | S2(target_proximity=high)=1.33 (\u00d70.67 social_opportunity)",
       "decision_line": "Airwallex is where your Schwarzman contact works. You arrive warm, into recurring context \u2014 the pattern both your live contacts came through.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
@@ -7079,7 +7080,19 @@
     ],
     "primary_reason": "below_bar",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0,
+    "segments": [
+      {
+        "kind": "mixer",
+        "duration_min": 30,
+        "source": "described"
+      },
+      {
+        "kind": "panel",
+        "duration_min": 60,
+        "source": "described"
+      }
+    ]
   },
   {
     "schema_version": 1,
@@ -7098,7 +7111,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "mixer",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -7111,7 +7124,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.04,
+    "predicted_p": 0.17,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7129,19 +7142,19 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Good room \u2014 small, curated, Stripe present. Loses Tuesday's slot to AI Heist.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
       "cost_blocks_source": "manual"
     },
-    "verdict": "skip",
+    "verdict": "part",
     "reasons": [
       "spectator"
     ],
     "primary_reason": "spectator",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   },
   {
     "schema_version": 1,
@@ -7160,7 +7173,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "fireside",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -7191,7 +7204,7 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "why": "S3(format=fireside,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "decision_line": "A fund's salon. You're not raising and they can't hire you.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
@@ -7204,7 +7217,7 @@
     ],
     "primary_reason": "spectator",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   },
   {
     "schema_version": 1,
@@ -7223,7 +7236,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "build_night",
     "size": null,
     "speakers": [],
     "participant": true,
@@ -7236,7 +7249,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.21,
+    "predicted_p": 0.5,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7254,19 +7267,29 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=build_night,participant=True)=2.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Genuine builder night \u2014 strong on its own. Loses to AI Heist by two hours.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
       "cost_blocks_source": "manual"
     },
-    "verdict": "part",
-    "reasons": [
-      "below_bar"
-    ],
-    "primary_reason": "below_bar",
+    "verdict": "go",
+    "reasons": [],
+    "primary_reason": null,
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0,
+    "segments": [
+      {
+        "kind": "mixer",
+        "duration_min": 30,
+        "source": "described"
+      },
+      {
+        "kind": "build_night",
+        "duration_min": 120,
+        "source": "described"
+      }
+    ]
   },
   {
     "schema_version": 1,
@@ -7285,7 +7308,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "workshop",
     "size": null,
     "speakers": [],
     "participant": true,
@@ -7298,7 +7321,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.21,
+    "predicted_p": 0.33,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7316,19 +7339,17 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=workshop,participant=True)=1.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Hands-on and waitlisted. Same slot as AI Heist.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
       "cost_blocks_source": "manual"
     },
-    "verdict": "part",
-    "reasons": [
-      "below_bar"
-    ],
-    "primary_reason": "below_bar",
+    "verdict": "go",
+    "reasons": [],
+    "primary_reason": null,
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   },
   {
     "schema_version": 1,
@@ -7347,7 +7368,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "hackathon",
     "size": null,
     "speakers": [],
     "participant": true,
@@ -7360,7 +7381,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.25,
+    "predicted_p": 0.67,
     "is_exploration": false,
     "intent": "want",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7378,19 +7399,24 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=high)=0.50 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=hackathon,participant=True)=2.00 | S2(target_proximity=high)=2.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Best profile of the week. Team format means you're doing the thing, and teams force conversation in a way no mixer does.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
       "cost_blocks_source": "manual"
     },
-    "verdict": "part",
-    "reasons": [
-      "below_bar"
-    ],
-    "primary_reason": "below_bar",
+    "verdict": "go",
+    "reasons": [],
+    "primary_reason": null,
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0,
+    "segments": [
+      {
+        "kind": "hackathon",
+        "duration_min": 150,
+        "source": "described"
+      }
+    ]
   },
   {
     "schema_version": 1,
@@ -7409,7 +7435,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "hackathon",
     "size": null,
     "speakers": [],
     "participant": true,
@@ -7422,7 +7448,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.3,
+    "predicted_p": 0.8,
     "is_exploration": false,
     "intent": "want",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7440,17 +7466,26 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=high)=0.50 (\u00d70.25 social_opportunity) | \u00d71.20 prior_hook=topic",
+      "why": "S3(format=hackathon,participant=True)=2.00 | S2(target_proximity=high)=2.00 (\u00d71.00 social_opportunity) | \u00d71.20 prior_hook=topic",
       "decision_line": "Hackathon, participant, target-tier sponsor. The build stream at its cleanest.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
       "cost_blocks_source": "manual"
     },
-    "verdict": "part",
-    "reasons": [],
-    "primary_reason": null,
+    "verdict": "skip",
+    "reasons": [
+      "quota_full"
+    ],
+    "primary_reason": "quota_full",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0,
+    "segments": [
+      {
+        "kind": "hackathon",
+        "duration_min": 240,
+        "source": "described"
+      }
+    ]
   },
   {
     "schema_version": 1,
@@ -7469,7 +7504,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "mixer",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -7500,7 +7535,7 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "decision_line": "VC-and-portfolio room. Stripe's there, but not as an employer.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
@@ -7513,7 +7548,7 @@
     ],
     "primary_reason": "spectator",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   },
   {
     "schema_version": 1,
@@ -7532,7 +7567,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "workshop",
     "size": null,
     "speakers": [],
     "participant": true,
@@ -7545,7 +7580,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.21,
+    "predicted_p": 0.33,
     "is_exploration": false,
     "intent": "want",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7563,19 +7598,26 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=workshop,participant=True)=1.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Hands-on lab at a scaled company. Doesn't collide with Wednesday evening.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
       "cost_blocks_source": "manual"
     },
-    "verdict": "part",
+    "verdict": "skip",
     "reasons": [
-      "below_bar"
+      "quota_full"
     ],
-    "primary_reason": "below_bar",
+    "primary_reason": "quota_full",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0,
+    "segments": [
+      {
+        "kind": "workshop",
+        "duration_min": 150,
+        "source": "described"
+      }
+    ]
   },
   {
     "schema_version": 1,
@@ -7594,7 +7636,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "workshop",
     "size": null,
     "speakers": [],
     "participant": true,
@@ -7607,7 +7649,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.21,
+    "predicted_p": 0.33,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7625,19 +7667,17 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=workshop,participant=True)=1.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Technical and relevant. Wednesday is already full.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
       "cost_blocks_source": "manual"
     },
-    "verdict": "part",
-    "reasons": [
-      "below_bar"
-    ],
-    "primary_reason": "below_bar",
+    "verdict": "go",
+    "reasons": [],
+    "primary_reason": null,
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   },
   {
     "schema_version": 1,
@@ -7656,7 +7696,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "mixer",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -7669,7 +7709,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.04,
+    "predicted_p": 0.17,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7687,19 +7727,26 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Small dinner means real talk time, but who's in the room is unknown.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
       "cost_blocks_source": "manual"
     },
-    "verdict": "skip",
+    "verdict": "part",
     "reasons": [
       "spectator"
     ],
     "primary_reason": "spectator",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0,
+    "segments": [
+      {
+        "kind": "mixer",
+        "duration_min": 180,
+        "source": "described"
+      }
+    ]
   },
   {
     "schema_version": 1,
@@ -7718,7 +7765,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "mixer",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -7731,7 +7778,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.08,
+    "predicted_p": 0.33,
     "is_exploration": true,
     "intent": "want",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7749,7 +7796,7 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=high)=0.50 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=high)=2.00 (\u00d71.00 social_opportunity)",
       "decision_line": "WILDCARD. Small dinner, target-tier, high talk time \u2014 the model rates it mid because dinners aren't build events. Go if you get a seat.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
@@ -7757,11 +7804,19 @@
     },
     "verdict": "wildcard",
     "reasons": [
-      "spectator"
+      "spectator",
+      "quota_full"
     ],
-    "primary_reason": "spectator",
+    "primary_reason": "quota_full",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0,
+    "segments": [
+      {
+        "kind": "mixer",
+        "duration_min": 180,
+        "source": "described"
+      }
+    ]
   },
   {
     "schema_version": 1,
@@ -7780,7 +7835,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "panel",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -7811,7 +7866,7 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=panel,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
       "decision_line": "Scale/growth framing, spectator format.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
@@ -7823,7 +7878,7 @@
     ],
     "primary_reason": "spectator",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   },
   {
     "schema_version": 1,
@@ -7842,7 +7897,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "mixer",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -7873,7 +7928,7 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "decision_line": "A fund's dinner. Wrong ladder, and late on a full day.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
@@ -7886,7 +7941,14 @@
     ],
     "primary_reason": "spectator",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0,
+    "segments": [
+      {
+        "kind": "mixer",
+        "duration_min": 180,
+        "source": "described"
+      }
+    ]
   },
   {
     "schema_version": 1,
@@ -7905,7 +7967,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "mixer",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -7936,7 +7998,7 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "decision_line": "For founders. You are not one.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
@@ -7949,7 +8011,7 @@
     ],
     "primary_reason": "spectator",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   },
   {
     "schema_version": 1,
@@ -7968,7 +8030,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "demo_day",
     "size": null,
     "speakers": [],
     "participant": true,
@@ -7981,7 +8043,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.21,
+    "predicted_p": 0.42,
     "is_exploration": false,
     "intent": "want",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -7999,19 +8061,29 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=demo_day,participant=True)=1.50 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
       "decision_line": "You present. Being on stage inverts networking \u2014 people come to you. Bring the BaZi material.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
       "cost_blocks_source": "manual"
     },
-    "verdict": "part",
-    "reasons": [
-      "below_bar"
-    ],
-    "primary_reason": "below_bar",
+    "verdict": "go",
+    "reasons": [],
+    "primary_reason": null,
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0,
+    "segments": [
+      {
+        "kind": "demo_day",
+        "duration_min": 90,
+        "source": "described"
+      },
+      {
+        "kind": "mixer",
+        "duration_min": 90,
+        "source": "described"
+      }
+    ]
   },
   {
     "schema_version": 1,
@@ -8030,7 +8102,7 @@
     "reachable": true,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "mixer",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -8043,7 +8115,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.04,
+    "predicted_p": 0.17,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -8061,19 +8133,19 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity)",
+      "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
       "decision_line": "Several scaled companies, but it's a mixer after a day you've already spent.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
       "cost_blocks_source": "manual"
     },
-    "verdict": "skip",
+    "verdict": "part",
     "reasons": [
       "spectator"
     ],
     "primary_reason": "spectator",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   },
   {
     "schema_version": 1,
@@ -8092,7 +8164,7 @@
     "reachable": false,
     "host_names": [],
     "host_tier": null,
-    "format": null,
+    "format": "mixer",
     "size": null,
     "speakers": [],
     "participant": false,
@@ -8123,7 +8195,7 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "format unknown -> neutral prior 1.0 | S3(format=None,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "decision_line": "Los Angeles. Not reachable, and a founder room regardless.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
@@ -8137,6 +8209,6 @@
     ],
     "primary_reason": "not_reachable",
     "region_status": "in_region",
-    "confidence": 0.8
+    "confidence": 1.0
   }
 ]
