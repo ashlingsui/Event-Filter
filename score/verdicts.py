@@ -31,13 +31,18 @@ Below that bar it is `suppressed` — out of the stack, but counted in `suppress
 coverage is never silently lost. `blocked` is now reserved for rows that can't be scored or ranked
 at all (no parseable start date) — reachability no longer produces it.
 
-### conflict — redefined 2026-09-21
+### conflict — redefined 2026-09-21, widened 2026-10-02
 
-Conflict means overlapping something ALREADY COMMITTED (rsvp_state == "confirmed"), never overlap
-between two of this run's own candidates — two recommended events overlapping each other is a
-choice for the weekly quota/ranking to resolve, not a conflict. Until intent-capture (SPEC.md §1b)
-actually confirms an RSVP, this will correctly read zero rather than fabricate a signal from data
-we don't have.
+Conflict has two sources, both producing primary_reason == "conflict":
+  1. Overlapping something ALREADY COMMITTED (rsvp_state == "confirmed") — Pass 5.
+  2. Overlapping a higher-ranked event that took a slot the same week — Pass 3. The 2026-09-21
+     version excluded this on the theory that "two recommended events overlapping each other is a
+     choice for the weekly quota/ranking to resolve." In practice the ranking never resolved it:
+     two events at 17:30 Tuesday both came out GO, and the `conflict` code had never appeared in
+     any score_summary. A board that tells her to be in two places is worse than a wrong score —
+     a wrong-but-coherent plan is still usable. So overlapping events cannot both hold a slot; the
+     lower-ranked one gets `conflict` and `conflict_with` names the event it lost to. Losing to a
+     conflict does not consume a quota slot, so the next-best non-overlapping candidate can take it.
 """
 import datetime as dt
 import json
@@ -177,14 +182,44 @@ def _mark_recurring(rows):
     _apply_recurring_groups(by_cadence)
 
 
+def _interval(row):
+    """(start, end) as datetimes. Most scraped rows have no `end` at all, so fall back to
+    start + duration_hr; with neither, the interval is zero-length (and _overlaps then only
+    matches an identical start). Silently treating a missing end as "ends when it starts" is
+    exactly why two events at the same 17:30 both came out GO."""
+    start = _parse_dt(row.get("start"))
+    if start is None:
+        return None, None
+    end = _parse_dt(row.get("end"))
+    if end is None and row.get("duration_hr"):
+        end = start + dt.timedelta(hours=row["duration_hr"])
+    return start, end or start
+
+
 def _overlaps(a, b):
-    a_start = _parse_dt(a.get("start"))
-    a_end = _parse_dt(a.get("end")) or a_start
-    b_start = _parse_dt(b.get("start"))
-    b_end = _parse_dt(b.get("end")) or b_start
+    a_start, a_end = _interval(a)
+    b_start, b_end = _interval(b)
     if not (a_start and b_start):
         return False
-    return a_start < b_end and b_start < a_end
+    return a_start == b_start or (a_start < b_end and b_start < a_end)
+
+
+def _can_conflict(row):
+    return (row.get("duration_hr") or 0) <= CONFLICT_MAX_DURATION_HR
+
+
+def _rank_key(row):
+    """Order in which slot candidates are served, best first (SPEC.md §3d, option B, approved
+    2026-10-02). Rank by VALUE ALONE: predicted_p is a probability and cost_blocks a block count,
+    so `p - cost` silently assumed one block costs a whole unit of probability (and let a 0.42
+    event beat a 0.80 one). Cost still acts, as a gate rather than a subtracted number — Pass 4
+    turns a won GO into PART at cost >= COST_DOWNGRADES_TO_PART, and known-unreachable events need
+    top-3 value to become go_if — and as the tiebreak here (cheaper first). A confirmed RSVP
+    outranks every unconfirmed candidate: it is a commitment, not a prediction. Final tiebreaks
+    (earlier start, then name) keep equal scores resolving identically on every run."""
+    confirmed_first = 0 if row.get("rsvp_state") == "confirmed" else 1
+    return (confirmed_first, -(row["predicted_p"] or 0.0), row["cost_blocks"],
+            row.get("start") or "", row.get("name") or "")
 
 
 def _load_quota_overrides():
@@ -219,6 +254,8 @@ def resolve(rows):
     rows). Returns (skip_summary, blocked_summary, suppressed_summary, unscored_summary)."""
     _mark_recurring(rows)
     overrides = _load_quota_overrides()
+    for row in rows:
+        row.pop("conflict_with", None)  # recomputed below; never carry a stale "lost to" forward
 
     scoreable = []
     for row in rows:
@@ -263,7 +300,11 @@ def resolve(rows):
         if row.get("phase") and row["phase"] != CURRENT_PHASE:
             reasons.append("off_phase")
 
-        unreachable = row.get("reachable") is not True
+        # Only a KNOWN-unreachable event (reachable is False) takes the max-cost penalty.
+        # reachable is None means the location is unknown — scorer.py already priced that at the
+        # neutral prior, and it competes as an ordinary candidate; treating "don't know where it
+        # is" as worse than "two hours away" is the §3c error, on the cost side.
+        unreachable = row.get("reachable") is False
         if unreachable:
             row["cost_blocks"] = UNREACHABLE_COST_BLOCKS
             row["_raw"]["cost_blocks_source"] = "unreachable_penalty"
@@ -287,8 +328,8 @@ def resolve(rows):
     #   (a) go_if eligibility — pending unreachable rows must rank top-3 by raw predicted_p among
     #       EVERYONE that week to even be considered, and still clear GO_BAR outright (a weak week
     #       can't manufacture a "top 3" out of zeros).
-    #   (b) the slot quota — "eligible" and "go_if" candidates are ranked by (value - cost_blocks),
-    #       not by value alone with cost as a mere tiebreak. Only the top N (that week's budget)
+    #   (b) the slot quota — "eligible" and "go_if" candidates are ranked by value alone, with cost
+    #       as the tiebreak (SPEC.md §3d). Only the top N (that week's budget)
     #       become "go"; everyone else eligible loses to quota_full. Non-eligible rows (skip/part
     #       from Pass 2) never enter this competition at all — they already have their own reason.
     by_week = defaultdict(list)
@@ -310,10 +351,21 @@ def resolve(rows):
 
         candidates = sorted(
             (r for r in members if r["_tier"] in ("eligible", "go_if")),
-            key=lambda r: -((r["predicted_p"] or 0.0) - r["cost_blocks"]),
+            key=_rank_key,
         )
-        for i, r in enumerate(candidates):
-            if i < quota:
+        holders = []  # candidates that hold a slot, in rank order
+        for r in candidates:
+            # A candidate that overlaps a higher-ranked slot holder cannot also hold a slot: it
+            # loses to that event by name and does NOT consume quota. Checked before the quota so
+            # the reason states what it lost to, not just that the week was full.
+            clash = next((h for h in holders if _can_conflict(r) and _can_conflict(h) and _overlaps(r, h)), None)
+            if clash is not None:
+                r["_tier"] = "skip"
+                r["_reasons"].append("conflict")
+                r["conflict_with"] = {"id": clash.get("id"), "name": clash.get("name"),
+                                      "kind": "confirmed" if clash.get("rsvp_state") == "confirmed" else "ranked"}
+            elif len(holders) < quota:
+                holders.append(r)
                 if r["_tier"] == "eligible":
                     r["_tier"] = "go"
                 # go_if candidates that win a slot simply stay "go_if" — finalized in Pass 6.
@@ -337,15 +389,24 @@ def resolve(rows):
 
     # Pass 5: conflict against real commitments only (rsvp_state == "confirmed") — see module
     # docstring. Reads as zero today; that's correct, not broken.
+    # Confirmed-vs-confirmed overlaps were already settled in Pass 3 (one holds the slot, the other
+    # is marked conflict). Here a confirmed event only blocks UNCONFIRMED candidates, and only if it
+    # didn't itself lose a conflict — otherwise the winner would be knocked out by the loser it just
+    # beat, and the board would show neither.
     confirmed = [
         r for r in rows
         if r.get("rsvp_state") == "confirmed" and (r.get("duration_hr") or 0) <= CONFLICT_MAX_DURATION_HR
+        and not r.get("conflict_with")
     ]
     for r in scoreable:
+        if r.get("rsvp_state") == "confirmed":
+            continue
         if r["_tier"] in ("go", "part", "go_if") and (r.get("duration_hr") or 0) <= CONFLICT_MAX_DURATION_HR:
-            if any(_overlaps(r, c) for c in confirmed if c is not r):
+            clash = next((c for c in confirmed if c is not r and _overlaps(r, c)), None)
+            if clash is not None:
                 r["_tier"] = "skip"
                 r["_reasons"].append("conflict")
+                r["conflict_with"] = {"id": clash.get("id"), "name": clash.get("name"), "kind": "confirmed"}
 
     # Pass 6: finalize. wildcard overrides tier but keeps the underlying reasons — SPEC.md §3's
     # exploration mechanism needs to know what the model would have skipped it for.

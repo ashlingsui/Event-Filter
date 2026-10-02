@@ -1,6 +1,24 @@
 # Current state
 
-Updated: 2026-09-21
+Updated: 2026-10-02
+
+**2026-10-02 pass (supersedes the stale frontend notes below — all v12 routes are built):**
+- One command refreshes everything: `scripts/refresh.sh` (ingest -> enrich -> score ->
+  `app/build_data.py` -> final counts). `scripts/check.sh` now also runs `scripts/selftest.py` and a
+  drift check that regenerates `app/generated/data.js` and fails if it differs from what is on disk.
+- Hand-entered values are protected: rows carry `_manual: {fields, ...}`; `manual_guard.py` makes
+  ingest/enrich/score restore those fields after each stage and record what the stage wanted in
+  `_manual.shadow`. Each run prints (and `score_summary.json` stores) how many overwrites were blocked.
+- `prior_hook` `person` is now scored (x1.3, above `topic` x1.2); `score/scorer.py` refuses to load if
+  any SPEC.md §2 enum value lacks a table entry, and rejects an unrecognized value instead of
+  defaulting. Overlapping events can no longer both hold a slot (`conflict`, with `conflict_with`).
+- Unknown location is a neutral cost prior (1.0 block) with lower confidence, not the worst case;
+  `cost_blocks` is recomputed every run unless listed in `_manual.fields`.
+- `enrich/rules.py` (tier 1, no model) also fills `participant` and `target_proximity`
+  (employer list: `config/target_employers.json`).
+- The page shows data age and a loud banner past 48h (`data/ingest_meta.json` records the scrape time).
+- Slot ranking is by value, with cost as gate and tiebreak (SPEC.md §3d, option B, approved 2026-10-02).
+- Not deployed: the site is local-only; `vercel.json` exists but no Vercel project is linked.
 
 - Current frontend UX reference: `design_v12.html`. Implementation contract for the
   next code/data iteration: `DESIGN_V12_HANDOFF.md` (2026-09-21).

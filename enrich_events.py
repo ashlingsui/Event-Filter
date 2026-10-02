@@ -34,8 +34,13 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import manual_guard
 import supabase.config  # noqa: F401 — side effect only: loads supabase/.env into os.environ if present
 from enrich import geocode, llm_enrich, rules
+
+# Distinct from 1 (a crash / unhandled error) so scripts/refresh.sh can tell "ran fine, optional
+# tier 3 skipped" from "broke". Still non-zero: SPEC.md §3c says a skipped tier must never be silent.
+TIER3_SKIPPED_EXIT = 3
 
 ROOT = Path(__file__).parent
 EVENTS_PATH = ROOT / "data" / "events.json"
@@ -47,18 +52,24 @@ def main():
 
     session = requests.Session()
 
+    guard = manual_guard.Report()
+
     print("Geocode / reachable:")
-    geocode.enrich_all(rows, session=session)
+    with guard.protect(rows, "enrich:geocode"):
+        geocode.enrich_all(rows, session=session)
 
     print("Rule pass (tier 1, deterministic):")
-    rules.enrich_all(rows, session=session)
+    with guard.protect(rows, "enrich:rules"):
+        rules.enrich_all(rows, session=session)
 
     print("LLM pass (tier 3, optional):")
-    rows, llm_ran, llm_eligible = llm_enrich.enrich_all(rows, session=session)
+    with guard.protect(rows, "enrich:llm"):
+        rows, llm_ran, llm_eligible = llm_enrich.enrich_all(rows, session=session)
 
     with EVENTS_PATH.open("w") as f:
         json.dump(rows, f, indent=2, default=str)
     print("\n{} rows written back to {}".format(len(rows), EVENTS_PATH))
+    guard.print_summary()
 
     if not llm_ran:
         still_null = sum(
@@ -74,7 +85,7 @@ def main():
             "supabase/.env for tier 3.".format(llm_eligible, len(rows), still_null),
             file=sys.stderr,
         )
-        sys.exit(1)
+        sys.exit(TIER3_SKIPPED_EXIT)
 
 
 if __name__ == "__main__":

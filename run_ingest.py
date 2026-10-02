@@ -9,6 +9,7 @@ target_proximity, format, cohort_saturation, prior_hook etc. stay null. That's s
 Usage:
     python3 run_ingest.py
 """
+import datetime
 import json
 import sys
 from pathlib import Path
@@ -17,6 +18,7 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import manual_guard
 from ingest import campusgroups, luma, normalize, partiful, region
 
 ROOT = Path(__file__).parent
@@ -52,7 +54,8 @@ def main():
     partiful_rows = partiful.fetch_all(config.get("partiful_urls", []), session=session)
     partiful_rows += partiful.fetch_explore(session=session)
 
-    rows = normalize.merge(existing_rows, luma_rows, campus_rows, partiful_rows)
+    guard = manual_guard.Report()
+    rows = normalize.merge(existing_rows, luma_rows, campus_rows, partiful_rows, guard=guard)
 
     fresh_ids = {r["id"] for r in luma_rows + campus_rows + partiful_rows if r.get("id")}
     stale_retained = sum(1 for r in rows if r["id"] not in fresh_ids)
@@ -67,10 +70,17 @@ def main():
         if cal.get("region_filter")
     }
     partiful_region = config.get("partiful_region_filter")
-    rows, region_dropped, region_flagged = region.apply_filter(rows, region_by_calendar, partiful_region)
+    with guard.protect(rows, "ingest:region"):
+        rows, region_dropped, region_flagged = region.apply_filter(rows, region_by_calendar, partiful_region)
     flagged_names = [r["name"] for r in rows if r.get("region_status") == "unknown"]
 
     normalize.write(rows, OUTPUT_PATH)
+    # When the scrape actually ran. Nothing else records this, so a site rebuilt from week-old
+    # events looked identical to a fresh one (the UI reads it via build_data's source_ingested_at).
+    (ROOT / "data" / "ingest_meta.json").write_text(json.dumps({
+        "ingested_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+        "events": len(rows),
+    }, indent=2) + "\n")
 
     summary = normalize.summarize(rows)
     print("\n{} events written to {}".format(summary["total"], OUTPUT_PATH))
@@ -85,6 +95,7 @@ def main():
         print("  unknown-location rows needing review:")
         for name in flagged_names:
             print("    - {}".format(name))
+    guard.print_summary()
 
 
 if __name__ == "__main__":

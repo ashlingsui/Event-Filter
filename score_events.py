@@ -20,6 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import manual_guard
 from score import scorer, verdicts
 
 ROOT = Path(__file__).parent
@@ -31,11 +32,15 @@ def main():
     with EVENTS_PATH.open() as f:
         rows = json.load(f)
 
+    guard = manual_guard.Report()
+
     print("Score:")
-    scorer.score_all(rows)
+    with guard.protect(rows, "score:scorer"):
+        scorer.score_all(rows)
 
     print("Verdicts:")
-    skip_summary, blocked_summary, suppressed_summary, unscored_summary = verdicts.resolve(rows)
+    with guard.protect(rows, "score:verdicts"):
+        skip_summary, blocked_summary, suppressed_summary, unscored_summary = verdicts.resolve(rows)
     print("  skip_summary:       {}".format(skip_summary))
     print("  blocked_summary:    {}".format(blocked_summary))
     print("  suppressed_summary: {}".format(suppressed_summary))
@@ -63,10 +68,12 @@ def main():
             "blocked_summary": blocked_summary,
             "suppressed_summary": suppressed_summary,
             "unscored_summary": unscored_summary,
+            "manual_preservation": guard.as_dict(),
         }, f, indent=2)
 
     print("\n{} rows written back to {}".format(len(rows), EVENTS_PATH))
     print("summary written to {}".format(SUMMARY_PATH))
+    guard.print_summary()
 
     top = sorted(
         (r for r in rows if r["verdict"] in ("go", "part", "go_if")),

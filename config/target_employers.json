@@ -1,0 +1,11 @@
+{
+  "_note": "Employers Tier 1 (enrich/rules.py) treats as 'her target companies' when it appears in an event's title or host names. SPEC.md §2: target_proximity is the density of people CURRENTLY INSIDE target companies. This is a declared, editable list, not a learned one — add or remove names freely; it only changes which events get target_proximity filled by rule. Matching is case-sensitive and word-bounded, so ambiguous common words (Apple, Meta, Block) are deliberately NOT listed.",
+  "employers": [
+    "Google", "DeepMind", "Microsoft", "Amazon", "AWS", "NVIDIA", "OpenAI", "Anthropic",
+    "Stripe", "Atlassian", "HubSpot", "Salesforce", "Databricks", "Snowflake", "Figma", "Notion",
+    "Canva", "Adobe", "Intuit", "LinkedIn", "Airbnb", "Uber", "DoorDash", "Instacart", "Coinbase",
+    "Plaid", "Ramp", "Brex", "Rippling", "Datadog", "Cloudflare", "Vercel", "Modal", "Scale AI",
+    "Perplexity", "Cohere", "Mistral", "Hugging Face", "GitHub", "Slack", "Zoom", "Twilio",
+    "Shopify", "Square", "Pinterest", "Snap", "Dropbox", "Box", "Workday", "ServiceNow"
+  ]
+}

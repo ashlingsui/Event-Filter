@@ -771,7 +771,7 @@
       none: "No target-company density", wrong_ladder: "VC/founder room, not a target-employer room",
       some: "Some target-company density", high: "High target-company density",
     }[e.target_proximity] || "Unknown";
-    const hookTxt = { none: "None", topic: "Topic hook (×1.20 value)" }[e.prior_hook] || "Unknown";
+    const hookTxt = { none: "None", topic: "Topic hook (×1.20 value)", person: "Someone you know is there (×1.30 value)" }[e.prior_hook] || "Unknown";
     const companionsTxt = e.companions && e.companions.length ? e.companions.join(", ") : "None recorded";
     const cohortTxt = { none: "Low", some: "Some (×0.85 value)", high: "High (×0.60 value)" }[e.cohort_saturation] || "Unknown";
     const travelBits = [`${e.cost_blocks != null ? e.cost_blocks : "—"} cost blocks`];
@@ -1425,7 +1425,8 @@
     const bits = [];
     if (e.participant === true) bits.push("You can do the thing this event is for, not just watch it — ask what people are actually building today.");
     else if (e.participant === false) bits.push("This is a spectator format — plan a question for the Q&A or the hallway rather than counting on hands-on time.");
-    if (e.prior_hook === "topic") bits.push("You already have a hook into this topic — open with what actually drew you in, not small talk.");
+    if (e.prior_hook === "person") bits.push("You know someone who will be in the room — ask them for the introduction before you arrive, not after.");
+    else if (e.prior_hook === "topic") bits.push("You already have a hook into this topic — open with what actually drew you in, not small talk.");
     if (e.target_proximity === "high" || e.target_proximity === "some") bits.push("This room skews toward people at your target companies — ask what they're working on right now, not just what they do.");
     else if (e.target_proximity === "wrong_ladder") bits.push("This room is mostly VCs and founders, not target-company peers — treat it as a listening night.");
     if (e.cohort_saturation === "high") bits.push("Expect a lot of familiar faces — the highest-value conversation may be the one person you don't already know.");
@@ -1901,6 +1902,51 @@
     showView(KNOWN_VIEWS.has(id) ? id : "home");
   }
   window.addEventListener("hashchange", routeFromHash);
+
+  // Data age. A site serving month-old events looks identical to a fresh one unless it says so.
+  // 48h is a declared threshold: the pipeline is meant to be refreshed (scripts/refresh.sh) before
+  // any week she is actually deciding about, and most events are posted days, not hours, ahead.
+  const STALE_AFTER_HOURS = 48;
+  function fmtAge(ms) {
+    const h = ms / 3600000;
+    if (h < 1) return "under an hour ago";
+    if (h < 48) return `${Math.round(h)}h ago`;
+    return `${Math.round(h / 24)} days ago`;
+  }
+  function fmtPT(iso) {
+    return new Date(iso).toLocaleString("en-US", {
+      timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+    }) + " PT";
+  }
+  function renderDataAge() {
+    const t = DataAccess.getDataTimes();
+    const el = document.getElementById("dataAge");
+    const banner = document.getElementById("staleBanner");
+    const now = Date.now();
+    // The scrape time is the honest "age of the events"; fall back to scoring, then build, and say
+    // which one we are showing so a rebuilt-but-never-rescraped site cannot pass as fresh.
+    const basis = t.ingested ? ["scraped", t.ingested] : t.scored ? ["scored", t.scored] : t.built ? ["built", t.built] : null;
+    if (!basis) {
+      el.textContent = "Data age unknown";
+      el.classList.add("stale");
+      banner.textContent = "DATA AGE UNKNOWN — this build carries no timestamp, so there is no way to tell how old these events are.";
+      banner.hidden = false;
+      return;
+    }
+    const ageMs = now - new Date(basis[1]).getTime();
+    const parts = [`${basis[0]} ${fmtPT(basis[1])} (${fmtAge(ageMs)})`];
+    if (!t.ingested) parts.push("scrape time not recorded");
+    el.textContent = "Data " + parts.join(" · ");
+    const stale = ageMs > STALE_AFTER_HOURS * 3600000;
+    el.classList.toggle("stale", stale);
+    if (stale) {
+      banner.textContent = `STALE DATA — these events were ${basis[0]} ${fmtAge(ageMs)}. Events may have been added, moved, filled or cancelled since. Run scripts/refresh.sh before trusting this board.`;
+      banner.hidden = false;
+    } else {
+      banner.hidden = true;
+    }
+  }
+  renderDataAge();
 
   weekPrev.addEventListener("click", () => setWeek(currentWeekIndex - 1));
   weekNext.addEventListener("click", () => setWeek(currentWeekIndex + 1));

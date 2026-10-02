@@ -208,7 +208,7 @@ schema_version, id, source (luma | campusgroups | partiful), url, name
 start, end, duration_hr
 venue, city, lat, lng, bart_walk_min, reachable        # reachable = hard filter
 host_names[], host_tier (tier1_vc | scaled_co | startup | student_club | unknown)
-format (build_night | hackathon | demo_day | workshop | panel | fireside | mixer | lecture | class)
+format (build_night | hackathon | demo_day | workshop | panel | fireside | mixer | lecture | class | office_hours)
 size (guest_count, or bucket when hidden)
 
 participant (bool)          # can I legitimately DO the thing this event is for? → drives S3
@@ -735,3 +735,73 @@ A tool that renders `0.0 · below_bar` for an event it has never looked at is ly
 It is the same failure as a calibration panel showing n=4 when only one row has a prediction, and
 the same failure as a UI implying coverage it does not have. **Never display a confident value
 derived from an absence.**
+
+---
+
+## §3d SLOT RANKING — OPTION B APPROVED AND IMPLEMENTED — 2026-10-02
+
+**Status: option B approved 2026-10-02 and implemented in `score/verdicts.py::_rank_key`. The
+text below is kept as the record of the decision; "today"/"currently" in it describes the
+pre-change behavior.**
+
+### The bug
+
+When more events clear `GO_BAR` than the week has slots, `verdicts.py` ranks them by
+`predicted_p − cost_blocks`. The two terms do not share a unit: `predicted_p` is a probability in
+[0, 0.95]; `cost_blocks` is a count of class/time blocks on the grid {0, 0.5, 1, 1.5, 2}. The
+subtraction silently assumes **one block costs one whole unit of probability**, which no one chose.
+Under that exchange rate a single half-block outweighs a 0.47 probability difference.
+
+It also contradicts the rule the scorer states for itself (LESSONS.md #5, scorer.py's docstring):
+*value and cost are separate axes; cost gates, it does not fold into the value number.*
+
+### Evidence — real data, SF Tech Week (2026-W41)
+
+With the week's slot budget at the standing default of 2, ranking by `p − cost`:
+
+| event | p | cost | p − cost | outcome today |
+|---|---|---|---|---|
+| Agent Hackathon (Anthropic) | **0.80** | 1.5 | −0.70 | **quota_full — loses its slot** |
+| Love at First Slide (Gamma × Atlassian) | 0.42 | 1.0 | −0.58 | GO |
+| AI Heist Challenge | 0.67 | 1.0 | −0.33 | GO |
+
+The highest-value event of the week loses to a 0.42 because it costs 0.5 more blocks. At a budget
+of 3 or more the two rules produce identical verdicts on today's data, so this is a *scarce-slot*
+defect: it bites exactly when the week is overbooked, which is when the ranking matters.
+
+### Options
+
+**A. Pick an exchange rate λ and rank by `p − λ·cost`.** Honest in form, but λ has no data behind
+it: there are no outcomes yet that say what a block of her time is worth in probability. Any value
+(0.1, 0.2, 0.3) is a made-up constant that will quietly decide the board. Rejected unless she
+supplies λ from her own sense of what a block is worth — and then it should be a visible setting.
+
+**B. Rank by value; let cost act only through the gates that already exist. (RECOMMENDED)**
+Slot candidates are ordered by `predicted_p` alone, with `cost_blocks` (lower first) as the
+tiebreak. Cost still does real work, but as a gate, not a number subtracted from a probability:
+- `cost_blocks ≥ COST_DOWNGRADES_TO_PART (1.5)` still turns a won GO into PART (Pass 4);
+- known-unreachable events still need top-3 value to become `go_if`;
+- a confirmed RSVP still outranks everything.
+This introduces **no new constant**, matches LESSONS.md #5 as written, and removes the unit error
+rather than hiding it behind a coefficient. Its cost: two events of equal value never trade a
+cheaper one against a slightly better one — a 0.60 event 2 blocks away beats a 0.58 event next
+door. The tiebreak and the PART gate cover the extreme cases; the middle is a judgment call that
+belongs to her, not to a fitted coefficient we cannot yet fit.
+
+**C. Rank by value per cost, `p / (cost + k)`.** Removes the unit clash but needs `k` to avoid
+division by zero at cost 0 — another unprincipled constant, and it over-rewards free events.
+Rejected.
+
+**D. Express cost in the same unit as value** (a block's opportunity cost = the P(hit) she would
+earn from what she gives up in that block). The only fully principled option, and it needs
+outcome data on the alternatives. Revisit once there are labelled events (SPEC.md §3, multi-user).
+
+### What approval would change
+
+Only `_rank_key` in `score/verdicts.py` (one function, one line of intent) plus its tests. Pass 4,
+the `go_if` gate, conflict resolution and the confirmed-first rule are untouched.
+
+### Decision
+
+Option B approved and built. `_rank_key` orders by confirmed-first, then `predicted_p` descending,
+then `cost_blocks` ascending, then start and name. No new constant was introduced.
