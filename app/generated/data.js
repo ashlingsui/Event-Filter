@@ -1,6 +1,6 @@
 window.EVENT_FILTER_DATA = {
-  "generated_at": "2026-10-02T01:55:05.291351Z",
-  "source_scored_at": "2026-10-02T01:55:05.105749Z",
+  "generated_at": "2026-10-02T01:56:10.146584Z",
+  "source_scored_at": "2026-10-02T01:56:09.901196Z",
   "current_week_key": "2026-W40",
   "events": [
     {
@@ -6015,7 +6015,7 @@ window.EVENT_FILTER_DATA = {
     }
   ],
   "score_summary": {
-    "scored_at": "2026-10-02T01:55:05.105749Z",
+    "scored_at": "2026-10-02T01:56:09.901196Z",
     "verdict_counts": {
       "unscored": 77,
       "go": 2,
@@ -6048,7 +6048,7 @@ window.EVENT_FILTER_DATA = {
     }
   },
   "ca_suppressed_total": 1,
-  "out_of_region_count": 1,
+  "out_of_region_count": 0,
   "social_cohort_overrides_note": "DRAFT \u2014 unreviewed by Ashling. score/verdicts.py has no field distinguishing a social/cohort plan from an ordinary low-scoring professional event, and a per-club rule doesn't work (the same club hosts both kinds of event \u2014 see DESIGN_V12_HANDOFF review, 2026-09-21). This file is a manual, per-event allowlist so the board can still show a Social/Cohort lane without inventing a classification. Every id below is Claude's best guess from the event name alone, not a confirmed fact \u2014 confirm or edit each entry before trusting the lane. Unlisted events are never auto-classified; they keep their real pipeline verdict.",
   "map_bounds": {
     "lat_min": 37.28,

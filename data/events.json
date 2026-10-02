@@ -8136,7 +8136,7 @@
       "not_reachable"
     ],
     "primary_reason": "not_reachable",
-    "region_status": "out_of_region",
+    "region_status": "in_region",
     "confidence": 0.8
   }
 ]

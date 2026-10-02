@@ -1,15 +1,17 @@
 {
-  "scored_at": "2026-10-02T01:19:06.620272Z",
+  "scored_at": "2026-10-02T01:56:09.901196Z",
   "verdict_counts": {
     "unscored": 77,
     "go": 2,
-    "part": 3,
-    "skip": 12
+    "part": 10,
+    "skip": 24,
+    "wildcard": 1,
+    "suppressed": 1
   },
   "skip_summary": {
-    "total": 12,
+    "total": 24,
     "by_reason": {
-      "spectator": 12
+      "spectator": 24
     }
   },
   "blocked_summary": {
@@ -17,8 +19,10 @@
     "by_reason": {}
   },
   "suppressed_summary": {
-    "total": 0,
-    "by_reason": {}
+    "total": 1,
+    "by_reason": {
+      "not_reachable": 1
+    }
   },
   "unscored_summary": {
     "total": 77,

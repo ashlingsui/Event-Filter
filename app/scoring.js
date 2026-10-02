@@ -13,7 +13,7 @@
 const Scoring = (() => {
   const FORMAT_S3_POINTS = {
     build_night: 2.0, hackathon: 2.0, demo_day: 1.5, workshop: 1.0,
-    panel: 0.0, fireside: 0.0, mixer: 0.0, lecture: 0.0, class: 0.0,
+    panel: 0.0, fireside: 0.0, mixer: 0.0, lecture: 0.0, class: 0.0, office_hours: 0.0,
   };
   const TARGET_PROXIMITY_POINTS = { none: 0.0, wrong_ladder: 0.0, some: 1.0, high: 2.0 };
   const PRIOR_HOOK_MULT = { none: 1.0, topic: 1.2 };
@@ -28,32 +28,79 @@ const Scoring = (() => {
   const LONG_EVENT_SURCHARGE = 0.5;
   const UNREACHABLE_COST_BLOCKS = 2.0;
 
-  function sizeMult(size) {
-    if (!size) return 1.0;
-    if (size <= 20) return 1.15;
-    if (size <= 75) return 1.0;
-    if (size <= 150) return 0.85;
-    return 0.65;
+  // SPEC.md §3c "unknown is not zero" — same declared constants as score/scorer.py, not derived
+  // from any sample (see that file for why).
+  const NEUTRAL_PRIOR_S3 = 1.0;
+  const NEUTRAL_PRIOR_S2 = 1.0;
+  const NEUTRAL_PARTICIPANT_MULT = 0.5;
+
+  // SPEC.md §3b "Events have segments" — see score/scorer.py for the full rationale. `size` is
+  // deliberately absent here: SPEC.md §3b retracted it before it was ever built.
+  const SEGMENT_MINUTES_FULL_CREDIT = 45.0;
+  const SOCIAL_SEGMENT_KINDS = new Set([
+    "mixer", "build_night", "hackathon", "demo_day", "workshop", "office_hours", "fireside", "class",
+  ]);
+  const SOCIAL_OPPORTUNITY_FLOOR = 0.25;
+
+  function effectiveSegments(event) {
+    const segments = event.segments && event.segments.length ? event.segments : null;
+    if (segments) return segments;
+    const fmt = event.format || null;
+    const durationMin = typeof event.duration_hr === "number" ? event.duration_hr * 60 : null;
+    if (fmt === null && durationMin === null) return [];
+    return [{ kind: fmt, duration_min: durationMin }];
+  }
+
+  function segmentS3Points(segments) {
+    let best = null;
+    for (const seg of segments) {
+      if (!(seg.kind in FORMAT_S3_POINTS)) continue;
+      const duration = seg.duration_min;
+      const durationCredit = duration != null ? Math.min(1.0, duration / SEGMENT_MINUTES_FULL_CREDIT) : 1.0;
+      const points = FORMAT_S3_POINTS[seg.kind] * durationCredit;
+      best = best === null ? points : Math.max(best, points);
+    }
+    return best;
+  }
+
+  function socialOpportunity(segments) {
+    let socialMinutes = 0;
+    for (const seg of segments) {
+      if (SOCIAL_SEGMENT_KINDS.has(seg.kind)) socialMinutes += seg.duration_min || 0;
+    }
+    return Math.max(SOCIAL_OPPORTUNITY_FLOOR, Math.min(1.0, socialMinutes / SEGMENT_MINUTES_FULL_CREDIT));
   }
 
   // context: { ride: bool|null, companion: bool|null, hook: bool|null } — null/undefined means
   // "no answer given," in which case the event's own scraped field is used unchanged.
   function recomputeP(event, context) {
-    const participant = event.participant;
-    const s3 = participant ? (FORMAT_S3_POINTS[event.format] ?? 0.0) : 0.0;
-    const s2 = TARGET_PROXIMITY_POINTS[event.target_proximity] ?? 0.0;
+    const segments = effectiveSegments(event);
+
+    const segmentS3 = segmentS3Points(segments);
+    const formatPoints = segmentS3 !== null ? segmentS3 : NEUTRAL_PRIOR_S3;
+
+    let participantMult;
+    if (event.participant === true) participantMult = 1.0;
+    else if (event.participant === false) participantMult = 0.0;
+    else participantMult = NEUTRAL_PARTICIPANT_MULT;
+
+    const s3 = formatPoints * participantMult;
+
+    const proximityPoints = event.target_proximity != null
+      ? (TARGET_PROXIMITY_POINTS[event.target_proximity] ?? 0.0)
+      : NEUTRAL_PRIOR_S2;
+
+    const socialOpp = socialOpportunity(segments);
+    const cohortMult = COHORT_SATURATION_MULT[event.cohort_saturation] ?? 1.0;
+    const s2 = proximityPoints * socialOpp * cohortMult;
 
     const priorHook = context.hook === true ? "topic" : (event.prior_hook || "none");
     const hookMult = PRIOR_HOOK_MULT[priorHook] ?? 1.0;
 
-    const cohortMult = COHORT_SATURATION_MULT[event.cohort_saturation] ?? 1.0;
-
     const hasCompanion = context.companion === true || (event.companions && event.companions.length > 0);
     const companionMult = hasCompanion ? COMPANIONS_MULT : 1.0;
 
-    const szMult = sizeMult(event.size);
-
-    const value = (s3 + s2) * hookMult * cohortMult * companionMult * szMult;
+    const value = (s3 + s2) * hookMult * companionMult;
     return Math.min(MAX_PREDICTED_P, Math.round((value / VALUE_TO_P_DIVISOR) * 100) / 100);
   }
 

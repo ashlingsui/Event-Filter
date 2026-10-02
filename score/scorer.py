@@ -71,38 +71,93 @@ def confidence(row):
     return round(known / len(CONFIDENCE_FIELDS), 2)
 
 
-# --- Multipliers. All positive-only except cohort_saturation and size, per BUILD_HANDOFF.md:
-# "Never frame going to events with friends as a cost. Companions are a positive." prior_hook
-# boost matches LESSONS.md #12 ("a prior hook is what makes the room warm"). cohort_saturation
-# penalty matches LESSONS.md #9 (a saturated room, not companionship, is what kills new-contact
-# yield).
+# --- Multipliers. All positive-only except cohort_saturation, per BUILD_HANDOFF.md: "Never frame
+# going to events with friends as a cost. Companions are a positive." prior_hook boost matches
+# LESSONS.md #12 ("a prior hook is what makes the room warm"). cohort_saturation penalty matches
+# LESSONS.md #9 (a saturated room, not companionship, is what kills new-contact yield).
 PRIOR_HOOK_MULT = {"none": 1.0, "topic": 1.2}
 COHORT_SATURATION_MULT = {"none": 1.0, "some": 0.85, "high": 0.6}
 COMPANIONS_MULT = 1.15
 
-# size (guest_count) enters the value model — added 2026-09-21. Her clearest labeled contrast so
-# far: the 200-person Founder & Funder Night delivered nothing; the small a16z build night was the
-# one confirmed hit. Buckets are drawn from the real distribution in the current data (checked live
-# 2026-09-21: 76 of 104 sized rows read exactly 0), not picked blind. 0 is deliberately treated as
-# "no signal yet", same as None — Luma's guest_count is a live RSVP count, so a just-listed event
-# reads 0 for reasons that have nothing to do with room size, and would otherwise get wrongly
-# boosted as "intimate." This makes the signal noisiest for events far from their date and most
-# reliable close to it, which is an honest property of the data, not a flaw to paper over.
-def _size_mult(size):
-    if not size:
-        return 1.0
-    if size <= 20:
-        return 1.15
-    if size <= 75:
-        return 1.0
-    if size <= 150:
-        return 0.85
-    return 0.65
+# size (guest_count) was added to the value model 2026-09-21 and RETRACTED 2026-09-22, before it
+# was ever wired in here — SPEC.md §3b. The n=2 contrast it was fit to (Founder & Funder vs. the
+# a16z build night) was fully confounded by wrong_ladder/participant/prior_hook/cohort_saturation
+# on both sides; a coefficient derived from that is exactly the mistake LESSONS.md #9 exists to
+# prevent. Her own objections: small events are routinely `gated` (selective, not just small) —
+# this would punish the exact selectivity `gated` is meant to reward — and a large room is often
+# large BECAUSE the host is good, so penalizing size penalizes host quality backwards. Everything
+# size was assumed to proxy for is now modeled directly: talk time is social_opportunity (below),
+# composition is target_proximity + cohort_saturation, structure is segments. `size` is still
+# recorded on every event (ingest) and stays at weight zero, exactly like `host_tier` — it earns a
+# weight from outcomes someday, or not at all. Do not reintroduce a size multiplier here.
+
+# --- SPEC.md §3b "Events have segments". One format enum can't describe a mixed agenda ("first 30
+# minutes hanging out and meeting people, then about an hour of live demos") — it forces a wrong
+# answer either way, and averaging destroys the half that carried the value. `segments` (enrich/
+# rules.py's Tier 1 parse, or hand-entered) let S3 take the best block instead of averaging, and
+# let S2 ask whether there was actually time to talk to anyone — proximity says who is in the
+# room, segments say whether you could reach them.
+SEGMENT_MINUTES_FULL_CREDIT = 45.0  # a block shorter than this earns partial S3 credit, proportionally
+
+# Segment kinds during which she could actually approach and talk to someone. A lecture or panel
+# is one-way broadcast (SPEC.md §3b: "you cannot talk to anyone during a lecture") — everything
+# else in the format vocabulary has at least some mingling/working-alongside structure.
+SOCIAL_SEGMENT_KINDS = {
+    "mixer", "build_night", "hackathon", "demo_day", "workshop", "office_hours", "fireside", "class",
+}
+
+# LESSONS.md #25: the entire payoff of the 2026-09-18 OpenRouter event — meeting the Engineering
+# 198 instructor, and the offer to take over the course — happened in the queue, before doors
+# opened. Arrival/queue/departure is real social time even at an all-lecture event. Not a fudge
+# factor; do not remove it.
+SOCIAL_OPPORTUNITY_FLOOR = 0.25
 
 
-# raw value tops out around 4 * 1.2 * 1.15 * 1.15 ≈ 6.3 (S3 max 2 + S2 max 2, full hook + companion
-# + small-room boost, no cohort penalty) — divisor chosen so a near-ceiling event lands under the
-# 0.95 cap rather than blowing through it into false certainty; predicted_p is clamped regardless.
+def _effective_segments(row):
+    """Real parsed segments if there are any; otherwise a single implicit segment spanning the
+    whole event, built from the top-level format/duration — SPEC.md §3b: "top-level format
+    remains, as the dominant segment." Returns [] only when there is truly nothing to build one
+    from (no format, no duration) — S3/S2 then fall back to their own neutral priors."""
+    segments = row.get("segments") or []
+    if segments:
+        return segments
+    fmt = row.get("format")
+    duration_hr = row.get("duration_hr")
+    duration_min = duration_hr * 60 if duration_hr is not None else None
+    if fmt is None and duration_min is None:
+        return []
+    return [{"kind": fmt, "duration_min": duration_min}]
+
+
+def _segment_s3_points(segments):
+    """max over segments of FORMAT_S3_POINTS[kind] * min(1.0, duration_min/45) — SPEC.md §3b:
+    "S3 takes the max, not the sum. Two demo blocks are not twice the inspiration." Returns None
+    (not 0.0) when no segment has a recognized kind, so the caller applies the neutral prior
+    instead of a false floor."""
+    best = None
+    for seg in segments:
+        kind = seg.get("kind")
+        if kind not in FORMAT_S3_POINTS:
+            continue
+        duration = seg.get("duration_min")
+        duration_credit = min(1.0, duration / SEGMENT_MINUTES_FULL_CREDIT) if duration is not None else 1.0
+        points = FORMAT_S3_POINTS[kind] * duration_credit
+        best = points if best is None else max(best, points)
+    return best
+
+
+def _social_opportunity(segments):
+    """min(1.0, social_minutes/45), floored at SOCIAL_OPPORTUNITY_FLOOR."""
+    social_minutes = sum(
+        (seg.get("duration_min") or 0) for seg in segments if seg.get("kind") in SOCIAL_SEGMENT_KINDS
+    )
+    return max(SOCIAL_OPPORTUNITY_FLOOR, min(1.0, social_minutes / SEGMENT_MINUTES_FULL_CREDIT))
+
+
+# raw value tops out around (2.0 + 2.0) * 1.2 * 1.15 ≈ 5.52 (S3 max 2 + S2 max 2 — proximity "high"
+# × social_opportunity 1.0 × no cohort penalty — full prior_hook + companion boost) — divisor
+# chosen so a near-ceiling event lands under the 0.95 cap rather than blowing through it into false
+# certainty; predicted_p is clamped regardless.
 VALUE_TO_P_DIVISOR = 6.0
 MAX_PREDICTED_P = 0.95
 
@@ -171,12 +226,13 @@ def score_row(row):
     event regardless of its actual classification, which meant nothing could ever have been good
     enough to surface as `go_if`. Fixed: value is computed the same way regardless of reachability."""
     why = []
+    segments = _effective_segments(row)
 
-    # SPEC.md §3c: null is not 0. A format/participant/target_proximity we never looked at scores
-    # at its NEUTRAL_PRIOR, not at the floor — see the constants above for why these particular
-    # numbers and not a fitted one.
-    if row.get("format") is not None:
-        format_points = FORMAT_S3_POINTS.get(row["format"], 0.0)
+    # S3 — SPEC.md §3b: max over segments (not the sum), gated by participant. SPEC.md §3c: an
+    # unknown format/participant scores at its declared neutral prior, never the zero floor.
+    segment_s3 = _segment_s3_points(segments)
+    if segment_s3 is not None:
+        format_points = segment_s3
     else:
         format_points = NEUTRAL_PRIOR_S3
         why.append("format unknown -> neutral prior {:.1f}".format(NEUTRAL_PRIOR_S3))
@@ -189,31 +245,37 @@ def score_row(row):
 
     s3 = format_points * participant_mult
 
+    # S2 — SPEC.md §3b: gated on social_opportunity (who's in the room says nothing if there was
+    # never time to talk to them) and cohort_saturation applied HERE, not globally — the same
+    # principle as the sponsorship rule: a factor goes on the stream it actually affects, never
+    # the whole event.
     if row.get("target_proximity") is not None:
-        s2 = TARGET_PROXIMITY_POINTS.get(row["target_proximity"], 0.0)
+        proximity_points = TARGET_PROXIMITY_POINTS.get(row["target_proximity"], 0.0)
     else:
-        s2 = NEUTRAL_PRIOR_S2
+        proximity_points = NEUTRAL_PRIOR_S2
         why.append("target_proximity unknown -> neutral prior {:.1f}".format(NEUTRAL_PRIOR_S2))
 
-    why.append("S3(format={},participant={})={:.2f}".format(row.get("format"), row.get("participant"), s3))
-    why.append("S2(target_proximity={})={:.2f}".format(row.get("target_proximity"), s2))
-
-    hook_mult = PRIOR_HOOK_MULT.get(row.get("prior_hook"), 1.0)
+    social_opportunity = _social_opportunity(segments)
     cohort_mult = COHORT_SATURATION_MULT.get(row.get("cohort_saturation"), 1.0)
-    companion_mult = COMPANIONS_MULT if row.get("companions") else 1.0
-    size_mult = _size_mult(row.get("size"))
-    if hook_mult != 1.0:
-        why.append("×{:.2f} prior_hook={}".format(hook_mult, row["prior_hook"]))
+    s2 = proximity_points * social_opportunity * cohort_mult
+
+    why.append("S3(format={},participant={})={:.2f}".format(row.get("format"), row.get("participant"), s3))
+    why.append("S2(target_proximity={})={:.2f} (×{:.2f} social_opportunity)".format(
+        row.get("target_proximity"), s2, social_opportunity
+    ))
     if cohort_mult != 1.0:
         why.append("×{:.2f} cohort_saturation={}".format(cohort_mult, row["cohort_saturation"]))
-    if companion_mult != 1.0:
-        why.append("×{:.2f} companions".format(companion_mult))
-    if size_mult != 1.0:
-        why.append("×{:.2f} size={}".format(size_mult, row.get("size")))
     if row.get("target_proximity") == "wrong_ladder":
         why.append("wrong_ladder: VC/founder room, not a target-employer room")
 
-    value = (s3 + s2) * hook_mult * cohort_mult * companion_mult * size_mult
+    hook_mult = PRIOR_HOOK_MULT.get(row.get("prior_hook"), 1.0)
+    companion_mult = COMPANIONS_MULT if row.get("companions") else 1.0
+    if hook_mult != 1.0:
+        why.append("×{:.2f} prior_hook={}".format(hook_mult, row["prior_hook"]))
+    if companion_mult != 1.0:
+        why.append("×{:.2f} companions".format(companion_mult))
+
+    value = (s3 + s2) * hook_mult * companion_mult
     predicted_p = round(min(MAX_PREDICTED_P, value / VALUE_TO_P_DIVISOR), 2)
     row["predicted_p"] = predicted_p
     row["confidence"] = confidence(row)

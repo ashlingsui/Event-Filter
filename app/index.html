@@ -289,7 +289,7 @@
 
       <section class="standards">
         <b>Frozen standard</b>
-        <p>The outcome definition and T+0 / T+7 / T+30 horizons are deliberately absent from controls (SPEC.md §1). The scoring model (<code>score/scorer.py</code>) is a hand-written v0 heuristic, not fitted weights; sources remain the calendars this pipeline actually follows — Luma, Haas CampusGroups, and Partiful — not every event in the Bay Area (SPEC.md §5).</p>
+        <p>The outcome definition and T+0 / T+7 / T+30 horizons are deliberately absent from controls (SPEC.md §1). The scoring model (<code>score/scorer.py</code>) is a hand-written v0 heuristic, not fitted weights. Luma and Haas CampusGroups are scanned automatically; Partiful has no public feed — only events she RSVPs to, plus a small public sample (SPEC.md §5).</p>
       </section>
 
       <p class="not-built" id="learnEmptyNote" hidden>No local outcomes/hypotheses record found — <code>app/generated/private_data.js</code> is missing or empty. Run <code>python3 app/build_data.py</code> after a local pipeline run to populate this page.</p>
@@ -345,7 +345,7 @@
         <section>
           <div class="section-kicker">Honest coverage</div>
           <h2>What the system sees — and what it does not.</h2>
-          <p>The system sees followed Luma calendars, Haas CampusGroups, and Partiful — not everything in the Bay Area. Unknown data remains unknown, and suppressed events are counted rather than silently dropped. Source provenance, unknown fields, suppressed reachability, and pending hypotheses stay on the surface.</p>
+          <p>Luma and Haas CampusGroups are scanned automatically. Partiful has no public feed — Partiful's own API doesn't exist, its /explore page ignores every filter and always returns the same fixed 15, and host pages 404 — so coverage there is only events she RSVPs to, plus that same small public sample. Unknown data remains unknown, and suppressed events are counted rather than silently dropped. Source provenance, unknown fields, suppressed reachability, and pending hypotheses stay on the surface.</p>
           <p id="aboutCoverageDetail"></p>
         </section>
 
