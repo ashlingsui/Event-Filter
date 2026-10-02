@@ -4,7 +4,7 @@ mechanical." Runs over the same scraped text enrich/llm_enrich.py's _event_text(
 prompt from (name + description-ish _raw fields); it just classifies it with regex instead of a
 model call.
 
-Two things this sets:
+Four things this sets:
 
 1. `format` — single closest keyword match, same enum as the LLM/manual path. Deliberately
    conservative: unlike the LLM pass (which defaults to "mixer" when genuinely ambiguous), a rule
@@ -18,12 +18,29 @@ Two things this sets:
    still reads top-level `format` only, not segments, until a later change wires §3b's
    segment-aware formula in.
 
-Both fields are marked `source: "rule"` in `_raw` (`format_source`, `segments_source`) so they
+3. `participant` — SPEC.md §2 "can I legitimately DO the thing this event is for?". True for the
+   hands-on formats (hackathon, build night, workshop, demo day — the same convention the LLM
+   prompt states) or explicit hands-on wording (lab, hands-on, bring your laptop, ...). False only
+   for pure watch-and-listen formats (panel, fireside, lecture) with no hands-on wording. Mixers,
+   classes and office hours are left unknown: whether she can "do the thing" there is genuinely a
+   judgment call, and guessing it would be the §3c mistake again.
+
+4. `target_proximity` — SPEC.md §2 "density of people CURRENTLY INSIDE my target companies".
+   Derived from named employers (config/target_employers.json) in the title or host names: an
+   employer alone is `high`; an employer alongside VC/founder wording is a mixed room, `some`.
+   Absent any employer, VC/founder-room wording is `wrong_ladder`, and Haas EWMBA/EMBA hosts are `some`
+   (SPEC.md §2: "EWMBA/EMBA events are S2 events"). No signal leaves it null — never `none`, which
+   is a positive claim ("nobody relevant is there"), not an absence of evidence.
+
+All four fields are marked `source: "rule"` in `_raw` (`format_source`, `segments_source`,
+`participant_source`, `target_proximity_source`; the rule's evidence goes in `*_evidence`) so they
 stay distinguishable from an LLM judgment (`_raw.enrichment_source` = model name) or a hand-entered
 one. Only ever FILLS a currently-null/empty field — never overwrites an existing value, same
 non-destructive contract as llm_enrich.apply_manual().
 """
+import json
 import re
+from pathlib import Path
 
 import requests
 
@@ -61,6 +78,70 @@ SEGMENT_KIND_KEYWORD_RULES = [
         r"\bnetworking\b", r"\bsocial(izing)?\b", r"\bfood\s+and\s+drinks?\b",
     )),
 ]
+
+# --- participant (SPEC.md §2) ---------------------------------------------------------------
+HANDS_ON_FORMATS = {"hackathon", "build_night", "workshop", "demo_day"}
+SPECTATOR_FORMATS = {"panel", "fireside", "lecture"}
+HANDS_ON_PATTERNS = (
+    r"\bhands-?on\b", r"\blab\b", r"\bbring\s+your\s+(laptop|computer)\b", r"\blive[\s-]?cod(e|ing)\b",
+    r"\bbuild\s+mode\b", r"\bbuild(ing)?\s+with\b", r"\bbuild\s+your\b", r"\bcoding\s+(session|jam)\b", r"\bjam\b",
+    r"\bbuilder'?s?\b", r"\bhack(ing)?\b",
+)
+
+# --- target_proximity (SPEC.md §2) -----------------------------------------------------------
+EMPLOYERS_PATH = Path(__file__).resolve().parent.parent / "config" / "target_employers.json"
+WRONG_LADDER_PATTERNS = (
+    r"\bVCs?\b", r"\bventure\b", r"\binvestors?\b", r"\bfunders?\b", r"\bfounders?\b",
+    r"\ba16z\b", r"\bSequoia\b", r"\bY\s?Combinator\b", r"\bSkyDeck\b", r"\baccelerator\b",
+    r"\bCapital\b", r"\bPartners\b", r"\bVentures?\b",
+)
+HAAS_EVENING_WEEKEND_PATTERNS = (r"\bEWMBA\b", r"\bEMBA\b", r"\bEvening\s*&\s*Weekend\b")
+
+
+def _load_employers():
+    with EMPLOYERS_PATH.open(encoding="utf-8") as f:
+        return json.load(f)["employers"]
+
+
+def _employers_in(text, employers):
+    return [e for e in employers if re.search(r"(?<![A-Za-z0-9])" + re.escape(e) + r"(?![A-Za-z0-9])", text)]
+
+
+def classify_participant(text, fmt):
+    """(value, evidence) or (None, None). See module docstring item 3."""
+    hands_on = next((p for p in HANDS_ON_PATTERNS if re.search(p, text or "", re.IGNORECASE)), None)
+    if fmt in HANDS_ON_FORMATS:
+        return True, "format={}".format(fmt)
+    if hands_on:
+        return True, "hands-on wording: /{}/".format(hands_on)
+    if fmt in SPECTATOR_FORMATS:
+        return False, "format={} with no hands-on wording".format(fmt)
+    return None, None
+
+
+def classify_target_proximity(row, employers=None):
+    """(value, evidence) or (None, None). See module docstring item 4. Employer matching reads
+    only the title and host names — a description that merely mentions Google in passing is not
+    evidence anyone from Google is in the room."""
+    employers = employers if employers is not None else _load_employers()
+    title = row.get("name") or ""
+    hosts = " | ".join(row.get("host_names") or [])
+    combined = "{} | {}".format(title, hosts)
+    found = _employers_in(hosts, employers) + [
+        e for e in _employers_in(title, employers) if e not in _employers_in(hosts, employers)]
+    vc_wording = next((p for p in WRONG_LADDER_PATTERNS if re.search(p, combined, re.IGNORECASE)), None)
+    if found and vc_wording:
+        # A target employer AND a VC/founder room (e.g. "Lux Capital x Stripe"): a mixed room.
+        # Neither all-employer-staff nor all-wrong-ladder, so the middle value, not a coin flip.
+        return "some", "target employer ({}) alongside VC/founder wording /{}/".format(", ".join(found), vc_wording)
+    if found:
+        return "high", "named target employer: {}".format(", ".join(found))
+    if any(re.search(p, combined, re.IGNORECASE) for p in HAAS_EVENING_WEEKEND_PATTERNS):
+        return "some", "Haas EWMBA/EMBA host (SPEC.md §2: S2 events)"
+    if vc_wording:
+        return "wrong_ladder", "VC/founder wording: /{}/".format(vc_wording)
+    return None, None
+
 
 _NUMBER_WORDS = {"a": 1, "an": 1, "one": 1, "two": 2, "three": 3, "four": 4, "half": 0.5}
 
@@ -187,21 +268,36 @@ def enrich_row(row, session=None):
         row["_raw"]["segments_source"] = "rule"
         changed = True
 
+    # participant/target_proximity read the (possibly just-filled) format, so they run last.
+    if row.get("participant") is None:
+        value, evidence = classify_participant(text, row.get("format"))
+        if value is not None:
+            row["participant"] = value
+            row["_raw"]["participant_source"] = "rule"
+            row["_raw"]["participant_evidence"] = evidence
+            changed = True
+
+    if row.get("target_proximity") is None:
+        value, evidence = classify_target_proximity(row)
+        if value is not None:
+            row["target_proximity"] = value
+            row["_raw"]["target_proximity_source"] = "rule"
+            row["_raw"]["target_proximity_evidence"] = evidence
+            changed = True
+
     return changed
 
 
 def enrich_all(rows, session=None):
-    format_set = 0
-    segments_set = 0
+    fields = ("format", "segments", "participant", "target_proximity")
+    newly = dict.fromkeys(fields, 0)
     for row in rows:
-        had_format = row.get("format") is not None
-        had_segments = bool(row.get("segments"))
+        had = {f: bool(row.get(f)) if f == "segments" else row.get(f) is not None for f in fields}
         enrich_row(row, session=session)
-        if not had_format and row.get("format") is not None:
-            format_set += 1
-        if not had_segments and row.get("segments"):
-            segments_set += 1
-    print("  rule pass: {} rows got format, {} rows got segments, from keyword rules alone".format(
-        format_set, segments_set
-    ))
+        for f in fields:
+            now = bool(row.get(f)) if f == "segments" else row.get(f) is not None
+            if now and not had[f]:
+                newly[f] += 1
+    print("  rule pass: newly set by keyword rules alone — " + ", ".join(
+        "{} {}".format(newly[f], f) for f in fields))
     return rows

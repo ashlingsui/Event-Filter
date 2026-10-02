@@ -8,6 +8,7 @@ cd "$root_dir"
 python3 -B - <<'PY'
 import ast
 import json
+import sys
 from pathlib import Path
 
 root = Path.cwd()
@@ -56,6 +57,51 @@ if data_js_path.exists():
           f"{sorted(FORBIDDEN_PUBLIC_EVENT_FIELDS)} fields)")
 else:
     print("privacy boundary check skipped (app/generated/data.js not found — run app/build_data.py)")
+
+# Drift check: app/generated/data.js is a committed BUILD ARTIFACT of data/*.json + app/build_data.py.
+# Regenerate it into a temp dir and fail if it differs from what is on disk — the stale-site
+# failure (someone re-scored but never rebuilt, or hand-edited the artifact) otherwise passes
+# silently. generated_at is the build clock, so it is excluded; everything else must match exactly.
+import subprocess
+import tempfile
+
+needed = [root / "data" / name for name in ("events.json", "score_summary.json", "outcomes.json", "pending_hypotheses.json")]
+if data_js_path.exists() and all(path.exists() for path in needed):
+    with tempfile.TemporaryDirectory() as tmp:
+        fresh_path = Path(tmp) / "data.js"
+        result = subprocess.run(
+            [sys.executable, "-B", str(root / "app" / "build_data.py"), "--out", str(fresh_path),
+             "--private-out", str(Path(tmp) / "private_data.js")],
+            capture_output=True, text=True, cwd=root,
+        )
+        if result.returncode != 0:
+            raise SystemExit("DRIFT CHECK FAILED: app/build_data.py could not regenerate data.js:\n" + result.stderr[-2000:])
+
+        def load(path):
+            text = path.read_text(encoding="utf-8")
+            payload = json.loads(text[text.index("{"):text.rindex("}") + 1])
+            payload.pop("generated_at", None)
+            return payload
+
+        committed, fresh = load(data_js_path), load(fresh_path)
+        if committed != fresh:
+            differing = sorted(k for k in set(committed) | set(fresh) if committed.get(k) != fresh.get(k))
+            changed_events = []
+            if "events" in differing:
+                old = {e["id"]: e for e in committed["events"]}
+                new = {e["id"]: e for e in fresh["events"]}
+                changed_events = sorted(i for i in set(old) | set(new) if old.get(i) != new.get(i))
+            raise SystemExit(
+                "DRIFT: app/generated/data.js does not match what app/build_data.py produces from the "
+                f"current data/*.json. Differing top-level keys: {differing}; "
+                f"{len(changed_events)} event(s) differ. Run `python3 app/build_data.py` (or "
+                "scripts/refresh.sh) and commit the result."
+            )
+        print(f"drift check passed (data.js matches a fresh build; {len(fresh['events'])} events)")
+else:
+    print("drift check skipped (data.js or one of its input data/*.json files is missing)")
 PY
+
+python3 -B scripts/selftest.py
 
 python3 -B run_checks.py

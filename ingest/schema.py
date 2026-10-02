@@ -62,6 +62,9 @@ def new_event():
         # row, set by score_row(). Low confidence routes to the `unscored` verdict (score/
         # verdicts.py) instead of a confident go/skip computed from neutral priors.
         "confidence": None,
+        # {id, name} of the higher-ranked (or already-confirmed) event this one overlaps and lost to,
+        # set by score/verdicts.py when primary_reason == "conflict". None otherwise.
+        "conflict_with": None,
         "is_exploration": False,
 
         # intent — SPEC.md §1b, added 2026-09-18. Her own want/pass judgment, captured at

@@ -18,6 +18,8 @@ Two design commitments carried over from LESSONS.md, both violated easily if you
 """
 import datetime as dt
 
+import manual_guard
+
 # --- S3 (build) potential by format. Gated by `participant`: per SPEC.md §2, participant asks
 # "can I legitimately DO the thing this event is for" — a format's build-potential is moot if she
 # can't actually take part (e.g. she isn't eligible to build/exhibit at it).
@@ -67,15 +69,25 @@ CONFIDENCE_FIELDS = ("format", "participant", "target_proximity", "cohort_satura
 
 
 def confidence(row):
+    """Known judgment fields over what we need to know. An unknown location (reachable is null)
+    adds one more unknown to the denominator: knowing where an event is doesn't make a judgment
+    more certain, but NOT knowing it makes the cost — and so the verdict — less certain."""
     known = sum(1 for f in CONFIDENCE_FIELDS if row.get(f) is not None)
-    return round(known / len(CONFIDENCE_FIELDS), 2)
+    unknowns_needed = len(CONFIDENCE_FIELDS) + (1 if row.get("reachable") is None else 0)
+    return round(known / unknowns_needed, 2)
 
 
 # --- Multipliers. All positive-only except cohort_saturation, per BUILD_HANDOFF.md: "Never frame
 # going to events with friends as a cost. Companions are a positive." prior_hook boost matches
 # LESSONS.md #12 ("a prior hook is what makes the room warm"). cohort_saturation penalty matches
 # LESSONS.md #9 (a saturated room, not companionship, is what kills new-contact yield).
-PRIOR_HOOK_MULT = {"none": 1.0, "topic": 1.2}
+# "person" (SPEC.md §2: none | topic | person) was missing from this table until 2026-10-02, so the
+# `.get(..., 1.0)` below read the STRONGEST hook as no hook at all. Knowing someone in the room
+# outranks knowing the topic: a person is a warm introduction, a topic is only a conversation
+# starter. 1.3 is a declared constant, not a fitted one — chosen so the theoretical ceiling
+# (2.0 + 2.0) * 1.3 * 1.15 = 5.98 still sits under VALUE_TO_P_DIVISOR and MAX_PREDICTED_P stays a
+# safety clamp rather than something every top event hits.
+PRIOR_HOOK_MULT = {"none": 1.0, "topic": 1.2, "person": 1.3}
 COHORT_SATURATION_MULT = {"none": 1.0, "some": 0.85, "high": 0.6}
 COMPANIONS_MULT = 1.15
 
@@ -113,6 +125,53 @@ SOCIAL_SEGMENT_KINDS = {
 SOCIAL_OPPORTUNITY_FLOOR = 0.25
 
 
+# --- Enum completeness. This module has had three silent-default bugs of the same shape: a value
+# SPEC.md allows had no table entry, and a `.get(key, default)` quietly scored it as the default
+# (unknown format -> 0.0; prior_hook "person" -> 1.0). So the allowed values are declared once,
+# here, and checked two ways: (1) at import — every allowed value must have a table entry or the
+# scorer refuses to load; (2) at score time — a value that is neither allowed nor null raises
+# instead of defaulting. scripts/check.sh additionally checks ALLOWED_ENUMS against SPEC.md §2's
+# text, so the spec and the scorer cannot drift apart unnoticed. null is NOT an enum value: it
+# means "unknown" and each field handles it explicitly (neutral prior, or "no hook").
+ALLOWED_ENUMS = {
+    "format": ("build_night", "hackathon", "demo_day", "workshop", "panel", "fireside", "mixer",
+               "lecture", "class", "office_hours"),
+    "target_proximity": ("none", "some", "high", "wrong_ladder"),
+    "cohort_saturation": ("none", "some", "high"),
+    "prior_hook": ("none", "topic", "person"),
+}
+_ENUM_TABLES = {
+    "format": FORMAT_S3_POINTS,
+    "target_proximity": TARGET_PROXIMITY_POINTS,
+    "cohort_saturation": COHORT_SATURATION_MULT,
+    "prior_hook": PRIOR_HOOK_MULT,
+}
+
+
+def assert_tables_complete():
+    for field, allowed in ALLOWED_ENUMS.items():
+        table = _ENUM_TABLES[field]
+        missing = [v for v in allowed if v not in table]
+        extra = [v for v in table if v not in allowed]
+        if missing or extra:
+            raise RuntimeError(
+                "scorer.py refuses to run: {} table out of sync with ALLOWED_ENUMS "
+                "(allowed but no table entry: {}; table entry but not allowed: {}). A missing "
+                "entry would be silently scored as the default.".format(field, missing, extra)
+            )
+
+
+assert_tables_complete()
+
+
+def _lookup(field, value):
+    """Table value for an allowed enum value. Raises on anything else — never defaults."""
+    if value not in ALLOWED_ENUMS[field]:
+        raise ValueError("{}={!r} is not an allowed value ({}); refusing to score it as a default".format(
+            field, value, "/".join(ALLOWED_ENUMS[field])))
+    return _ENUM_TABLES[field][value]
+
+
 def _effective_segments(row):
     """Real parsed segments if there are any; otherwise a single implicit segment spanning the
     whole event, built from the top-level format/duration — SPEC.md §3b: "top-level format
@@ -137,8 +196,9 @@ def _segment_s3_points(segments):
     best = None
     for seg in segments:
         kind = seg.get("kind")
-        if kind not in FORMAT_S3_POINTS:
-            continue
+        if kind is None:
+            continue  # kind unknown (implicit segment with a duration only) — not an enum value
+        _lookup("format", kind)  # raises on a kind the table doesn't know, instead of skipping it
         duration = seg.get("duration_min")
         duration_credit = min(1.0, duration / SEGMENT_MINUTES_FULL_CREDIT) if duration is not None else 1.0
         points = FORMAT_S3_POINTS[kind] * duration_credit
@@ -154,7 +214,7 @@ def _social_opportunity(segments):
     return max(SOCIAL_OPPORTUNITY_FLOOR, min(1.0, social_minutes / SEGMENT_MINUTES_FULL_CREDIT))
 
 
-# raw value tops out around (2.0 + 2.0) * 1.2 * 1.15 ≈ 5.52 (S3 max 2 + S2 max 2 — proximity "high"
+# raw value tops out around (2.0 + 2.0) * 1.3 * 1.15 ≈ 5.98 (S3 max 2 + S2 max 2 — proximity "high"
 # × social_opportunity 1.0 × no cohort penalty — full prior_hook + companion boost) — divisor
 # chosen so a near-ceiling event lands under the 0.95 cap rather than blowing through it into false
 # certainty; predicted_p is clamped regardless.
@@ -175,6 +235,16 @@ COST_DOWNGRADES_TO_PART = 1.5
 # into the hundreds of thousands of minutes — without a catch-all this raised StopIteration the
 # moment the old reachable-only early return was removed.
 WALK_COST_BREAKS = [(10, 0.0), (20, 0.5), (99, 1.0), (float("inf"), 2.0)]
+
+# SPEC.md §3c "unknown is not zero", applied to COST. An event whose location is unknown (no
+# address — every Partiful listing — so bart_walk_min is null) used to land in one of two wrong
+# places: `(walk or 0)` here priced it as 0.0, "right next to BART", and verdicts.py priced
+# reachable=None as the worst case (2.0, above COST_DOWNGRADES_TO_PART), so "we don't know where
+# this is" cost MORE than "it is two hours away". Unknown now costs the declared midpoint of the
+# cost_blocks grid [0, 2.0] — maximum uncertainty, neither free nor prohibitive — and lowers
+# `confidence` (see confidence()). 1.0 is also deliberately below COST_DOWNGRADES_TO_PART (1.5),
+# so not knowing where something is can never by itself demote it to a partial-attendance verdict.
+NEUTRAL_PRIOR_COST_BLOCKS = 1.0
 FRIDAY_DISCOUNT = 0.5  # BUILD_HANDOFF.md: "No class Fridays. Friday events cost almost nothing."
 TRIP_CHAINED_DISCOUNT = 1.0  # LESSONS.md #5: the Yosemite/OpenRouter case — cost went to ~zero
 LONG_EVENT_SURCHARGE_HR = 4.0
@@ -200,7 +270,10 @@ def _pacific_weekday(start_iso):
 
 def _estimate_cost_blocks(row):
     walk = row.get("bart_walk_min")
-    cost = next(pts for cutoff, pts in WALK_COST_BREAKS if (walk or 0) <= cutoff)
+    if walk is None:
+        cost = NEUTRAL_PRIOR_COST_BLOCKS
+    else:
+        cost = next(pts for cutoff, pts in WALK_COST_BREAKS if walk <= cutoff)
 
     if _pacific_weekday(row.get("start")) == 4:
         cost = max(0.0, cost - FRIDAY_DISCOUNT)
@@ -250,13 +323,15 @@ def score_row(row):
     # principle as the sponsorship rule: a factor goes on the stream it actually affects, never
     # the whole event.
     if row.get("target_proximity") is not None:
-        proximity_points = TARGET_PROXIMITY_POINTS.get(row["target_proximity"], 0.0)
+        proximity_points = _lookup("target_proximity", row["target_proximity"])
     else:
         proximity_points = NEUTRAL_PRIOR_S2
         why.append("target_proximity unknown -> neutral prior {:.1f}".format(NEUTRAL_PRIOR_S2))
 
     social_opportunity = _social_opportunity(segments)
-    cohort_mult = COHORT_SATURATION_MULT.get(row.get("cohort_saturation"), 1.0)
+    # null cohort_saturation = unknown: no penalty applied (and it counts against confidence).
+    cohort_mult = 1.0 if row.get("cohort_saturation") is None else _lookup(
+        "cohort_saturation", row["cohort_saturation"])
     s2 = proximity_points * social_opportunity * cohort_mult
 
     why.append("S3(format={},participant={})={:.2f}".format(row.get("format"), row.get("participant"), s3))
@@ -268,7 +343,8 @@ def score_row(row):
     if row.get("target_proximity") == "wrong_ladder":
         why.append("wrong_ladder: VC/founder room, not a target-employer room")
 
-    hook_mult = PRIOR_HOOK_MULT.get(row.get("prior_hook"), 1.0)
+    # null prior_hook = unknown: no boost (a boost is only ever earned, never assumed).
+    hook_mult = 1.0 if row.get("prior_hook") is None else _lookup("prior_hook", row["prior_hook"])
     companion_mult = COMPANIONS_MULT if row.get("companions") else 1.0
     if hook_mult != 1.0:
         why.append("×{:.2f} prior_hook={}".format(hook_mult, row["prior_hook"]))
@@ -280,9 +356,15 @@ def score_row(row):
     row["predicted_p"] = predicted_p
     row["confidence"] = confidence(row)
 
-    if row.get("cost_blocks") is None:
+    # cost_blocks is hand-set ONLY if the row's _manual record says so (manual_guard.py). It used
+    # to be "set iff non-null", which treated every value a previous run had written as a hand
+    # entry: a stale unreachable-penalty 2.0 stuck to a row forever, labelled "manual".
+    if "cost_blocks" not in manual_guard.protected_fields(row):
         row["cost_blocks"] = _estimate_cost_blocks(row)
-        row["_raw"]["cost_blocks_source"] = "estimated"
+        unknown_location = row.get("bart_walk_min") is None
+        row["_raw"]["cost_blocks_source"] = "neutral_prior" if unknown_location else "estimated"
+        if unknown_location:
+            why.append("location unknown -> neutral cost prior {:.1f}".format(NEUTRAL_PRIOR_COST_BLOCKS))
     else:
         row["_raw"]["cost_blocks_source"] = "manual"
 

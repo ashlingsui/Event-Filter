@@ -43,7 +43,7 @@ REFERENCE_CITIES = {
 
 REASON_SENTENCES = {
     "not_reachable": "Not BART-reachable, and didn't rank in this week's top 3 to justify the ride.",
-    "conflict": "Overlaps a commitment you've already confirmed.",
+    "conflict": "Overlaps a higher-ranked event or a commitment you've already confirmed.",
     "spectator": "Spectator format — you'd be watching, not doing.",
     "wrong_ladder": "The room is VCs and founders, not people at your target companies.",
     "recurring": "Part of a recurring series; the next occurrence is already accounted for.",
@@ -142,6 +142,11 @@ def _decision_line(row, quota_winners_by_week, week_key):
             if others:
                 return f"Cleared the bar at {p_txt}, but lost its slot to {', '.join(others)}."
             return f"Cleared the bar at {p_txt}, but lost its slot this week."
+        if primary == "conflict" and row.get("conflict_with"):
+            cw = row["conflict_with"]
+            if cw.get("kind") == "confirmed":
+                return f"{p_txt} P(contact ∪ build), but it overlaps {cw['name']}, which you've already confirmed. You can't be in both."
+            return f"{p_txt} P(contact ∪ build), but it runs at the same time as {cw['name']}, which ranked higher. You can't be in both."
         if primary and primary in REASON_SENTENCES:
             return REASON_SENTENCES[primary]
         return "Not everything good belongs on your calendar."
@@ -158,9 +163,13 @@ def _decision_line(row, quota_winners_by_week, week_key):
     return "Unscored."
 
 
-def build():
+def build(out_path=None, private_out_path=None):
+    out_path = Path(out_path) if out_path else OUT_PATH
+    private_out_path = Path(private_out_path) if private_out_path else PRIVATE_OUT_PATH
     events = json.loads((DATA_DIR / "events.json").read_text())
     score_summary = json.loads((DATA_DIR / "score_summary.json").read_text())
+    ingest_meta_path = DATA_DIR / "ingest_meta.json"
+    ingest_meta = json.loads(ingest_meta_path.read_text()) if ingest_meta_path.exists() else {}
     outcomes = json.loads((DATA_DIR / "outcomes.json").read_text())
     pending_hypotheses = json.loads((DATA_DIR / "pending_hypotheses.json").read_text())
     overrides_doc = json.loads((APP_DIR / "config" / "social_cohort_overrides.json").read_text())
@@ -248,6 +257,7 @@ def build():
             "unblock_action": row.get("unblock_action"),
             "predicted_p": row.get("predicted_p"),
             "confidence": row.get("confidence"),
+            "conflict_with": row.get("conflict_with"),
             "cost_blocks": row.get("cost_blocks"),
             "why_raw": (row.get("_raw") or {}).get("why"),
             "decision_line": (
@@ -312,6 +322,10 @@ def build():
     public_payload = {
         "generated_at": dt.datetime.utcnow().isoformat() + "Z",
         "source_scored_at": score_summary.get("scored_at"),
+        # When the scrape ran (data/ingest_meta.json, written by run_ingest.py). None if ingest
+        # has not run since this was added — the UI then says "scrape time not recorded" rather
+        # than implying the data is fresh.
+        "source_ingested_at": ingest_meta.get("ingested_at"),
         "current_week_key": current_week_key,
         "events": out_events,
         "weeks": [{"key": k, "label": v} for k, v in sorted(week_meta.items())],
@@ -336,14 +350,14 @@ def build():
         "event_private": event_private,
     }
 
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUT_PATH.write_text("window.EVENT_FILTER_DATA = " + json.dumps(public_payload, indent=2) + ";\n")
-    PRIVATE_OUT_PATH.write_text(
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text("window.EVENT_FILTER_DATA = " + json.dumps(public_payload, indent=2) + ";\n")
+    private_out_path.write_text(
         "// PRIVATE — named real people. Never commit. See .gitignore and SPEC.md §4.\n"
         "window.EVENT_FILTER_PRIVATE_DATA = " + json.dumps(private_payload, indent=2) + ";\n"
     )
-    print(f"wrote {OUT_PATH} ({len(out_events)} events, {len(week_meta)} weeks)")
-    print(f"wrote {PRIVATE_OUT_PATH} (gitignored — outcomes + pending hypotheses + per-event plans)")
+    print(f"wrote {out_path} ({len(out_events)} events, {len(week_meta)} weeks)")
+    print(f"wrote {private_out_path} (gitignored — outcomes + pending hypotheses + per-event plans)")
     if out_of_region_names:
         print(
             f"WARNING: {len(out_of_region_names)} out_of_region row(s) reached build_data.py — "
@@ -357,4 +371,9 @@ def build():
 
 
 if __name__ == "__main__":
-    build()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", help="write the public data.js here instead of app/generated/data.js")
+    parser.add_argument("--private-out", help="write private_data.js here instead of its default path")
+    args = parser.parse_args()
+    build(out_path=args.out, private_out_path=args.private_out)

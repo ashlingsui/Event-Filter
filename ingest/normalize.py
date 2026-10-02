@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 
-def merge(existing_rows, *fresh_row_lists):
+def merge(existing_rows, *fresh_row_lists, guard=None):
     """existing_rows: whatever was already in events.json before this run (empty on first run).
     Retained for any id that no longer appears in a fresh pull — an event whose date has passed
     drops out of Luma's `period=future` feed, and a naive rebuild would silently delete that row
@@ -19,6 +19,11 @@ def merge(existing_rows, *fresh_row_lists):
     for rows in fresh_row_lists:
         for row in rows:
             if row.get("id"):
+                previous = by_id.get(row["id"])
+                # Hand-set values (_manual.fields) survive the wholesale replacement — see
+                # manual_guard.py. `guard` is None only for callers that don't track a run report.
+                if guard is not None and previous is not None:
+                    guard.carry_forward(previous, row)
                 by_id[row["id"]] = row
     merged = list(by_id.values())
     merged.sort(key=lambda r: r.get("start") or "")

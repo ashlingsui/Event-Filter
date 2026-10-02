@@ -16,7 +16,7 @@ const Scoring = (() => {
     panel: 0.0, fireside: 0.0, mixer: 0.0, lecture: 0.0, class: 0.0, office_hours: 0.0,
   };
   const TARGET_PROXIMITY_POINTS = { none: 0.0, wrong_ladder: 0.0, some: 1.0, high: 2.0 };
-  const PRIOR_HOOK_MULT = { none: 1.0, topic: 1.2 };
+  const PRIOR_HOOK_MULT = { none: 1.0, topic: 1.2, person: 1.3 };
   const COHORT_SATURATION_MULT = { none: 1.0, some: 0.85, high: 0.6 };
   const COMPANIONS_MULT = 1.15;
   const VALUE_TO_P_DIVISOR = 6.0;
@@ -42,6 +42,13 @@ const Scoring = (() => {
   ]);
   const SOCIAL_OPPORTUNITY_FLOOR = 0.25;
 
+  // Mirrors score/scorer.py's _lookup: an unrecognized enum value throws instead of silently
+  // scoring as a default. null/undefined is handled by each caller (it means "unknown").
+  function lookup(table, field, value) {
+    if (!(value in table)) throw new Error(field + "=" + JSON.stringify(value) + " is not an allowed value");
+    return table[value];
+  }
+
   function effectiveSegments(event) {
     const segments = event.segments && event.segments.length ? event.segments : null;
     if (segments) return segments;
@@ -54,7 +61,8 @@ const Scoring = (() => {
   function segmentS3Points(segments) {
     let best = null;
     for (const seg of segments) {
-      if (!(seg.kind in FORMAT_S3_POINTS)) continue;
+      if (seg.kind == null) continue;
+      lookup(FORMAT_S3_POINTS, "format", seg.kind);
       const duration = seg.duration_min;
       const durationCredit = duration != null ? Math.min(1.0, duration / SEGMENT_MINUTES_FULL_CREDIT) : 1.0;
       const points = FORMAT_S3_POINTS[seg.kind] * durationCredit;
@@ -87,15 +95,17 @@ const Scoring = (() => {
     const s3 = formatPoints * participantMult;
 
     const proximityPoints = event.target_proximity != null
-      ? (TARGET_PROXIMITY_POINTS[event.target_proximity] ?? 0.0)
+      ? lookup(TARGET_PROXIMITY_POINTS, "target_proximity", event.target_proximity)
       : NEUTRAL_PRIOR_S2;
 
     const socialOpp = socialOpportunity(segments);
-    const cohortMult = COHORT_SATURATION_MULT[event.cohort_saturation] ?? 1.0;
+    const cohortMult = event.cohort_saturation == null ? 1.0
+      : lookup(COHORT_SATURATION_MULT, "cohort_saturation", event.cohort_saturation);
     const s2 = proximityPoints * socialOpp * cohortMult;
 
-    const priorHook = context.hook === true ? "topic" : (event.prior_hook || "none");
-    const hookMult = PRIOR_HOOK_MULT[priorHook] ?? 1.0;
+    // A "topic" answer never downgrades a recorded "person" hook (person outranks topic).
+    const priorHook = context.hook === true && event.prior_hook !== "person" ? "topic" : event.prior_hook;
+    const hookMult = priorHook == null ? 1.0 : lookup(PRIOR_HOOK_MULT, "prior_hook", priorHook);
 
     const hasCompanion = context.companion === true || (event.companions && event.companions.length > 0);
     const companionMult = hasCompanion ? COMPANIONS_MULT : 1.0;

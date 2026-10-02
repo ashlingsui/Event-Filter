@@ -14,6 +14,11 @@ Python entry points execute a file-backed pipeline rooted at the repository:
 3. `score_events.py` calls `score/scorer.py` for value/cost estimates and `score/verdicts.py` for
    weekly quota, reachability, conflict, and reason-code policy. It updates `data/events.json`
    and writes aggregate output to `data/score_summary.json`.
+   Every stage runs inside `manual_guard.py`'s snapshot/restore, so fields listed in a row's
+   `_manual.fields` are never overwritten; blocked writes are kept in `_manual.shadow` and counted
+   in each run's summary. `enrich/rules.py` is the deterministic tier 1 (format, segments,
+   participant, target_proximity; employers in `config/target_employers.json`). `scripts/refresh.sh`
+   runs ingest -> enrich -> score -> `app/build_data.py` as one fail-loud command.
 4. `capture_feedback.py` and `run_checks.py` support outcome capture. `capture/` persists
    outcomes in `data/outcomes.json` and pending hypotheses in `data/pending_hypotheses.json`.
    T+7/T+30 recognition checks are derived from those local records.

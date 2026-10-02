@@ -68,6 +68,14 @@ const DataAccess = (() => {
     return raw().generated_at;
   }
 
+  // The three moments that decide how old the board really is: when the scrape ran, when scoring
+  // ran, and when this file was built. Any may be null (ingest_meta.json only exists once ingest
+  // has run since it was added).
+  function getDataTimes() {
+    const d = raw();
+    return { ingested: d.source_ingested_at || null, scored: d.source_scored_at || null, built: d.generated_at || null };
+  }
+
   function getSourceScoredAt() {
     return raw().source_scored_at;
   }
@@ -112,6 +120,7 @@ const DataAccess = (() => {
     getOutcomes,
     getPendingHypotheses,
     getGeneratedAt,
+    getDataTimes,
     getSourceScoredAt,
     getCurrentWeekKey,
     getSocialCohortNote,

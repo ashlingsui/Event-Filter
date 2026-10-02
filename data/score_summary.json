@@ -1,18 +1,19 @@
 {
-  "scored_at": "2026-10-02T18:03:33.633916Z",
+  "scored_at": "2026-10-02T19:18:39.557631Z",
   "verdict_counts": {
-    "unscored": 78,
-    "go": 7,
+    "unscored": 77,
+    "skip": 26,
+    "go": 4,
     "part": 7,
-    "skip": 22,
     "wildcard": 1,
     "suppressed": 1
   },
   "skip_summary": {
-    "total": 22,
+    "total": 26,
     "by_reason": {
-      "spectator": 19,
-      "quota_full": 3
+      "wrong_ladder": 1,
+      "conflict": 6,
+      "spectator": 19
     }
   },
   "blocked_summary": {
@@ -26,9 +27,16 @@
     }
   },
   "unscored_summary": {
-    "total": 78,
+    "total": 77,
     "by_reason": {
-      "null": 78
+      "null": 77
     }
+  },
+  "manual_preservation": {
+    "rows_with_manual_fields": 21,
+    "field_checks": 462,
+    "preserved_unchanged": 462,
+    "overwrites_blocked": 0,
+    "blocked": []
   }
 }

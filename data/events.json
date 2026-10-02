@@ -59,7 +59,7 @@
       "ics_description": "Get up-to-date information at: https://luma.com/n5wmfka6\\n\\nAddress:\\nCheck event page for more details.\\n\\nHosted by George Pickett, Sahar Mor (Bond AI) & WorkOS",
       "nearest_bart": "Montgomery St.",
       "description_mirror": "Codex SF is a small, high-signal meetup for engineers and founders actively using OpenAI Codex in real codebases.\nThis is not an intro talk or a tool overview. The room is filled with people shipping with agentic coding and comparing what actually works: prompt discipline, repo and sandbox hygiene, long-horizon task management, review loops, failure modes, and how Codex is being wired into real toolchains.\nCome prepared to share, demo, or dissect workflows (including what broke)\nFormat:\n6:00 - 6:30 - networking & pizza\n6:30 - 7:30 - demos\nOpen show-and-tell and technical discussion",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -91,7 +91,7 @@
     "segments": [],
     "size": null,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -101,8 +101,8 @@
     "recurring": true,
     "next_occurrence": "2026-01-30T02:00:00Z",
     "phase": null,
-    "predicted_p": 0.29,
-    "confidence": 0.2,
+    "predicted_p": 0.42,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -127,9 +127,11 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "Join us for the weekly Codex SF Builder night. Note: this is different than the monthly flagship event featuring speakers and talks.\nThis is not a talk or demo night.It\u2019s a hands-on AI build session focused on practicing how to actually work with tools like Codex.\nYou\u2019ll bring a laptop and spend most of the time building small experiments solo or in lightweight collaboration. No stage, no presentations, no speakers.\nFormat\nShort kickoff with the day\u2019s constraint and goals\nFocused build time using your own project or provided experimental starter repos\nOptional pairing and collaboration (opt-in, clearly signaled at tables)\nQuick closing round where a few people share one thing they learned\nWe\u2019ll provide:\nA small set of rough, experimental repos to explore\nSimple project prompts if you don\u2019t want to start from a blank page\nStructure and constraints to keep things moving\nGuidance/mentoring\nThis is meant to feel more like a practice gym than a meetup. Come to experiment, get unstuck, compare notes, and leave with sharper instincts for working with AI tools.\nWho it\u2019s for:Builders, engineers, and tinkerers who want to practice, not watch.Bring a laptop. Expect to build.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=demo_day,participant=None)=0.75 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
-      "recurring_soon": true
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=demo_day,participant=True)=1.50 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "recurring_soon": true,
+      "participant_source": "rule",
+      "participant_evidence": "format=demo_day"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -160,7 +162,7 @@
     "segments": [],
     "size": null,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -170,8 +172,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.12,
-    "confidence": 0.0,
+    "predicted_p": 0.21,
+    "confidence": 0.2,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -195,8 +197,10 @@
       "ics_description": "Get up-to-date information at: https://luma.com/2cbfdn6l\\n\\nAddress:\\nCheck event page for more details.\\n\\nHosted by George Pickett & Ojus Save",
       "nearest_bart": "Powell St.",
       "description_mirror": "Join us for the weekly Codex SF Builder night. \nThis is a hands-on AI build session focused on practicing how to actually work with tools like Codex.\nYou\u2019ll bring a laptop and spend most of the time building small experiments solo or in lightweight collaboration. No stage, no presentations, no speakers.\nFormat\nShort kickoff with the day\u2019s constraint and goals\nFocused build time using your own project or provided experimental starter repos\nOptional pairing and collaboration (opt-in, clearly signaled at tables)\nQuick closing round where a few people share one thing they learned\nWe\u2019ll provide:\nA small set of rough, experimental repos to explore\nSimple project prompts if you don\u2019t want to start from a blank page\nStructure and constraints to keep things moving\nGuidance/mentoring\nThis is meant to feel more like a practice gym than a meetup. Come to experiment, get unstuck, compare notes, and leave with sharper instincts for working with AI tools.\nWho it\u2019s for:Builders, engineers, and tinkerers who want to practice, not watch.Bring a laptop. Expect to build.",
-      "cost_blocks_source": "manual",
-      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "format unknown -> neutral prior 1.0 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=True)=1.00 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "hands-on wording: /\\bbuilder'?s?\\b/"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -269,7 +273,7 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "Codex SF is a high-signal meetup for engineers and founders actively using Codex in real production workflows.\nThis flagship session features four technical demos focused entirely on agentic coding workflows. No pitches, no product overviews, no sales. Just engineers walking through how they actually use skills, automations, planning systems, multi-agent coordination, and review loops inside Codex.\nExpect concrete walkthroughs of:\nStructured planning and task decomposition\nLong-horizon workflows and memory management\nMulti-agent orchestration and parallelization\nFailure modes, debugging patterns, and recovery\nWiring Codex into real toolchains and repos\nThis is not beginner content. The focus is on what works in practice and what breaks.\nCome ready to take notes, ask sharp questions, and compare workflows with other serious builders.\nFormat\n6:00 \u2013 6:15 \u2014 networking/pizza/drinks6:15 \u2013 7:30  \u2014 4 technical demos w/ q&a(15\u201320 min each)7:30 \u2013 8:00 \u2014 networking",
       "segments_source": "rule",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.33 | S2(target_proximity=None)=0.44 (\u00d70.44 social_opportunity)"
     },
     "verdict": "unscored",
@@ -301,7 +305,7 @@
     "segments": [],
     "size": null,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -311,8 +315,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.29,
-    "confidence": 0.2,
+    "predicted_p": 0.42,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -337,8 +341,10 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "Codex SF is a high-signal meetup for engineers and founders actively using Codex in real production workflows.\n\u200bThis event will feature 4 technical demos. One on each of the following\nAutomations (via the Codex app)\nSkills\nSubagents\nParallel worktrees \u2192 review queue \u2192 clean PR\nNo pitches, no product overviews, no sales.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=demo_day,participant=None)=0.75 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=demo_day,participant=True)=1.50 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=demo_day"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -369,7 +375,7 @@
     "segments": [],
     "size": null,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -379,8 +385,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.29,
-    "confidence": 0.2,
+    "predicted_p": 0.42,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -405,8 +411,10 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "Codex SF is a meetup about the layer above the code. How do you actually orchestrate, delegate to, and manage agents as an engineer?\nWe've got 4 technical demos lined up, and the focus isn't \"look what I built.\" It's how people are working with Codex day-to-day \u2014 the workflows, the prompting patterns, the stuff that actually matters once you're past the tutorial phase.\nWe'll be digging into things like:\norchestrating multiple agents and subagents running in parallel\nprompting patterns and iteration loops for long-running tasks\nskills and reusable workflows that capture how your team actually thinks\nautomations running in the background \u2014 CI, triage, research, whatever you've got on autopilot\nusing Codex as a command center across multiple projects\nThe bigger picture here is that Codex has quietly become something different than what most people think it is. It's not a coding assistant anymore. It's closer to a full engineering system \u2014 you supervise, delegate, and collaborate with agents that persist, parallelize, and operate across entire codebases.\nBetween subagents that break down complex work, automations that run on a schedule without you touching anything, and skills that turn your team's knowledge into reusable units \u2014 the interesting question isn't \"can it write code\" anymore. It's how you structure and direct these systems effectively.\nThat's what this meetup is about.\nThis isn't a demo night for projects \u2014 it's a working session on how to actually use Codex as an engineer.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=demo_day,participant=None)=0.75 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=demo_day,participant=True)=1.50 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=demo_day"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -437,7 +445,7 @@
     "size": null,
     "speakers": [],
     "participant": null,
-    "target_proximity": null,
+    "target_proximity": "wrong_ladder",
     "cohort_saturation": null,
     "prior_hook": null,
     "companions": [],
@@ -446,8 +454,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.17,
-    "confidence": 0.2,
+    "predicted_p": 0.0,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -472,8 +480,10 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "Join SkyDeck for a relaxed evening of baseball, food, and great company at Giants Stadium.\nSchedule:\n6:15-7:15 KAIYO Rooftop\n7:15-9:00 PM Giants Game (see your ticket in your email for seats)\nWho should come: Skydeck founders will be prioritized, but others are welcome! Bring a co-founder, advisor, or investor who'd enjoy the night!\nWhen: Friday, June 12 \u2014KAIYO Rooftop 6:15, Giants Stadium 7:15 PM Where: KAIYO Rooftop and Giants Stadium Cost: Free to attend \u2014 food and drinks included\nSpace is limited, so RSVP early to grab your spot. We'll see you at the ballpark!\n\ud83d\ude4f Thanks to our sponsors\nA special thanks to Rho for making tonight possible, we're thrilled to have them as a sponsor! Be sure to connect with Roy or Chris ahead of the game\nChris (Rho):\u00a0christopher.bruen@rho.co\nRoy (Rho):\u00a0roy.boateng@rho.co\nAnother special thanks to Finstrat Management!\u00a0Make sure to talk to Kristian and Adam at the game and pre-event happy hour!\nKristian (Finstrat):\u00a0kmarquez@finstratmgmt.com\nAdam (Finstrat):\u00a0achen@finstratmgmt.comFinStrat Management is a strategic finance partner for venture-backed founders, providing institutional-grade financial infrastructure without the cost of a full in-house team. From CFO advisory to back-office operations, we help startups build investor-ready financials and scale with confidence. Proud to support the SkyDeck community and excited to be at the game!",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=mixer,participant=None)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "participant unknown -> neutral prior \u00d70.50 | S3(format=mixer,participant=None)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "target_proximity_source": "rule",
+      "target_proximity_evidence": "VC/founder wording: /\\bfounders?\\b/"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -504,7 +514,7 @@
     "size": null,
     "speakers": [],
     "participant": null,
-    "target_proximity": null,
+    "target_proximity": "wrong_ladder",
     "cohort_saturation": null,
     "prior_hook": null,
     "companions": [],
@@ -513,8 +523,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.17,
-    "confidence": 0.2,
+    "predicted_p": 0.0,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -539,8 +549,10 @@
       "nearest_bart": "Civic Center/UN Plaza",
       "description_mirror": "Technical Founder vs. Content Creator?\nProduct vs. Distribution?\nClaudeCode vs. CapCut?\nCold Plunge vs. Sauna?\nWrong questions. The best choose both \u2014 and the lines are blurring faster than ever.\nFounders are creating. Building in public, founder-led sales, building a personal brand for trust + pipeline.\nCreators are building. UGC deals turning into product roles, audiences turning into launch pads.\nThe moat is no longer product or distribution. It's both.\nYou've been heads-down all day. Come out of the cave. Regulate your nervous system in the largest luxury sauna in SF. Shock it awake in the plunge. Shoot some content in the steam. Trade hot takes at 200\u00b0F. Leave with dinner in your stomach and five new people worth knowing.\nThe evening:5:00 PM \u2014 Full Contrast Therapy: Sauna, Cold Plunge, Thermal Benches, Outdoor Showers, Tea Bar6:30 PM \u2014 Dinner\nWho's coming: A curated room of SF's most cracked builders + creators.\nBring: Swimsuit + Towel + at least one hot take.\nSpots are limited \u2014 approval required.About your hosts:Afore Capital is the largest pre-seed VC with over $500M AUM, investing exclusively at pre-seed. Our superpower is getting founders from idea to product-market-fit, closing your first customers, and getting you to your Series A and beyond.\nRho is the all-in-one banking platform for startups and the accountants supporting them. With banking setup in minutes, up to 2% cashback cards, and powerful tools for managing spend, paying bills, and closing the books, Rho helps high-growth startups move fast and stay focused, backed by support that goes to the end of the earth to help you win.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=mixer,participant=None)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "participant unknown -> neutral prior \u00d70.50 | S3(format=mixer,participant=None)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "target_proximity_source": "rule",
+      "target_proximity_evidence": "VC/founder wording: /\\bfounders?\\b/"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -571,7 +583,7 @@
     "size": null,
     "speakers": [],
     "participant": null,
-    "target_proximity": null,
+    "target_proximity": "wrong_ladder",
     "cohort_saturation": null,
     "prior_hook": null,
     "companions": [],
@@ -580,8 +592,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.17,
-    "confidence": 0.2,
+    "predicted_p": 0.0,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -606,8 +618,10 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "Afore FIR & FIR U fam \ud83e\udef6 pull up \ud83e\udef6\nwe're taking over Corgi Cafe for a night.\ncome thru after the grind, grab a bite, sip something, and actually vibe with your crew. think less \"networking event,\" more \"your friends who happen to be founders all in one room.\"\nwhether you're deep in build mode or just need an excuse to touch grass, this is your sign to show up.spots are limited so lock it in \ud83d\udc40 rsvp + bring your energy.\ncatch you tuesday \ud83d\udc96",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=mixer,participant=None)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "participant unknown -> neutral prior \u00d70.50 | S3(format=mixer,participant=None)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "target_proximity_source": "rule",
+      "target_proximity_evidence": "VC/founder wording: /\\bfounders?\\b/"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -638,7 +652,7 @@
     "size": null,
     "speakers": [],
     "participant": null,
-    "target_proximity": null,
+    "target_proximity": "wrong_ladder",
     "cohort_saturation": null,
     "prior_hook": null,
     "companions": [],
@@ -647,8 +661,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.12,
-    "confidence": 0.0,
+    "predicted_p": 0.08,
+    "confidence": 0.2,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -672,8 +686,10 @@
       "ics_description": "Get up-to-date information at: https://luma.com/6v28u9rm\\n\\nAddress:\\nCheck event page for more details.\\n\\nHosted by Afore Capital & 3 others",
       "nearest_bart": "Embarcadero",
       "description_mirror": "Please join us to celebrate the soft launch of People Before Ideas, Afore's Founders-in-Residence program: afore.vc/residence ... with some friendly pickleball competition!what are we celebrating \ud83c\udfc6\nat Afore we obsess over People before Ideas. Our 2-month Founders-in-Residence, run 3x a year in Feb, Jun, and Oct is exactly that \u2014 a 2-month program designed to help technical builders go from Idea to Traction to Series A at warp speed.\nwe'll write your first check, and more importantly, help you sign your first 5 design customers and raise the rest of your round at the best terms.\ncan't make it but want to learn more or get funded? afore.vc/residence\nwho this is for \ud83d\udc40\nengineers, researchers, builders. if you want to validate your ideas, and about to/have recently gone full-time building, this is your time!\nagenda \ud83c\udfbe- 5:00 courts open, food, pickleball - 5:15 rotating courts, everyone plays everyone- 6:30 championship matchup\ndetails \ud83d\udccd\nwednesday, august 12, 5\u20137 pmthe crossing at east cut, 200 folsom\nskill level: open to all skill levels, bonus points if your pickleball skills match your competitive drive. We will end with a championship matchup at 630pm.\nAbout your hosts:\nAfore Capital is the largest pre-seed VC with over $500M AUM, investing exclusively at pre-seed. Our superpower is getting founders from idea to product-market-fit, closing your first customers, and helping founders raise an insane Series A and beyond.\nRho is the all-in-one banking platform for startups and the accountants supporting them. With banking setup in minutes, up to 2% cashback cards, and powerful tools for managing spend, paying bills, and closing the books, Rho helps high-growth startups move fast and stay focused, backed by support that goes to the end of the earth to help you win.",
-      "cost_blocks_source": "manual",
-      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | S3(format=None,participant=None)=0.50 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "target_proximity_source": "rule",
+      "target_proximity_evidence": "VC/founder wording: /\\bCapital\\b/"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -703,8 +719,8 @@
     "segments": [],
     "size": null,
     "speakers": [],
-    "participant": null,
-    "target_proximity": null,
+    "participant": true,
+    "target_proximity": "wrong_ladder",
     "cohort_saturation": null,
     "prior_hook": null,
     "companions": [],
@@ -713,8 +729,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.04,
-    "confidence": 0.2,
+    "predicted_p": 0.0,
+    "confidence": 0.6,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -739,12 +755,18 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "Come join us for a night of deep-dive discussions and networking focused on the next frontier of Embodied & Physical AI.\nAgenda\n6:00 to 6:30 PM: Reception, check-in, food and beverages\n6:30 to 6:45 PM: Opening Remarks\n6:45 to 7:15 PM: Keynote Speaker\n7:15 to 7:45 PM: Physical AI Founder Lightning Talks\n7:45 to 8:30 PM: Open Networking\nAbout your Hosts\nFusion Fund is a Silicon Valley based VC firm with focus on early stage companies in enterprise AI, healthcare AI, and deep tech. Since 2015, Fusion Fund has invested over 95 portfolio companies across US and is actively deploying capital from its latest fund. Learn more from our\u00a0website.\nAfore Capital is the largest VC investing exclusively at pre-seed with over $500M AUM. Our superpower is getting founders from idea to product-market-fit, closing your first customers, and getting you to your Series A and beyond.\u200b We are actively recruiting for our next Founders in Residence cohort!\nThank you to our generous sponsors, Rho, TriNet and JLL, for making this evening possible.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=lecture,participant=None)=0.00 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "S3(format=lecture,participant=True)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "participant_source": "rule",
+      "participant_evidence": "hands-on wording: /\\bbuilder'?s?\\b/",
+      "target_proximity_source": "rule",
+      "target_proximity_evidence": "VC/founder wording: /\\bfounders?\\b/"
     },
-    "verdict": "unscored",
-    "primary_reason": null,
-    "reasons": []
+    "verdict": "skip",
+    "primary_reason": "wrong_ladder",
+    "reasons": [
+      "wrong_ladder"
+    ]
   },
   {
     "schema_version": 1,
@@ -813,7 +835,7 @@
       },
       "nearest_bart": "Embarcadero",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=workshop,participant=True)=2.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity) | \u00d71.20 prior_hook=topic",
       "description_mirror": "Direct access to Claude, the Anthropic team, and an afternoon built around the work you actually do.\nThis Claude Workshop, presented with Provectus, is a half-day product experience for business leaders who live in documents, spreadsheets, decks, and cross-tool workflows \u2014 Finance, Operations, Marketing, HR, Legal, and Sales.\nIf you are in a technical role, we encourage you to view the calendar and register for a Claude Code Workshop. Please refrain from registering for both sessions.\nPlease note: If you\u2019re bringing your business laptop, make sure you have the Claude desktop app installed with Cowork enabled.\nYou'll experience a live \"Day in the Life\" demo that follows a business leader through a real workday with Claude: the afternoon brief pulled from Slack and Salesforce, the variance analysis the CFO needed by noon, the board deck that built itself, the internal tool Engineering said they couldn't get to this quarter. Then you'll open your own laptop and build something real for your role \u2014 with the Anthropic and Provectus team in the room to help.\nThe focus is the product, the people who build it, and the work you do every week.\nWhy attend\nSee Claude handle your actual workday.\u00a0Claude for Excel and PowerPoint, connectors across Google Workspace, Salesforce, Slack, Jira, and more \u2014 shown as one continuous story, not a feature tour.\nBuild something real in 45 minutes.\u00a0A hands-on session with a starter project tailored to your title and industry. Anthropic and partner teams on the floor to help.\nLeave with a plan, not a pile of notes.\u00a0Every attendee walks out with a personalized \"Your First Week with Claude\" guide \u2014 ready to open Monday morning.\nWho should attend\nWorking with Claude is built for Director and VP-level leaders of teams who own the document-heavy, high-scrutiny work their teams run every week.\nVP / Director, Finance & FP&A\nVP / Director, Operations\nVP / Director, Marketing\nVP / Director, HR & People\nVP / Director, Legal\nVP / Director, Sales & RevOps\nSchedule:\n1 PM - 4 PM - Workshop\n4 PM - 5 PM - Networking Happy Hour\nWhat to bring\nYour laptop \u2014 the build session is hands-on, and you\u2019ll leave with something saved! If you\u2019re bringing your business laptop, make sure you have the Claude desktop app installed with Cowork enabled.\nA workflow you'd love to hand off \u2014 the weekly report, the board prep, the onboarding pack. Bring the one that eats your Mondays.\nThe fine print\nThe event is free to attend and refreshments will be included.\nSpace is limited. Registration is required, subject to approval, and non-transferable.\nThe workshop is intended for director-level roles and above. We may reach out to confirm your role.",
       "segments_source": "rule"
@@ -898,15 +920,22 @@
       },
       "nearest_bart": "Embarcadero",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=workshop,participant=True)=1.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity) | \u00d71.20 prior_hook=topic",
       "description_mirror": "Learn to orchestrate AI agents that write and ship code for you.\nClaude Code is already changing how the best engineering teams ship. This workshop, presented with Provectus, is a chance to build with it directly \u2014 not watch a demo, not sit through slides about it. You'll leave having shipped something real, with a working sense of how to bring this back to your own team.We'll spend a little time on context \u2014 how Claude Code fits into modern engineering workflows and where teams are seeing the biggest wins. Then the slides go away, and you're at a build station with Anthropic and Provectus beside you, orchestrating agents that write and ship code while you direct the work.We'll spend a little time on context \u2014 how Claude Code fits into modern engineering workflows and where teams are seeing the biggest wins. Then the slides go away, and you're at a build station with Anthropic and Provectus beside you, orchestrating agents that write and ship code while you direct the work.\nWhy attend\nShip real output. Your agents write the code \u2014 you direct them. You'll leave with something you actually built, not a slide deck about what's possible.\nSee best practices in action. Learn how Claude Code fits into enterprise workflows, from the people who deploy it at scale.\nGet direct support. Live help at every table from Anthropic engineers and Provectus partners \u2014 no one gets stuck on an error alone.\nBuild your network. Spend the afternoon with technical leaders wrestling with the same questions you are.\n\nWho should attend\nEngineering Leaders \u2014 EMs, VPs, CTOs, Platform Leads, Principal Engineers\nBusiness Leaders \u2014 CPOs, Digital Transformation, senior AI sponsors, PMsYou don't need to be an engineer. If you're making decisions about AI investment or setting strategy, understanding what Claude Code actually does is the edge.\n\nAgenda\n12:30 PM - 1:30 PM: Check-in & Claude setup support\n1:30 PM - 2:15 PM: Welcome, Claude Code overview, demo\n2:15 PM - 2:30 PM: Snack break\n2:30 PM - 4:30 PM: Build session: hands-on with Claude Code\n4:30 PM - 5:30 PM: Networking Happy Hour\n\nWhat to bring\nYour laptop \u2014\u00a0Basic comfort with a terminal or code editor is helpful but not required \u2014 you'll be directing AI agents and building alongside them, and our team supports you the whole way.\n\nThe fine print\nThe event is free to attend if selected.\nRegistration is required and subject to approval.\nApplications are reviewed on a rolling basis \u2014 apply early.\nIf admitted, please bring a government ID to secure your badge.\nWant to bring a colleague? Have them apply separately \u2014 every seat needs its own approved registration."
     },
-    "verdict": "go",
-    "primary_reason": null,
-    "reasons": [],
+    "verdict": "skip",
+    "primary_reason": "conflict",
+    "reasons": [
+      "conflict"
+    ],
     "region_status": "in_region",
-    "confidence": 1.0
+    "confidence": 1.0,
+    "conflict_with": {
+      "id": "luma:evt-ipJSDV78SbivbFH",
+      "name": "Claude Workshop with Provectus - San Francisco",
+      "kind": "ranked"
+    }
   },
   {
     "schema_version": 1,
@@ -974,7 +1003,7 @@
       },
       "nearest_bart": "Montgomery St.",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=fireside,participant=False)=0.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
       "description_mirror": "South Park Commons is delighted to host Dmitri Dolgov, co-CEO of Waymo as part of our -1 to Now series.\nEvent Details\n2:30pm: Doors Open\n3:00-4:00pm: Fireside Chat\n*Please note doors close at event start time and we are unable to accommodate pending, waitlist, or late arrivals.\nDmitri Dolgov is the co-CEO of Waymo, an autonomous driving technology company with a mission to be the world\u2019s most trusted driver.\nDmitri is one of the founders of the Google self-driving car project, which began in 2009 and became Waymo in 2016. As co-CEO, Dmitri is responsible for overall company strategy, with his primary focus on the development and deployment of the Waymo Driver, based on a custom, in-house designed, fully autonomous technology stack.Dmitri previously served as Waymo\u2019s CTO. Prior to Waymo, Dmitri worked on autonomous driving efforts at Toyota and at Stanford as part of Stanford's DARPA Urban Challenge team.\nDmitri received his B.S. and M.S. in Physics and Math from the Moscow Institute of Physics and Technology, and a Ph.D. in Computer Science from the University of Michigan.\n\u200bAbout South Park Commons (SPC)SPC is a technical community and venture fund dedicated to helping founders, researchers, and technologists figure out what to work on next\u2014what we call the -1 to 0 stage of your career. We believe this is best accomplished in the most talent-dense community possible.\nSPC events are open to members, alumni, and special guests of the community. The best way to join events at SPC is to apply for SPC membership."
     },
@@ -1044,7 +1073,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d71.00 social_opportunity) | \u00d70.85 cohort_saturation=some",
       "description_mirror": null
     },
@@ -1114,7 +1143,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d71.00 social_opportunity) | \u00d70.85 cohort_saturation=some",
       "description_mirror": null
     },
@@ -1149,16 +1178,16 @@
     "size": 400,
     "speakers": [],
     "participant": null,
-    "target_proximity": null,
+    "target_proximity": "high",
     "cohort_saturation": null,
     "prior_hook": null,
     "companions": [],
     "trip_chained": false,
-    "cost_blocks": 2.0,
+    "cost_blocks": 1.0,
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.12,
+    "predicted_p": 0.17,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -1191,15 +1220,17 @@
         "require_approval": false
       },
       "nearest_bart": "San Bruno",
-      "cost_blocks_source": "manual",
-      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
-      "description_mirror": "Join us on September 22nd for the very first Stripe San Francisco developer meetup of 2026. This is an in-person event for anyone building with Stripe (or curious to start). An evening focused on Stripe user experiences, product insights, best practices, and community.\n\ud83c\udf55\ud83c\udf7a PerksFood and drinks provided!\ud83c\udfab TicketsThere is a hard limit for RSVP, with a waitlist operating on Luma\ud83d\udccdLocationThe event is hosted at Stripe's South San Francisco office,354 Oyster Point Blvd, South San Francisco, CA, 94080\ud83d\ude97 ParkingAttendees can park in the Stripe parking garage at level -1. Just be sure to validate your parking when checking in for the meetup!\n\ud83d\udce3 Talks\nMark Moriarty\u00a0(Stripe) - What it's like to be a Stripe (lightning talk)\nChethan Shriyan & Hasan Tariq\u00a0(AWS) - Agents that Transact: Agentic Commerce with Stripe, Amazon Bedrock AgentCore Payments & AWS WAF\nDavid Mataciunas (M11.ai) - Selling to Agents: Why product truth beats marketing\n\ud83d\udd5a Rough timings\n6:00 pm - 6:30 pm: Doors open with refreshments\n6:30 pm - 7:30 pm: Talks and Q&A\n7:30 pm - 8:00 pm: Drinks, food, and networking"
+      "cost_blocks_source": "estimated",
+      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | S3(format=None,participant=None)=0.50 | S2(target_proximity=high)=0.50 (\u00d70.25 social_opportunity)",
+      "description_mirror": "Join us on September 22nd for the very first Stripe San Francisco developer meetup of 2026. This is an in-person event for anyone building with Stripe (or curious to start). An evening focused on Stripe user experiences, product insights, best practices, and community.\n\ud83c\udf55\ud83c\udf7a PerksFood and drinks provided!\ud83c\udfab TicketsThere is a hard limit for RSVP, with a waitlist operating on Luma\ud83d\udccdLocationThe event is hosted at Stripe's South San Francisco office,354 Oyster Point Blvd, South San Francisco, CA, 94080\ud83d\ude97 ParkingAttendees can park in the Stripe parking garage at level -1. Just be sure to validate your parking when checking in for the meetup!\n\ud83d\udce3 Talks\nMark Moriarty\u00a0(Stripe) - What it's like to be a Stripe (lightning talk)\nChethan Shriyan & Hasan Tariq\u00a0(AWS) - Agents that Transact: Agentic Commerce with Stripe, Amazon Bedrock AgentCore Payments & AWS WAF\nDavid Mataciunas (M11.ai) - Selling to Agents: Why product truth beats marketing\n\ud83d\udd5a Rough timings\n6:00 pm - 6:30 pm: Doors open with refreshments\n6:30 pm - 7:30 pm: Talks and Q&A\n7:30 pm - 8:00 pm: Drinks, food, and networking",
+      "target_proximity_source": "rule",
+      "target_proximity_evidence": "named target employer: Stripe"
     },
     "verdict": "unscored",
     "reasons": [],
     "primary_reason": null,
     "region_status": "in_region",
-    "confidence": 0.0
+    "confidence": 0.2
   },
   {
     "schema_version": 1,
@@ -1273,7 +1304,7 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "Come hang out with the SF Codex community for an evening all about building with your voice brought to you by WorkOS and Parallel.ai\nCodex Voice lets you do a lot more than dictate prompts. You can talk through an idea, kick off coding tasks, steer agents while they work, check progress, and coordinate multiple threads without constantly going back to the keyboard.\nWe\u2019ll spend the first 30 minutes hanging out and meeting people, then jump into about an hour of live demos showing different ways to use voice with Codex, from everyday coding workflows to more ambitious voice-driven agent orchestration.\nIf you\u2019ve been experimenting with Codex already, come swap ideas. If you haven\u2019t tried Voice yet, this is a good place to see what it can do.",
       "segments_source": "rule",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.75 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
     },
     "verdict": "unscored",
@@ -1346,7 +1377,7 @@
       },
       "nearest_bart": "Montgomery St.",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=fireside,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d71.00 social_opportunity)",
       "description_mirror": "What's next for tech policy in the state of California? The rules for regulating technology were not built for a world where AI changes this fast. This conversation asks what tech policy in California needs to look like now that the old assumptions no longer hold, with CA gubernatorial candidate Steve Hilton.Agenda: 2:30pm: Doors Open3:00pm-4:00pm: Fireside Chat\nSteve Hilton is the Republican candidate for Governor of\nCalifornia. He advanced from a crowded primary with more than\n2.2 million votes and is now taking on career politician Xavier\nBecerra in the general election.\nSteve was born in London, the son of Hungarian immigrants who\nfled communism in search of freedom and opportunity. From a\nworking-class background, he made it to Oxford University and\nwent on to a career at the highest levels of business and\ngovernment, including serving as senior advisor to British Prime\nMinister David Cameron.\nAfter immigrating to the United States and making California his\nhome, Steve taught at Stanford University, built several\nbusinesses, hosted Fox News\u2019 The Next Revolution, and founded\nGolden Together, a movement for common-sense reform in\nCalifornia. He is the author of More Human, Positive Populism, and\nCalifailure.\n\u200bAbout South Park Commons (SPC)SPC is a technical community and venture fund dedicated to helping founders, researchers, and technologists figure out what to work on next\u2014what we call the -1 to 0 stage of your career. We believe this is best accomplished in the most talent-dense community possible.\nSPC events are open to members, alumni, and special guests of the community. The best way to join events at SPC is to apply for SPC membership.\n*Please note doors close at event start time and we are unable to accommodate pending, waitlist, or late arrivals."
     },
@@ -1416,7 +1447,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=lecture,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "recurring_soon": true,
       "description_mirror": null
@@ -1456,7 +1487,7 @@
     "segments": [],
     "size": null,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -1466,8 +1497,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.29,
-    "confidence": 0.2,
+    "predicted_p": 0.42,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -1492,8 +1523,10 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "\u26a0\ufe0f note: registration and approval is required for entry, we will only admit entrance to confirmed and approved attendees\nthere is limited in-person space, and there should be more space for virtual attendance in case irl attendance fills up quickly\nfriends of afore - we're delighted to invite you to get a first look at some afore's portfolio companies and founders-in-residence\nall presenting teams are planning to kick off a fundraise this fall!this year, we're also hosting a panel with speakers Anish Acharya (General Partner, A16Z), Amit Kumar (Partner, Accel), and Amber Yang (Partner, Lightspeed) to discuss the early stage AI trends they currently find most interesting.\nyou can rsvp above for the showcase, happy hour, both, virtual attendance, or just to get the list of companies presenting\nschedule:\n5-7pm pt: investor panel + afore company presentations\n7-9pm pt: happy hour\nmore info on our fir/fir u programs - we invest ~$50-$500k into 5-10 teams over three cohorts per year who work out of our sf office for 2 months: https://www.afore.vc/residence\u200bwe also run a student-focused fir program, learn more about it here: https://www.afore.vc/students\nwe are finalizing the list of founders presenting and will share this with approved attendees shortly\nafore is a ~$500m aum pre-seed fund backing exceptional founders. we were started in 2016 by the first product managers at twitter / android nexus, and helped launch the pre-seed category; since then, our portfolio companies have raised over $3 billion from top funds. we lead pre-seed rounds for software companies with checks up to $2m (in a concentrated way, ~10 checks per year), and also run a founders-in-residence (fir) program + fir university program.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=demo_day,participant=None)=0.75 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=demo_day,participant=True)=1.50 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=demo_day"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -1557,7 +1590,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=class,participant=False)=0.00 | S2(target_proximity=wrong_ladder)=0.00 (\u00d71.00 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "description_mirror": null
     },
@@ -1628,7 +1661,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d71.00 social_opportunity) | \u00d70.60 cohort_saturation=high",
       "description_mirror": null
     },
@@ -1698,7 +1731,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=fireside,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d71.00 social_opportunity)",
       "recurring_soon": true,
       "description_mirror": null
@@ -1770,7 +1803,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d71.00 social_opportunity) | \u00d70.85 cohort_saturation=some",
       "description_mirror": null
     },
@@ -1807,7 +1840,7 @@
     "format": "workshop",
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -1817,7 +1850,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.33,
+    "predicted_p": 0.5,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -1850,11 +1883,13 @@
         "require_approval": true
       },
       "nearest_bart": "16th St. Mission",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=None)=1.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=True)=2.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
       "description_mirror": "A live 2-hour workshop on the built-in specialist skills inside Claude -- contract review, accounting prep, document and spreadsheet production, and more -- and how to put them to work on your real tasks.\nMost people use about ten percent of what they are already paying for. Inside Claude sits a set of built-in specialist skills that work like the departments of a company: one reviews contracts and flags red lines, one preps financial documents, one builds polished spreadsheets, decks, and reports. Almost nobody knows they exist. You already have this team. You just have not met them.\nThis is the back office your business has never been able to afford, and it is the reason you are still doing the invoicing at 10pm after everyone is asleep.\nIn this live workshop, Arjita Sethi, founder of Build with AI Club and a Claude Community Ambassador, gives you the tour and then puts you to work: you will pick a real task from your own business and run it through the right skill, live.\nWe close with an open floor. Anyone who wants to can come up and show the task they just ran and what came back. Seeing exactly what another woman put in and what she got out is worth more than any description of the feature.\nWhat you will learn:\nThe skills tour: what specialist skills exist inside Claude today, what each one actually does, and how to find them\nThe legal desk: how to run a contract or agreement through review and get plain-English red flags before you sign\nThe finance desk: how to prep spreadsheets, financial summaries, and accountant-ready documents without a bookkeeper\nThe production desk: how to generate polished documents, decks, and reports that are ready to send, not ready to fix\nKnowing the limits: what these skills should and should not replace, and where a licensed professional still belongs\nWhat you will walk away with:\nOne real task from your own work completed through a Claude skill, live in the session\nA personal map of which skills replace which tasks in your week\nThe habit of asking \"is there a skill for this?\" before doing it manually or hiring it out\nWho this is for: Mothers running a business or a career without a legal, finance, or ops department behind them. Founders, freelancers, consultants, and professionals. Bring one real task: a contract you need to read, a spreadsheet you need built, a document you have been avoiding. No technical background required.\nYour hosts: Arjita Sethi is the founder of Build with AI Club, creator of the vibe-coded wellness platform Find Shaanti, a Lecturer of Entrepreneurship at San Francisco State University, Advisory Board member at the Nasdaq Entrepreneurial Center, and a Claude Community Ambassador for San Francisco for the non-technical and moms vertical. She runs the back office of three brands with the exact skills taught in this session. Co-hosted with Katie Choy founder of Moms Who AI, a IRL- first community of San Francisco based moms upskilling in AI together.",
       "format_source": "rule",
-      "segments_source": "rule"
+      "segments_source": "rule",
+      "participant_source": "rule",
+      "participant_evidence": "format=workshop"
     },
     "verdict": "unscored",
     "reasons": [],
@@ -1867,7 +1902,7 @@
         "source": "described"
       }
     ],
-    "confidence": 0.2
+    "confidence": 0.4
   },
   {
     "schema_version": 1,
@@ -1927,7 +1962,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d71.00 social_opportunity) | \u00d70.85 cohort_saturation=some",
       "description_mirror": null
     },
@@ -1997,7 +2032,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d71.00 social_opportunity) | \u00d70.60 cohort_saturation=high",
       "description_mirror": null
     },
@@ -2067,7 +2102,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=some)=1.00 (\u00d71.00 social_opportunity)",
       "description_mirror": null
     },
@@ -2105,7 +2140,7 @@
     "prior_hook": null,
     "companions": [],
     "trip_chained": false,
-    "cost_blocks": 2.0,
+    "cost_blocks": 1.0,
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
@@ -2141,8 +2176,8 @@
       },
       "is_public": true,
       "status": "PUBLISHED",
-      "cost_blocks_source": "manual",
-      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
+      "cost_blocks_source": "neutral_prior",
+      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity) | location unknown -> neutral cost prior 1.0",
       "description_mirror": null
     },
     "verdict": "unscored",
@@ -2180,7 +2215,7 @@
     "prior_hook": null,
     "companions": [],
     "trip_chained": false,
-    "cost_blocks": 2.0,
+    "cost_blocks": 1.0,
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
@@ -2216,8 +2251,8 @@
         "is_near_capacity": false,
         "require_approval": true
       },
-      "cost_blocks_source": "manual",
-      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
+      "cost_blocks_source": "neutral_prior",
+      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity) | location unknown -> neutral cost prior 1.0",
       "description_mirror": "Come join us for a salon style dinner discussion over topics for benchtop science is changing as robotics, machine learning, and computational pipelines move more and more into labs.\nThe goal for this dinner is discuss and debate the limits of traditional training while exploring what new skills, knowledge, and networks are needed to keep up with new tooling.\nAgenda6:30\u20137:00p \u2014 Mix & Mingle\n7:00\u20138:00p \u2014 Intros, Dinner + Salon Style Discussion\n8:00\u20138:30p \u2014 Mix & Mingle\nSome examples of discussion topics:What are limits of PhD as a credential?\nWhat does a good human-AI loop look like in the lab?\nHow does the role of the scientist evolve when experiments run more autonomously?\nIntros fromMukundh, current PhD at Stanford Genetics\nDi, Automation Scientist at Stealth Startup\nAustin, Environmental Researcher from BioKEA\nWho this is forScientists, researchers, and technical builders using Claude Code for automation and computational work. Curious newcomers welcome.\nFree and open to everyone.\nThank you to our event partnersHanwha AI Center (HAC)\u00a0is a private membership for all those dedicated to AI. As a hub for innovation,\u00a0HAC\u00a0brings together passionate entrepreneurs, researchers, and visionaries to explore the societal and technological impacts of AI on human life.\nThanks to\u00a0Worldwide Studios\u00a0(lead organizer) and\u00a0BioKEA\u00a0for helping bring this together."
     },
     "verdict": "unscored",
@@ -2284,7 +2319,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=lecture,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d70.25 social_opportunity) | \u00d71.20 prior_hook=topic",
       "description_mirror": null
     },
@@ -2319,7 +2354,7 @@
     "size": 0,
     "speakers": [],
     "participant": null,
-    "target_proximity": null,
+    "target_proximity": "wrong_ladder",
     "cohort_saturation": null,
     "prior_hook": null,
     "companions": [],
@@ -2328,7 +2363,7 @@
     "recurring": true,
     "next_occurrence": "2026-10-07T23:30:00Z",
     "phase": null,
-    "predicted_p": 0.12,
+    "predicted_p": 0.08,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -2353,16 +2388,18 @@
       "price_range": "",
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
-      "cost_blocks_source": "manual",
-      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
+      "cost_blocks_source": "estimated",
+      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | S3(format=None,participant=None)=0.50 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
       "recurring_soon": true,
-      "description_mirror": null
+      "description_mirror": null,
+      "target_proximity_source": "rule",
+      "target_proximity_evidence": "VC/founder wording: /\\bventure\\b/"
     },
     "verdict": "unscored",
     "reasons": [],
     "primary_reason": null,
     "region_status": "in_region",
-    "confidence": 0.0
+    "confidence": 0.2
   },
   {
     "schema_version": 1,
@@ -2422,7 +2459,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=mixer,participant=False)=0.00 | S2(target_proximity=none)=0.00 (\u00d71.00 social_opportunity) | \u00d70.85 cohort_saturation=some",
       "recurring_soon": true,
       "description_mirror": null
@@ -2502,7 +2539,7 @@
       },
       "nearest_bart": "Montgomery St.",
       "enrichment_source": "claude_manual_pass_2026-09-18",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "S3(format=panel,participant=False)=0.00 | S2(target_proximity=some)=0.25 (\u00d70.25 social_opportunity) | \u00d71.20 prior_hook=topic",
       "description_mirror": "AI models are getting smarter. But there\u2019s still a big gap between performing well on a benchmark and reliably doing real-world work.Join us for an evening of networking, drinks, and a fireside conversation with Osvald Nitski, Head of Product at Mercor, and Chris Clark, Co-Founder of OpenRouter, about what it takes to close that gap. Together, they\u2019ll explore how the way we train, evaluate, and deploy AI is changing - from benchmarks and expert data to reinforcement learning environments, model choice, and agents that can take on increasingly complex work.We\u2019ll dig into the big questions shaping what comes next: How should we measure what models can actually do? How do models learn from real-world environments? And what changes when AI can reliably take on work that once required humans?Expect a thoughtful discussion, a great crowd, and plenty of time to connect with founders, researchers, engineers, and technical leaders building the next generation of AI products.***OpenRouter is the unified interface for LLMs: 500+ models from 80+ providers, processing 400T+ monthly. Better prices, better uptime, no subscriptions."
     },
@@ -2582,7 +2619,7 @@
       "status": "PUBLISHED",
       "geo_source": "nominatim:130 Webster St, Oakland, CA 94607",
       "nearest_bart": "Lake Merritt",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
       "description_mirror": null
     },
@@ -2648,7 +2685,7 @@
       "price_range": "FREE",
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
       "description_mirror": null
     },
@@ -2716,7 +2753,7 @@
       "price_range": "FREE",
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
       "description_mirror": null
     },
@@ -2751,7 +2788,7 @@
     "segments": [],
     "size": 436,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -2761,8 +2798,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.33,
-    "confidence": 0.2,
+    "predicted_p": 0.5,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -2797,8 +2834,10 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "\u26a1 Claude Community x Cerebras: Cafe ComputeOpus 5.5 just landed, so we\u2019re getting the community together to celebrate. \ud83d\udd25\nJoin us in San Francisco for Cafe Compute: an evening of cocktails, conversation, and good people from across the AI community.\nThis is a 21+ event. IDs will be checked at the door.\n\u200b\ud83d\udca1 What it's aboutCelebrating Opus 5.5 with the people building around Claude and pushing AI forward.\nNo panels. No hackathon. No conference energy.\nJust a packed room of developers, founders, researchers, and creators hanging out, swapping ideas, talking about what they\u2019re building, and celebrating the latest Claude release together.\n\u200b\ud83c\udf89 What to expect\ud83e\udd42 An Opus 5.5 celebration with the Claude Community\u200b\u26a1 Cerebras in the room with some of the fastest AI infrastructure around\u200b\ud83e\udde0 Developers, founders, researchers, and AI-native teams\u200b\ud83e\udd1d Real conversations with people building at the edge of AI\u200b\ud83c\udf78 Cocktails, good energy, and Cafe Compute\n\u200b\ud83d\ude4b Who it's forDevelopers, founders, researchers, creators, and anyone excited about Claude, AI infrastructure, and what\u2019s coming next.\nWhether you\u2019re building with Claude every day or just want to meet other people deep in AI, come celebrate with us.\n\u200b\u200b\u2705 RegistrationSpace is limited and the room is expected to be full. Join the waitlist and we\u2019ll notify you if additional spots open up.\nAbout Claude Community\nClaude Community brings together developers, builders, and enthusiasts exploring what they can create with Claude.\nThis is a community-led event organized by members of the Claude Community in collaboration with the Cerebras community.\nCerebras is the world's fastest AI inference, up to 15x faster than leading GPUs. Cerebras Inference is powered by our Wafer-Scale Engine (WSE-3) - the world's largest AI chip. OpenAI's GPT 5.6 Sol Ultrafast is powered on Cerebras, you can try out one of the open source models like Qwen 3.8 27B.\nAnthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.\nJoin our rapidly growing communities:Discord \u2197Reddit \u2197X \u2197",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=hackathon,participant=None)=1.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=hackathon,participant=True)=2.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=hackathon"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -2865,7 +2904,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -2933,7 +2972,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -3001,7 +3040,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -3069,7 +3108,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -3137,7 +3176,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -3211,7 +3250,7 @@
       "status": "PUBLISHED",
       "geo_source": "nominatim:1 Ferry Building, San Francisco, CA 94111",
       "nearest_bart": "Embarcadero",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
       "description_mirror": null
     },
@@ -3292,7 +3331,7 @@
       "geo_source": "nominatim:110 Yacht Rd, San Francisco, CA 94123",
       "nearest_bart": "Civic Center/UN Plaza",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -3377,7 +3416,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -3404,7 +3457,7 @@
     "segments": [],
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": false,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -3415,7 +3468,7 @@
     "next_occurrence": null,
     "phase": null,
     "predicted_p": 0.04,
-    "confidence": 0.2,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -3450,8 +3503,10 @@
       "nearest_bart": "Berryessa/North San Jose",
       "description_mirror": "Join a Claude Community Event, organized by local enthusiasts for everyone who loves building with Claude!\nMarketers, Let's Talk AI \u2600\ufe0f\nAI is changing our jobs faster than any of us can keep up with, and most of us are figuring it out alone with a laptop and a deadline. Let's fix that.\nThis is an evening for OC marketers to think out loud together. No keynote. No expert on a stage telling you what to do. Just a room full of marketing people who do this work every day (social, lifecycle, paid, brand, community, events, content, product marketing, you name it) swapping what's working, what's flopping, and what we're all still trying to figure out.\nWe'll wrestle with 1 big question: what does AI actually mean for marketing? And by the end of the night, we'll pick 1 problem our community wants to tackle together at our follow-on Claude Impact Lab on Saturday, October 24. Hooray for building things!\nEvery corner of marketing, every experience level, every age. AI-curious or AI-skeptical, come as you are. Bring your questions, your wins, your fails, and your honest take. \ud83e\udd19\nFree event. Light snacks and drinks. Free on-site parking. SoCal vibes all around. \ud83c\udf34\nHosted by Bethany Joy Clark, Claude Ambassador for Marketing, Orange County. Can't wait to see y'all there! \u2728",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=lecture,participant=None)=0.00 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=lecture,participant=False)=0.00 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=lecture with no hands-on wording"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -3535,7 +3590,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -3593,12 +3662,11 @@
       "cost_blocks_source": "manual",
       "description_mirror": null
     },
-    "verdict": "skip",
+    "verdict": "part",
     "reasons": [
-      "spectator",
-      "quota_full"
+      "spectator"
     ],
-    "primary_reason": "quota_full",
+    "primary_reason": "spectator",
     "region_status": "in_region",
     "confidence": 1.0,
     "_manual": {
@@ -3617,7 +3685,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -3644,7 +3726,7 @@
     "segments": [],
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": false,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -3655,7 +3737,7 @@
     "next_occurrence": null,
     "phase": null,
     "predicted_p": 0.17,
-    "confidence": 0.2,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -3690,8 +3772,10 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "South Park Commons is delighted to host Sergey Levine, co-founder at Physical Intelligence and UC Berkeley professor.\nEvent Details\n10:30am: Doors Open + Mingling\n11:00am-12:00pm: Fireside Chat\nSergey Levine is one of the world's top robotics researchers and co-founder at Physical Intelligence. He joined the faculty of the Department of Electrical Engineering and Computer Sciences at UC Berkeley in fall 2016. His work focuses on machine learning for decision making and control, with an emphasis on deep learning and reinforcement learning algorithms. Applications of his work include autonomous robots and vehicles, as well as applications in other decision-making domains. His research includes developing algorithms for end-to-end training of deep neural network policies that combine perception and control, scalable algorithms for inverse reinforcement learning, deep reinforcement learning algorithms, and more. He received a BS and MS in Computer Science from Stanford University in 2009, and a Ph.D. in Computer Science from Stanford University in 2014.\n\u200bAbout South Park Commons (SPC)SPC is a technical community and venture fund dedicated to helping founders, researchers, and technologists figure out what to work on next\u2014what we call the -1 to 0 stage of your career. We believe this is best accomplished in the most talent-dense community possible.\nSPC events are open to members, alumni, and special guests of the community. The best way to join events at SPC is to apply for SPC membership.\n*Please note doors close at event start time and we are unable to accommodate pending, waitlist, or late arrivals.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=fireside,participant=None)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=fireside,participant=False)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=fireside with no hands-on wording"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -3727,7 +3811,7 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": "build",
-    "predicted_p": 0.22,
+    "predicted_p": 0.29,
     "is_exploration": false,
     "intent": "want",
     "intent_at": "2026-10-01T00:00:00Z",
@@ -3745,7 +3829,7 @@
     "hit": null,
     "label_status": "unknown",
     "_raw": {
-      "why": "S3(format=panel,participant=True)=0.00 | S2(target_proximity=high)=1.33 (\u00d70.67 social_opportunity)",
+      "why": "S3(format=panel,participant=True)=0.00 | S2(target_proximity=high)=1.33 (\u00d70.67 social_opportunity) | \u00d71.30 prior_hook=person",
       "decision_line": "Airwallex is where your Schwarzman contact works. You arrive warm, into recurring context \u2014 the pattern both your live contacts came through.",
       "scored_by": "claude_manual_2026-10-01",
       "prediction_locked": true,
@@ -3787,7 +3871,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -3851,7 +3949,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -3929,7 +4027,7 @@
       },
       "nearest_bart": "Civic Center/UN Plaza",
       "description_mirror": "Join a Claude Community Event, organized by local enthusiasts for everyone who loves building with Claude!",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -3991,11 +4089,12 @@
       "cost_blocks_source": "manual",
       "description_mirror": null
     },
-    "verdict": "part",
+    "verdict": "skip",
     "reasons": [
-      "spectator"
+      "spectator",
+      "conflict"
     ],
-    "primary_reason": "spectator",
+    "primary_reason": "conflict",
     "region_status": "in_region",
     "confidence": 1.0,
     "_manual": {
@@ -4014,7 +4113,26 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
+    },
+    "conflict_with": {
+      "id": "partiful:CQdFO5si7fnkMcfXet7q",
+      "name": "AI Heist Challenge with Cogent x Modal x LangChain",
+      "kind": "confirmed"
     }
   },
   {
@@ -4096,7 +4214,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -4158,7 +4290,7 @@
       "ticket_info": null,
       "nearest_bart": "Embarcadero",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -4220,9 +4352,11 @@
       "cost_blocks_source": "manual",
       "description_mirror": null
     },
-    "verdict": "go",
-    "reasons": [],
-    "primary_reason": null,
+    "verdict": "skip",
+    "reasons": [
+      "conflict"
+    ],
+    "primary_reason": "conflict",
     "region_status": "in_region",
     "confidence": 1.0,
     "segments": [
@@ -4254,7 +4388,26 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
+    },
+    "conflict_with": {
+      "id": "partiful:CQdFO5si7fnkMcfXet7q",
+      "name": "AI Heist Challenge with Cogent x Modal x LangChain",
+      "kind": "confirmed"
     }
   },
   {
@@ -4312,9 +4465,11 @@
       "cost_blocks_source": "manual",
       "description_mirror": null
     },
-    "verdict": "go",
-    "reasons": [],
-    "primary_reason": null,
+    "verdict": "skip",
+    "reasons": [
+      "conflict"
+    ],
+    "primary_reason": "conflict",
     "region_status": "in_region",
     "confidence": 1.0,
     "_manual": {
@@ -4333,7 +4488,26 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
+    },
+    "conflict_with": {
+      "id": "partiful:CQdFO5si7fnkMcfXet7q",
+      "name": "AI Heist Challenge with Cogent x Modal x LangChain",
+      "kind": "confirmed"
     }
   },
   {
@@ -4420,7 +4594,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -4451,7 +4639,7 @@
     "prior_hook": null,
     "companions": [],
     "trip_chained": false,
-    "cost_blocks": 0.0,
+    "cost_blocks": 1.0,
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
@@ -4493,8 +4681,8 @@
       "is_public": true,
       "status": "PUBLISHED",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
-      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
+      "cost_blocks_source": "neutral_prior",
+      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity) | location unknown -> neutral cost prior 1.0"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -4528,7 +4716,7 @@
     "prior_hook": null,
     "companions": [],
     "trip_chained": false,
-    "cost_blocks": 0.0,
+    "cost_blocks": 1.0,
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
@@ -4558,8 +4746,8 @@
       "location_type": null,
       "ticket_info": null,
       "description_mirror": null,
-      "cost_blocks_source": "manual",
-      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
+      "cost_blocks_source": "neutral_prior",
+      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity) | location unknown -> neutral cost prior 1.0"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -4637,7 +4825,7 @@
       },
       "nearest_bart": "16th St. Mission",
       "description_mirror": "Claude for Connected Agents \u00b7 San Francisco \ud83d\udd0cAgents are only as good as what they can reach. \ud83c\udf10 This hands-on morning is about building Claude agents connected to the live web: pulling real data, running real tools and acting on what they find, with Apify and Claude at the center of the build.\nWhat it's about \ud83d\udee0\ufe0fBuilding, not slides. We open with a quick walkthrough of how Claude connects to Apify's Actors through MCP (scrapers, crawlers and automations Claude can call as tools), then everyone opens their laptop and builds an agent that goes out, gets real data and does something useful with it. You leave with a working connected agent, not a diagram of one.\nWhat you get \u2728\ud83e\udd16 Hands-on time building a connected agent with Claude, Workato, and Apify, with the hosts walking the tables.\ud83e\uddd1\u200d\ud83d\udcbb The Apify and Workato team in the room to help you wire Actors into your agent and get unstuck fast.\ud83c\udf10 Real use cases: market research, lead lists, price tracking, content monitoring, whatever your agent needs from the web.\ud83c\udfa4 Open demos to close: show what your agent pulled and what it did with it.\u2615\ufe0f Coffee and pastries all morning.\nAgenda \u23f1\ufe0fDoors at 9:00 AM\nQuick intro to Claude + Apify + Workato, one continuous build block, open demos, wrap by 12:00 PM.\nJosh Lucas, Director of AI business solutions will speak on Workato.\nVojta Kopal, Head of Data at Apify will speak on Apify.\nRich Lira , Claude Ambassador will speak on Claude.\nWho it's for \ud83d\udc69\u200d\ud83d\udcbb\ud83d\udc68\u200d\ud83d\udcbbDevelopers, founders and builders who want their agents to do more than chat. If you've built with Claude Code or MCP, you'll go deep. If you haven't, you'll leave with your first connected agent running.\nWhat to bring \ud83c\udf92\ud83d\udcbb Laptop with Claude Desktop and Claude Code installed before the event\n\ud83d\udd11 A free Apify account created at apify.com before you arrive\n\ud83d\udd0c Charger\n\ud83d\udca1 An idea for something your agent should go find on the web\nDetails \ud83d\udccd\ud83d\udcc5 Date: Wednesday, October 7, 2026\n\u23f0 Time: 9:00 AM to 12:00 PM PDT\n\ud83c\udfe2 Venue: Workato \u00b7 600 Illinois St, San Francisco\n\ud83d\udde3\ufe0f Language: English\n\ud83e\udd1d Hosts: Rich Lira, Sean Jungbluth, Petros Hong and Leila Rishniw\nRegistration \u2705Approval-based: request your spot and we'll confirm by email (confirmation only comes through Luma). Limited seats.\nThanks to Workato for hosting us. \ud83d\ude4c\n\ud83c\udf10 claude.rich \u00b7 every upcoming Claude Community event in San Francisco and Mexico City",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -4699,11 +4887,9 @@
       "cost_blocks_source": "manual",
       "description_mirror": null
     },
-    "verdict": "skip",
-    "reasons": [
-      "quota_full"
-    ],
-    "primary_reason": "quota_full",
+    "verdict": "part",
+    "reasons": [],
+    "primary_reason": null,
     "region_status": "in_region",
     "confidence": 1.0,
     "segments": [
@@ -4730,7 +4916,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -4812,7 +5012,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -4872,9 +5086,9 @@
     },
     "verdict": "skip",
     "reasons": [
-      "quota_full"
+      "conflict"
     ],
-    "primary_reason": "quota_full",
+    "primary_reason": "conflict",
     "region_status": "in_region",
     "confidence": 1.0,
     "segments": [
@@ -4900,7 +5114,26 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
+    },
+    "conflict_with": {
+      "id": "partiful:bq3rFJ5Lfqyjtryj5v9I",
+      "name": "Agent Hackathon: Voice Mode On \u2014 Sponsored by Anthropic",
+      "kind": "confirmed"
     }
   },
   {
@@ -4928,7 +5161,7 @@
     "size": 0,
     "speakers": [],
     "participant": null,
-    "target_proximity": null,
+    "target_proximity": "wrong_ladder",
     "cohort_saturation": null,
     "prior_hook": null,
     "companions": [],
@@ -4937,8 +5170,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.12,
-    "confidence": 0.0,
+    "predicted_p": 0.08,
+    "confidence": 0.2,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -4964,8 +5197,10 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
-      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | S3(format=None,participant=None)=0.50 | S2(target_proximity=wrong_ladder)=0.00 (\u00d70.25 social_opportunity) | wrong_ladder: VC/founder room, not a target-employer room",
+      "target_proximity_source": "rule",
+      "target_proximity_evidence": "VC/founder wording: /\\bCapital\\b/"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -5047,7 +5282,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -5111,7 +5360,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -5203,7 +5452,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -5264,9 +5527,9 @@
     "verdict": "wildcard",
     "reasons": [
       "spectator",
-      "quota_full"
+      "conflict"
     ],
-    "primary_reason": "quota_full",
+    "primary_reason": "conflict",
     "region_status": "in_region",
     "confidence": 1.0,
     "segments": [
@@ -5292,7 +5555,26 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
+    },
+    "conflict_with": {
+      "id": "partiful:JKlWYyso3nX213VINcoQ",
+      "name": "AI Tool Evaluations with ScaleKit, SafeMCP, Workato & AAIF",
+      "kind": "ranked"
     }
   },
   {
@@ -5373,7 +5655,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -5462,7 +5758,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -5544,7 +5854,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -5618,7 +5942,7 @@
       },
       "nearest_bart": "16th St. Mission",
       "description_mirror": "Claude Picnic para Latinos \u00b7 San FranciscoUn picnic en Dolores Park para la comunidad latina que construye con Claude. \ud83c\udf2e\u2600\ufe0f Sin escenario, sin slides, sin agenda apretada: pasto, sol, comida y gente que habla tu idioma y est\u00e1 construyendo cosas incre\u00edbles con AI.\n\u00bfDe qu\u00e9 va?De conocernos. Somos muchos los latinos en el Bay Area trabajando en AI, en startups, en big tech, en research y como builders independientes, y casi nunca coincidimos en el mismo lugar. Este picnic es ese lugar. Trae tu proyecto, tu idea, tu duda o nada m\u00e1s tus ganas de platicar en espa\u00f1ol.\nQu\u00e9 vas a encontrarGente como t\u00fa: founders, engineers, designers, estudiantes y curiosos, todos latinos, todos construyendo con Claude.Demos de manta: si traes laptop y algo que ense\u00f1ar, se ense\u00f1a ah\u00ed, sentados en el pasto.Conexi\u00f3n con la comunidad: los organizadores de Claude Community en San Francisco y Ciudad de M\u00e9xico en el mismo picnic.Cero pitch: nadie te va a vender nada. Es una convivencia.\nAgendaLlegas cuando puedas, te vas cuando quieras. Nosotros ponemos el spot, la comunidad pone el resto.\nPara qui\u00e9n esLatinos e hispanohablantes en el Bay Area que construyen, usan o tienen curiosidad por Claude. Todos los niveles, todos los pa\u00edses. Si tu espa\u00f1ol es Spanglish, tambi\u00e9n cuentas.\nQu\u00e9 traerManta o silla plegable\nAlgo para compartir: botana, bebida o el platillo de tu pa\u00eds (puntos extra)\nLaptop si quieres ense\u00f1ar algo (opcional)\nBloqueador, porque es Dolores\nDetallesFecha: 8 de Octubre\nLugar: Dolores Park, Picnic Area D, on the Promenade, San Francisco\nIdioma: Espa\u00f1ol y Spanglish\nHosts: Sean Jungbluth, Rich Lira y Esteban Gorupicz\nRegistroPor aprobaci\u00f3n: solicita tu lugar y te confirmamos por correo. Cupo limitado por el espacio del picnic.",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -5657,7 +5981,7 @@
     ],
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -5667,8 +5991,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.33,
-    "confidence": 0.0,
+    "predicted_p": 0.5,
+    "confidence": 0.2,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -5703,8 +6027,10 @@
       "nearest_bart": "16th St. Mission",
       "description_mirror": "Claude Community Event x Build with AI Club\n\nA live 3-hour training where you build an end-to-end AI content system inside Claude \u2014 connected to your real brand assets \u2014 and generate on-brand output yourself before you leave the room.\nEvery founder says \"on-brand.\" Almost nobody has a system that enforces it. Instead, brand consistency depends on one person checking every asset by hand, and that does not scale past a team of one. That is not a taste problem. It is a systems problem, and Connectors just solved it.\n\nIn this session, Arjita Sethi, founder of Build with AI Club, shows you how to build a design system inside Claude that uses Connectors to pull in your actual brand assets, fonts, colors, and voice, so every output starts from your brand instead of a generic default. You will build your own system and generate from it, live.\n\nWhat you will learn:\n\nOne \u2014 The consistency problem: why \"on-brand\" breaks down once more than one person is producing output, and where yours is currently depending on manual review\nTwo \u2014 What Connectors actually do: how pulling in real brand assets differs from re-explaining your brand in a prompt every time\nThree \u2014 The build, live: connecting your brand materials, defining what \"on-brand\" means in concrete, checkable terms\nFour \u2014 The repeatability layer: setting up a workflow your team can run without you in the loop, and where to keep a review checkpoint\nFive \u2014 The scale move: how one working design system extends to new formats and new team members\n\nWhat you will walk away with:\n\nA working design system connected to your real brand assets, built and tested live in the session\nThe Connector setup and brand instructions, reusable for your next asset\nA repeatable way for your team to generate on-brand content without re-explaining your brand each time\n\nWho this is for: Founders, creators, and teams whose brand consistency depends on one person checking everything by hand. If your output quality drops the moment you are not the one making it, this session is the fix. No design or technical background required.\n\nYour host: Arjita Sethi is the founder of Build with AI Club, creator of the vibe-coded wellness platform Find Shaanti, a Lecturer of Entrepreneurship at San Francisco State University, Advisory Board member at the Nasdaq Entrepreneurial Center, and a Claude Community Ambassador for San Francisco for the non-technical and moms vertical. Her own brand system runs on the exact Connector setup taught in this session.\n\n#SFTechWeek #BuildWithAI #Claude",
       "segments_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=1.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=True)=2.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "hands-on wording: /\\bbuild\\s+your\\b/"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -5782,7 +6108,7 @@
       "nearest_bart": "Powell St.",
       "description_mirror": null,
       "format_source": "rule",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=mixer,participant=None)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
     },
     "verdict": "unscored",
@@ -5877,7 +6203,21 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -5935,11 +6275,12 @@
       "cost_blocks_source": "manual",
       "description_mirror": null
     },
-    "verdict": "part",
+    "verdict": "skip",
     "reasons": [
-      "spectator"
+      "spectator",
+      "conflict"
     ],
-    "primary_reason": "spectator",
+    "primary_reason": "conflict",
     "region_status": "in_region",
     "confidence": 1.0,
     "_manual": {
@@ -5958,7 +6299,26 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": true,
+          "at": "2026-10-02T19:17:31+00:00"
+        },
+        "bart_walk_min": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": 10,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
+    },
+    "conflict_with": {
+      "id": "partiful:Iok3TlIvDZje7pSm3ufb",
+      "name": "Love at First Slide with Gamma & Atlassian",
+      "kind": "confirmed"
     }
   },
   {
@@ -6022,7 +6382,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -6100,7 +6460,7 @@
       "geo_source": "nominatim:1630 San Pablo Ave, Oakland, CA 94612",
       "nearest_bart": "19th St. Oakland",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -6139,7 +6499,7 @@
     ],
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -6149,8 +6509,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.33,
-    "confidence": 0.0,
+    "predicted_p": 0.5,
+    "confidence": 0.2,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -6185,8 +6545,10 @@
       "nearest_bart": "16th St. Mission",
       "description_mirror": "Claude Community Event x Build with AI Club\n\nA live 2-hour training where you build an AI Chief of Staff inside Claude \u2014 one that holds context, tracks your priorities, and drafts your follow-ups \u2014 and put it to work on your real workload before you leave the room.\n\nEvery operator hits the same ceiling: you are the bottleneck for your own business. Every open loop, every follow-up, every piece of context about what matters this week lives in your head, and your output caps out at what you personally can hold and act on. That is not a discipline problem. It is a systems problem, and it has a fix most people have not built yet.\n\nIn this session, Arjita Sethi, founder of Build with AI Club, shows you how to configure Claude as a working Chief of Staff \u2014 one that remembers your priorities across conversations, surfaces what needs attention, and drafts communication in your voice instead of generic AI-speak. You will build your own setup and put it to work, live.\n\nWhat you will learn:\n\nOne \u2014 The overhead problem: why holding your own priorities and context in your head caps what you can get done, and where it is costing you right now\nTwo \u2014 What an AI Chief of Staff actually is: the difference between asking Claude questions and giving it standing context it holds across every conversation\nThree \u2014 The build, live: setting up memory, feeding it context about your work, and configuring it to surface the right things at the right time\nFour \u2014 The voice layer: getting it to draft follow-ups, recaps, and check-ins that sound like you, not like a generic assistant\nFive \u2014 The handoff: what to trust it with immediately, and what stays a human decision\n\nWhat you will walk away with:\n\nA working Claude setup configured as your Chief of Staff, built and tested live in the session\nThe configuration and prompting approach, reusable and extendable after the session\nA concrete plan for what to hand off first, back at your desk on Monday\n\nWho this is for: Founders, operators, and Chiefs of Staff carrying too much context in their own heads. If your week runs on things only you remember, this session is the fix. No technical background required.\n\nYour host: Arjita Sethi is the founder of Build with AI Club, creator of the vibe-coded wellness platform Find Shaanti, a Lecturer of Entrepreneurship at San Francisco State University, Advisory Board member at the Nasdaq Entrepreneurial Center, and a Claude Community Ambassador for San Francisco for the non-technical and moms vertical. Her own workload runs on the exact Chief of Staff setup taught in this session.\n\n#SFTechWeek #BuildWithAI #Claude",
       "segments_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=1.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=True)=2.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "hands-on wording: /\\bbuild\\s+your\\b/"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -6231,7 +6593,7 @@
     ],
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -6241,8 +6603,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.33,
-    "confidence": 0.2,
+    "predicted_p": 0.5,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -6278,8 +6640,10 @@
       "description_mirror": "Claude Community Event x SF Tech Week\nA live four-hour afternoon where three Claude Community Ambassadors each teach one build in 45 minutes, and you build along with every one of them.\nMost Tech Week events are talks. You sit, you watch someone demo something impressive, you leave with a photo and a full camera roll. This one runs the other way. Every session is a build, and the thing being built is on your screen, not just on the stage. Three ambassadors, three builds, forty-five minutes each. You leave with the work, not the notes.\nWe put this on Saturday afternoon on purpose. Saturday night is the busiest slot of Tech Week and the afternoon is one of the quietest. Build something first, then go to the parties.\nThe run of show:\n2:00 to 2:30 \u2014 Doors, check-in, networking2:30 to 3:15 \u2014 Arjita Sethi: How to Build Your Lead Engine with Claude3:20 to 4:05 \u2014 Laurie Sartain: Build Your Own Research Team4:10 to 4:55 \u2014 Sean Jungbluth: From Prompt to Print: 3D Printing with Claude for CAD5:00 to 5:30 \u2014 Attendee showcase (5-minute slots)5:30 to 6:00 \u2014 Networking\nWhat you will build:\nOne \u2014 How to Build Your Lead Engine with Claude, with Arjita SethiTwo \u2014 Your own research team, with Laurie Sartain: a multi-agent research setup you can clone from a repo and keep building on after the sessionThree \u2014 From Prompt to Print, with Sean Jungbluth: design a 3D-printable part with Claude in a free browser-based CAD tool and leave with a print-ready file. No installation, no printer needed\nWhat you will walk away with:\nThree working builds you made yourself, not three demos you watchedThe starter prompts, repos, and files from each session, yours to keep and extendA room full of people who build the same way you do\nWho this is for: Founders, builders, creators, and non-technical operators who are tired of watching AI demos and want to leave having made something. No technical background required for any session.\nYour host: Arjita Sethi is the founder of Build with AI Club, creator of the vibe-coded wellness platform Find Shaanti, a Lecturer of Entrepreneurship at San Francisco State University, Advisory Board member at the Nasdaq Entrepreneurial Center, and a Claude Community Ambassador for San Francisco for the non-technical and moms vertical. She is running the show and teaching one of the three builds.\n#SFTechWeek #BuildWithAI #ClaudeJoin a Claude Community Event, organized by local enthusiasts for everyone who loves building with Claude!\nA Claude Impact Lab event in San Francisco open to everyone.",
       "format_source": "rule",
       "segments_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=demo_day,participant=None)=1.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=demo_day,participant=True)=2.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=demo_day"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -6346,7 +6710,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -6423,7 +6787,7 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "Best Move Club by OpenRouter\u265f\ufe0fAn evening of chess, conversation, and thoughtful decision-making.\nEvery great company is built on a series of decisions.\nEvery move - whether on a chessboard or while building a company - equires navigating multiple possible paths, imperfect information, and tradeoffs between speed, quality, and risk.\nJoin founders, engineers, product leaders and AI researchers for an evening where meaningful conversations happen through a shared activity rather than a shared agenda.\nWe'll gather inside one of San Francisco's most iconic historic libraries before continuing into its legendary Chess Room - a timeless space designed for thoughtful conversations, friendly competition, and new connections.\nWhether you're an experienced chess player or have never played before, you're welcome.\nCome to play, watch, learn, or simply spend an evening with people building the future of AI.What to expect\nNetworking reception at the historic Mechanics' Institute Library\nExclusive access to the iconic Chess Room\nDrinks and delicious bites\nCasual chess games for all skill levels\nMeaningful conversations with the AI community\nAn intimate, thoughtfully curated evening\nSpace is intentionally limited.***OpenRouter is the unified interface for LLMs: 500+ models from 80+ providers, processing 400T+ monthly. Better prices, better uptime, no subscriptions.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=mixer,participant=None)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
     },
     "verdict": "unscored",
@@ -6510,7 +6874,15 @@
       ],
       "set_by": "claude_manual_2026-10-01",
       "note": "Partiful listings publish no address, so geocoding cannot resolve them and enrich sets reachable=None, which verdicts.py reads as not_reachable. These are SF Tech Week events in the city; reachability is known from the listing even though coordinates are not. lat/lng deliberately left NULL \u2014 an unknown location must never be silently placed on the map (DESIGN_V12_HANDOFF.md). Pipeline stages MUST NOT overwrite fields listed here.",
-      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class."
+      "cost_note": "Hand-set. Partiful publishes no address, so _estimate_cost_blocks falls to the 2.0 unknown-distance bucket, which exceeds COST_DOWNGRADES_TO_PART (1.5) and demotes every event to PART regardless of value. These are SF city events: 1.0 for an evening, 1.5 when it costs a class.",
+      "shadow": {
+        "reachable": {
+          "stage": "enrich:geocode",
+          "would_have_written": null,
+          "kept": false,
+          "at": "2026-10-02T19:17:31+00:00"
+        }
+      }
     }
   },
   {
@@ -6537,7 +6909,7 @@
     "segments": [],
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": false,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -6548,7 +6920,7 @@
     "next_occurrence": null,
     "phase": null,
     "predicted_p": 0.17,
-    "confidence": 0.2,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -6583,8 +6955,10 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "South Park Commons is delighted to host Tony Zhao, co-founder and CEO at Sunday Robotics, for a fireside chat.\nEvent Details\n5:30pm: Doors Open\n6:00-7:00pm: Fireside Chat\nTony Zhao is the co-founder and CEO of Sunday Robotics. He is building general-purpose home robots that give people time back for what matters most. He earned his B.S. in EECS from UC Berkeley in 2021 and later pursued a PhD in Computer Science at Stanford. His research in robotic fine manipulation contributed to ALOHA and ACT, influential projects and methods that helped advance imitation learning in robotics. Before founding Sunday Robotics, Tony worked at Google DeepMind and Tesla Autopilot.\n\u200bAbout South Park Commons (SPC)SPC is a technical community and venture fund dedicated to helping founders, researchers, and technologists figure out what to work on next\u2014what we call the -1 to 0 stage of your career. We believe this is best accomplished in the most talent-dense community possible.\nSPC events are open to members, alumni, and special guests of the community. The best way to join events at SPC is to apply for SPC membership.\n*Please note doors close at event start time and we are unable to accommodate pending, waitlist, or late arrivals.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=fireside,participant=None)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=fireside,participant=False)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=fireside with no hands-on wording"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -6651,7 +7025,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -6684,7 +7058,7 @@
     "prior_hook": null,
     "companions": [],
     "trip_chained": false,
-    "cost_blocks": 2.0,
+    "cost_blocks": 1.5,
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
@@ -6725,7 +7099,7 @@
       "status": "PUBLISHED",
       "geo_source": "nominatim:430 Emerson St, Palo Alto, CA 94301",
       "nearest_bart": "Union City",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
       "description_mirror": null
     },
@@ -6806,7 +7180,7 @@
       "geo_source": "nominatim:1172 Ocean Ave, Emeryville, CA 94608",
       "nearest_bart": "Ashby",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -6887,7 +7261,7 @@
       "geo_source": "nominatim:2200 Broadway, Redwood City, CA 94063",
       "nearest_bart": "Millbrae",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -6919,7 +7293,7 @@
     "segments": [],
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -6929,8 +7303,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.25,
-    "confidence": 0.2,
+    "predicted_p": 0.33,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -6965,8 +7339,10 @@
       "nearest_bart": "Embarcadero",
       "description_mirror": "Learn to orchestrate AI agents that write and ship code for you.\nClaude Code is already changing how the best engineering teams ship. This workshop, presented with Provectus, is a chance to build with it directly \u2014 not watch a demo, not sit through slides about it. You'll leave having shipped something real, with a working sense of how to bring this back to your own team.We'll spend a little time on context \u2014 how Claude Code fits into modern engineering workflows and where teams are seeing the biggest wins. Then the slides go away, and you're at a build station with Anthropic and Provectus beside you, orchestrating agents that write and ship code while you direct the work.\nWhy attend\nShip real output. Your agents write the code \u2014 you direct them. You'll leave with something you actually built, not a slide deck about what's possible.\nSee best practices in action. Learn how Claude Code fits into enterprise workflows, from the people who deploy it at scale.\nGet direct support. Live help at every table from Anthropic engineers and Provectus partners \u2014 no one gets stuck on an error alone.\nBuild your network. Spend the afternoon with technical leaders wrestling with the same questions you are.\n\nWho should attend\nEngineering Leaders \u2014 EMs, VPs, CTOs, Platform Leads, Principal Engineers\nBusiness Leaders \u2014 CPOs, Digital Transformation, senior AI sponsors, PMsYou don't need to be an engineer. If you're making decisions about AI investment or setting strategy, understanding what Claude Code actually does is the edge.\n\nAgenda\n12:30 PM - 1:30 PM: Check-in & Claude setup support\n1:30 PM - 2:15 PM: Welcome, Claude Code overview, demo\n2:15 PM - 2:30 PM: Snack break\n2:30 PM - 4:30 PM: Build session: hands-on with Claude Code\n4:30 PM - 5:30 PM: Networking Happy Hour\n\nWhat to bring\nYour laptop \u2014\u00a0Basic comfort with a terminal or code editor is helpful but not required \u2014 you'll be directing AI agents and building alongside them, and our team supports you the whole way.\n\nThe fine print\nThe event is free to attend if selected.\nRegistration is required and subject to approval.\nApplications are reviewed on a rolling basis \u2014 apply early.\nIf admitted, please bring a government ID to secure your badge.\nWant to bring a colleague? Have them apply separately \u2014 every seat needs its own approved registration.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=None)=0.50 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=True)=1.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=workshop"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -7003,7 +7379,7 @@
     ],
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -7013,8 +7389,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.33,
-    "confidence": 0.2,
+    "predicted_p": 0.5,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -7050,8 +7426,10 @@
       "description_mirror": "Direct access to Claude, the Anthropic team, and an afternoon built around the work you actually do.\nThis Claude Workshop, presented with Provectus, is a half-day product experience for business leaders who live in documents, spreadsheets, decks, and cross-tool workflows \u2014 Finance, Operations, Marketing, HR, Legal, and Sales.\nIf you are in a technical role, we encourage you to view the calendar and register for a Claude Code Workshop. Please refrain from registering for both sessions.\nPlease note: If you\u2019re bringing your business laptop, make sure you have the Claude desktop app installed.\nYou'll experience a live \"Day in the Life\" demo that follows a business leader through a real workday with Claude: the afternoon brief pulled from Slack and Salesforce, the variance analysis the CFO needed by noon, the board deck that built itself, the internal tool Engineering said they couldn't get to this quarter. Then you'll open your own laptop and build something real for your role \u2014 with the Anthropic and Provectus team in the room to help.\nThe focus is the product, the people who build it, and the work you do every week.\nWhy attend\nSee Claude handle your actual workday.\u00a0Claude for Excel and PowerPoint, connectors across Google Workspace, Salesforce, Slack, Jira, and more \u2014 shown as one continuous story, not a feature tour.\nBuild something real in 45 minutes.\u00a0A hands-on session with a starter project tailored to your title and industry. Anthropic and partner teams on the floor to help.\nLeave with a plan, not a pile of notes.\u00a0Every attendee walks out with a personalized \"Your First Week with Claude\" guide \u2014 ready to open Monday morning.\nWho should attend\nWorking with Claude is built for Director and VP-level leaders of teams who own the document-heavy, high-scrutiny work their teams run every week.\nVP / Director, Finance & FP&A\nVP / Director, Operations\nVP / Director, Marketing\nVP / Director, HR & People\nVP / Director, Legal\nVP / Director, Sales & RevOps\nSchedule:\n1 PM - 4 PM - Workshop\n4 PM - 5 PM - Networking Happy Hour\nWhat to bring\nYour laptop \u2014 the build session is hands-on, and you\u2019ll leave with something saved! If you\u2019re bringing your business laptop, make sure you have the Claude desktop app installed.\nA workflow you'd love to hand off \u2014 the weekly report, the board prep, the onboarding pack. Bring the one that eats your Mondays.\nThe fine print\nThe event is free to attend and refreshments will be included.\nSpace is limited. Registration is required, subject to approval, and non-transferable.\nThe workshop is intended for director-level roles and above. We may reach out to confirm your role.",
       "format_source": "rule",
       "segments_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=None)=1.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=True)=2.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=workshop"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -7081,7 +7459,7 @@
     "segments": [],
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": false,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -7092,7 +7470,7 @@
     "next_occurrence": null,
     "phase": null,
     "predicted_p": 0.17,
-    "confidence": 0.2,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -7127,8 +7505,10 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "South Park Commons is delighted to host Trae Stephens as part of our -1 to Now series.\nEvent Details\n3:00pm: Doors Open + Mingling\n3:30-4:30pm: Fireside Chat\nTrae is a General Partner at Founders Fund. He is also Co-founder and Executive Chairman of Anduril Industries, a defense technology company focused on autonomous systems.\nPreviously, Trae was an early employee at Palantir Technologies, where he led teams focused on growth in the intelligence/defense space as well as international expansion, helping large organizations solve their hardest data analysis problems. He was also an integral part of the product team, leading the design and strategy for new product offerings. While at Palantir, Trae also served as an adjunct faculty member at Georgetown University.\nPrior to Palantir, Trae worked as a computational linguist building enterprise solutions to Arabic/Persian name matching and data enrichment within the United States Intelligence community. He began his career working in the office of then Congressman Rob Portman and in the Political Affairs Office at the Embassy of Afghanistan in Washington, D.C. immediately following the installation of Hamid Karzai\u2019s transitional government. Trae graduated from the School of Foreign Service at Georgetown University.\n\u200bAbout South Park Commons (SPC)SPC is a technical community and venture fund dedicated to helping founders, researchers, and technologists figure out what to work on next\u2014what we call the -1 to 0 stage of your career. We believe this is best accomplished in the most talent-dense community possible.\nSPC events are open to members, alumni, and special guests of the community. The best way to join events at SPC is to apply for SPC membership.\n*Please note doors close at event start time and we are unable to accommodate pending, waitlist, or late arrivals.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=fireside,participant=None)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=fireside,participant=False)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=fireside with no hands-on wording"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -7204,7 +7584,7 @@
       "status": "PUBLISHED",
       "geo_source": "nominatim:1340 Fifth St, Berkeley, CA 94710",
       "nearest_bart": "North Berkeley",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
       "description_mirror": null
     },
@@ -7274,7 +7654,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -7352,7 +7732,7 @@
       "geo_source": "nominatim:2140 Mandela Pkwy, Oakland, CA 94607",
       "nearest_bart": "West Oakland",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -7420,7 +7800,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -7488,7 +7868,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -7519,7 +7899,7 @@
     "segments": [],
     "size": 39,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -7529,8 +7909,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.25,
-    "confidence": 0.2,
+    "predicted_p": 0.33,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -7557,8 +7937,10 @@
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=None)=0.50 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=True)=1.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=workshop"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -7625,7 +8007,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -7656,7 +8038,7 @@
     "segments": [],
     "size": 23,
     "speakers": [],
-    "participant": null,
+    "participant": false,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -7667,7 +8049,7 @@
     "next_occurrence": null,
     "phase": null,
     "predicted_p": 0.04,
-    "confidence": 0.2,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -7694,8 +8076,10 @@
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=lecture,participant=None)=0.00 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=lecture,participant=False)=0.00 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=lecture with no hands-on wording"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -7772,7 +8156,7 @@
       "geo_source": "nominatim:501 Stanyan St, San Francisco, CA 94117",
       "nearest_bart": "16th St. Mission",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -7803,7 +8187,7 @@
     "segments": [],
     "size": 60,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -7813,8 +8197,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.25,
-    "confidence": 0.2,
+    "predicted_p": 0.33,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -7841,8 +8225,10 @@
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=None)=0.50 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=True)=1.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=workshop"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -7909,7 +8295,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -7977,7 +8363,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -8054,7 +8440,7 @@
       "nearest_bart": "Montgomery St.",
       "description_mirror": "Best Move Club by OpenRouter\u265f\ufe0fAn evening of chess, conversation, and thoughtful decision-making.\nEvery great company is built on a series of decisions.\nEvery move - whether on a chessboard or while building a company - equires navigating multiple possible paths, imperfect information, and tradeoffs between speed, quality, and risk.\nJoin founders, engineers, product leaders and AI researchers for an evening where meaningful conversations happen through a shared activity rather than a shared agenda.\nWe'll gather inside one of San Francisco's most iconic historic libraries before continuing into its legendary Chess Room - a timeless space designed for thoughtful conversations, friendly competition, and new connections.\nWhether you're an experienced chess player or have never played before, you're welcome.\nCome to play, watch, learn, or simply spend an evening with people building the future of AI.What to expect\nNetworking reception at the historic Mechanics' Institute Library\nExclusive access to the iconic Chess Room\nDrinks and delicious bites\nCasual chess games for all skill levels\nMeaningful conversations with the AI community\nAn intimate, thoughtfully curated evening\nSpace is intentionally limited.\n***OpenRouter is the unified interface for LLMs: 500+ models from 80+ providers, processing 400T+ monthly. Better prices, better uptime, no subscriptions.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=mixer,participant=None)=0.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
     },
     "verdict": "unscored",
@@ -8122,7 +8508,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -8154,7 +8540,7 @@
     "segments": [],
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -8164,8 +8550,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.25,
-    "confidence": 0.2,
+    "predicted_p": 0.33,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -8200,8 +8586,10 @@
       "nearest_bart": "Milpitas",
       "description_mirror": "Learn to orchestrate AI agents that write and ship code for you.Claude Code is already changing how the best engineering teams ship. This workshop, presented with Tenex, is a chance to build with it directly \u2014 not watch a demo, not sit through slides about it. You'll leave having shipped something real, with a working sense of how to bring this back to your own team.We'll spend a little time on context \u2014 how Claude Code fits into modern engineering workflows and where teams are seeing the biggest wins. Then the slides go away, and you're at a build station with Anthropic and Tenex beside you, orchestrating agents that write and ship code while you direct the work.\nWhy attend\nShip real output. Your agents write the code \u2014 you direct them. You'll leave with something you actually built, not a slide deck about what's possible.\nSee best practices in action. Learn how Claude Code fits into enterprise workflows, from the people who deploy it at scale.\nGet direct support. Live help at every table from Anthropic engineers and Tenex partners \u2014 no one gets stuck on an error alone.\nBuild your network. Spend the afternoon with technical leaders wrestling with the same questions you are.\nWho should attend\nEngineering Leaders \u2014 EMs, VPs, CTOs, Platform Leads, Principal Engineers\nBusiness Leaders \u2014 CPOs, Digital Transformation, senior AI sponsors, PMsYou don't need to be an engineer. If you're making decisions about AI investment or setting strategy, understanding what Claude Code actually does is the edge.\nAgenda\n9:00 AM - 9:30 AM: Registration & setup support\n9:30 AM - 9:45 AM: Welcome\n9:45 AM - 11:15 AM: Claude Code overview, demo\n11:15 AM - 12:00 PM: Build session: hands-on with Claude Code\nWhat to bring\nYour laptop \u2014\u00a0Basic comfort with a terminal or code editor is helpful but not required \u2014 you'll be directing AI agents and building alongside them, and our team supports you the whole way.\nThe fine print\nThe event is free to attend if selected.\nRegistration is required and subject to approval.\nApplications are reviewed on a rolling basis \u2014 apply early.\nWant to bring a colleague? Have them apply separately \u2014 every seat needs its own approved registration.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=None)=0.50 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=True)=1.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=workshop"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -8232,7 +8620,7 @@
     "segments": [],
     "size": 0,
     "speakers": [],
-    "participant": null,
+    "participant": true,
     "target_proximity": null,
     "cohort_saturation": null,
     "prior_hook": null,
@@ -8242,8 +8630,8 @@
     "recurring": false,
     "next_occurrence": null,
     "phase": null,
-    "predicted_p": 0.25,
-    "confidence": 0.2,
+    "predicted_p": 0.33,
+    "confidence": 0.4,
     "is_exploration": false,
     "intent": "undecided",
     "intent_at": null,
@@ -8278,8 +8666,10 @@
       "nearest_bart": "Civic Center/UN Plaza",
       "description_mirror": "Learn to orchestrate AI agents that write and ship code for you.Claude Code is already changing how the best engineering teams ship. This workshop, presented with Tenex, is a chance to build with it directly \u2014 not watch a demo, not sit through slides about it. You'll leave having shipped something real, with a working sense of how to bring this back to your own team.We'll spend a little time on context \u2014 how Claude Code fits into modern engineering workflows and where teams are seeing the biggest wins. Then the slides go away, and you're at a build station with Anthropic and Tenex beside you, orchestrating agents that write and ship code while you direct the work.\nWhy attend\nShip real output. Your agents write the code \u2014 you direct them. You'll leave with something you actually built, not a slide deck about what's possible.\nSee best practices in action. Learn how Claude Code fits into enterprise workflows, from the people who deploy it at scale.\nGet direct support. Live help at every table from Anthropic engineers and Tenex partners \u2014 no one gets stuck on an error alone.\nBuild your network. Spend the afternoon with technical leaders wrestling with the same questions you are.\nWho should attend\nEngineering Leaders \u2014 EMs, VPs, CTOs, Platform Leads, Principal Engineers\nBusiness Leaders \u2014 CPOs, Digital Transformation, senior AI sponsors, PMsYou don't need to be an engineer. If you're making decisions about AI investment or setting strategy, understanding what Claude Code actually does is the edge.\nAgenda\n9:00 AM - 9:30 AM: Registration & setup support\n9:30 AM - 9:45 AM: Welcome\n9:45 AM - 11:15 AM: Claude Code overview, demo\n11:15 AM - 12:00 PM: Build session: hands-on with Claude Code\nWhat to bring\nYour laptop \u2014\u00a0Basic comfort with a terminal or code editor is helpful but not required \u2014 you'll be directing AI agents and building alongside them, and our team supports you the whole way.\nThe fine print\nThe event is free to attend if selected.\nRegistration is required and subject to approval.\nApplications are reviewed on a rolling basis \u2014 apply early.\nWant to bring a colleague? Have them apply separately \u2014 every seat needs its own approved registration.",
       "format_source": "rule",
-      "cost_blocks_source": "manual",
-      "why": "participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=None)=0.50 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)"
+      "cost_blocks_source": "estimated",
+      "why": "target_proximity unknown -> neutral prior 1.0 | S3(format=workshop,participant=True)=1.00 | S2(target_proximity=None)=1.00 (\u00d71.00 social_opportunity)",
+      "participant_source": "rule",
+      "participant_evidence": "format=workshop"
     },
     "verdict": "unscored",
     "primary_reason": null,
@@ -8346,7 +8736,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -8414,7 +8804,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -8482,7 +8872,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -8550,7 +8940,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -8618,7 +9008,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
@@ -8686,7 +9076,7 @@
       "geo_source": "campus_default",
       "nearest_bart": "Downtown Berkeley",
       "description_mirror": null,
-      "cost_blocks_source": "manual",
+      "cost_blocks_source": "estimated",
       "why": "format unknown -> neutral prior 1.0 | participant unknown -> neutral prior \u00d70.50 | target_proximity unknown -> neutral prior 1.0 | S3(format=None,participant=None)=0.50 | S2(target_proximity=None)=0.25 (\u00d70.25 social_opportunity)"
     },
     "verdict": "unscored",
