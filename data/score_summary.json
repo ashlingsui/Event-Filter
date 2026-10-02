@@ -1,7 +1,7 @@
 {
-  "scored_at": "2026-10-02T02:24:33.894703Z",
+  "scored_at": "2026-10-02T18:03:33.633916Z",
   "verdict_counts": {
-    "unscored": 77,
+    "unscored": 78,
     "go": 7,
     "part": 7,
     "skip": 22,
@@ -26,9 +26,9 @@
     }
   },
   "unscored_summary": {
-    "total": 77,
+    "total": 78,
     "by_reason": {
-      "null": 77
+      "null": 78
     }
   }
 }

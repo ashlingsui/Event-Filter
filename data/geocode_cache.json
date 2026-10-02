@@ -69,5 +69,9 @@
   "2140 Mandela Pkwy, Oakland, CA 94607": {
     "lat": 37.8161265,
     "lng": -122.2893115
+  },
+  "110 Yacht Rd, San Francisco, CA 94123": {
+    "lat": 37.8058478,
+    "lng": -122.4484701
   }
 }
