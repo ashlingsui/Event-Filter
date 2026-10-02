@@ -83,13 +83,25 @@ const Scoring = (() => {
   function recomputeCostBlocks(event, context) {
     const rideAnswered = context.ride === true;
     const wasUnreachablePenalty = event.reachable === false;
+    const hasRecordedCost = typeof event.cost_blocks === "number";
+
+    // A recorded cost_blocks value already includes the pipeline's day, duration, and
+    // trip-chain adjustments. Reapplying those every time an unrelated context answer changes
+    // (for example, adding a companion) quietly mutated 0.5 into 1.0. Keep that recorded fact
+    // authoritative; only a newly supplied ride changes it. For an unreachable event, a ride
+    // replaces its flat penalty with the ordinary BART-walk estimate first.
+    if (hasRecordedCost && !rideAnswered) return event.cost_blocks;
+
     let cost = wasUnreachablePenalty && rideAnswered
       ? walkCost(event.bart_walk_min)
-      : (typeof event.cost_blocks === "number" ? event.cost_blocks : walkCost(event.bart_walk_min));
+      : (hasRecordedCost ? event.cost_blocks : walkCost(event.bart_walk_min));
 
-    if (pacificWeekday(event.start) === 4) cost = Math.max(0, cost - FRIDAY_DISCOUNT);
-    if (rideAnswered || event.trip_chained) cost = Math.max(0, cost - TRIP_CHAINED_DISCOUNT);
-    if ((event.duration_hr || 0) > LONG_EVENT_SURCHARGE_HR) cost += LONG_EVENT_SURCHARGE;
+    if (!hasRecordedCost || (wasUnreachablePenalty && rideAnswered)) {
+      if (pacificWeekday(event.start) === 4) cost = Math.max(0, cost - FRIDAY_DISCOUNT);
+      if (event.trip_chained) cost = Math.max(0, cost - TRIP_CHAINED_DISCOUNT);
+      if ((event.duration_hr || 0) > LONG_EVENT_SURCHARGE_HR) cost += LONG_EVENT_SURCHARGE;
+    }
+    if (rideAnswered) cost = Math.max(0, cost - TRIP_CHAINED_DISCOUNT);
 
     cost = Math.min(2.0, Math.max(0, cost));
     return Math.round(cost * 2) / 2; // snap to the 0.5 grid, same as scorer.py

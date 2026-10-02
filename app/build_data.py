@@ -29,23 +29,6 @@ PRIVATE_OUT_PATH = APP_DIR / "generated" / "private_data.js"
 # silently reprojected into it.
 BAY_AREA_BOUNDS = {"lat_min": 37.28, "lat_max": 37.96, "lng_min": -122.46, "lng_max": -121.98}
 
-# California only (checked live 2026-09-21: covers the whole state with margin, but nothing in
-# a neighboring state). Used to drop out-of-state/international rows from the board entirely,
-# per Ashling's 2026-09-21 call: they're not "suppressed" (a solvable-friction category — a ride,
-# a long drive) — they're categorically not happening, so they don't need to be counted either.
-CALIFORNIA_BOUNDS = {"lat_min": 32.4, "lat_max": 42.1, "lng_min": -124.6, "lng_max": -114.0}
-
-# The source calendars use a "<City> | <title>" naming convention for anything outside the Bay
-# Area (confirmed live: "Barcelona | Claude...", "New York | Building with Claude...",
-# "San Francisco | Claude Meetup..."). A handful of these rows have no lat/lng at all, so the
-# only signal is the title prefix. Used ONLY to exclude — a title that doesn't match this pattern,
-# or whose city isn't recognized either way, is left alone (unknown is not false: SPEC.md's
-# missing-data policy applies to exclusion decisions too, not just displayed facts).
-CALIFORNIA_CITY_PREFIXES = {
-    "san francisco", "oakland", "berkeley", "emeryville", "palo alto", "san jose",
-    "sacramento", "los angeles", "san diego", "mountain view", "menlo park",
-    "fremont", "santa clara", "sunnyvale", "walnut creek", "san mateo", "redwood city",
-}
 
 # Real, published city coordinates — used only to orient the schematic fallback map (labels),
 # never to place an event. Projected through the same _project() function as event markers so
@@ -91,26 +74,6 @@ def _week_label(local_date):
     if monday.month == sunday.month:
         return f"{monday.strftime('%b %-d')}–{sunday.day}"
     return f"{monday.strftime('%b %-d')}–{sunday.strftime('%b %-d')}"
-
-
-def _in_california(row):
-    """True/False when confident, None when genuinely unknown (kept, never excluded — SPEC.md's
-    missing-data policy: unknown is not false)."""
-    lat, lng = row.get("lat"), row.get("lng")
-    if lat is not None and lng is not None:
-        b = CALIFORNIA_BOUNDS
-        return b["lat_min"] <= lat <= b["lat_max"] and b["lng_min"] <= lng <= b["lng_max"]
-
-    name = row.get("name") or ""
-    if "|" in name:
-        prefix = name.split("|", 1)[0].strip().lower()
-        if prefix in CALIFORNIA_CITY_PREFIXES:
-            return True
-        # A short, capitalized "<City> |" prefix that isn't a known CA city is confidently
-        # elsewhere (Barcelona, New York, Yamagata, Brisbane, Seoul all matched this live).
-        if 0 < len(prefix.split()) <= 3 and name.split("|", 1)[0].strip()[:1].isupper():
-            return False
-    return None
 
 
 def _map_bucket(row):
@@ -188,6 +151,10 @@ def _decision_line(row, quota_winners_by_week, week_key):
         return "No parseable date — can't be ranked into a week yet."
     if verdict == "wildcard":
         return "Wildcard: scored low, going anyway — this is how the model finds out it's wrong."
+    if verdict == "unscored":
+        conf = row.get("confidence")
+        conf_txt = f"{conf * 100:.0f}%" if isinstance(conf, (int, float)) else "too little"
+        return f"Not enough information to judge yet — only {conf_txt} of what the model needs to know is in. Neither a go nor a skip."
     return "Unscored."
 
 
@@ -221,12 +188,18 @@ def build():
         elif first_host:
             seen_start_host.setdefault(key, row["name"])
 
+    # Geographic exclusion now happens at ingest (ingest/region.py), not here — see that module's
+    # docstring for why (paying for enrich/score on a row only to throw it away at the last step).
+    # This is a VERIFICATION pass, not a second filter: it trusts the `region_status` ingest
+    # already stamped on each row rather than recomputing California membership itself, so this
+    # geography logic lives in exactly one place and the two layers cannot silently disagree. A
+    # row reaching here "out_of_region" means the ingest filter has a bug (or the calendar isn't
+    # configured for it) — it is reported, not silently re-excluded, so it doesn't go unnoticed.
+    out_of_region_names = [row["name"] for row in events if row.get("region_status") == "out_of_region"]
+
     out_events = []
-    excluded_non_ca = []
+    event_private = {}
     for row in events:
-        if _in_california(row) is False:
-            excluded_non_ca.append(row["name"])
-            continue
         wk = week_of.get(row["id"])
         bucket = _map_bucket(row)
         track = "social_cohort" if row["id"] in social_ids else "professional"
@@ -252,6 +225,7 @@ def build():
             "host_names": row.get("host_names") or [],
             "host_tier": row.get("host_tier"),
             "format": row.get("format"),
+            "segments": row.get("segments") or [],
             "size": row.get("size"),
             "speakers": row.get("speakers") or [],
             # Everything below is only here because app/scoring.js needs it to recompute P
@@ -263,7 +237,6 @@ def build():
             "target_proximity": row.get("target_proximity"),
             "cohort_saturation": row.get("cohort_saturation"),
             "prior_hook": row.get("prior_hook"),
-            "companions": row.get("companions") or [],
             "trip_chained": row.get("trip_chained"),
             "recurring": row.get("recurring"),
             "next_occurrence": row.get("next_occurrence"),
@@ -274,8 +247,8 @@ def build():
             "reasons": row.get("reasons") or [],
             "unblock_action": row.get("unblock_action"),
             "predicted_p": row.get("predicted_p"),
+            "confidence": row.get("confidence"),
             "cost_blocks": row.get("cost_blocks"),
-            "is_exploration": row.get("is_exploration"),
             "why_raw": (row.get("_raw") or {}).get("why"),
             "decision_line": (
                 _decision_line(row, quota_winners_by_week, wk)
@@ -283,10 +256,21 @@ def build():
                 else _social_line(row)
             ),
             "duplicate_of_name": duplicate_of.get(row["id"]),
-            "intent": row.get("intent"),
-            "rsvp_state": row.get("rsvp_state"),
             "gated": row.get("gated"),
         })
+        # PLANS vs. METHOD split, inside the already-existing public/private boundary (SPEC.md
+        # §4): `intent`/`rsvp_state` reveal which specific events she is actually attending —
+        # different disclosure than "the model scored this 0.4" — and `companions` will contain
+        # OTHER PEOPLE'S NAMES the moment she logs "going with Ivy." Ivy never agreed to be in a
+        # file served from a public URL, and publishing a third party's name isn't Ashling's call
+        # to make alone. `is_exploration` goes with them for the same "reveals a real plan" reason.
+        # These stay real data — they move to private_data.js, they are not deleted.
+        event_private[row["id"]] = {
+            "intent": row.get("intent"),
+            "rsvp_state": row.get("rsvp_state"),
+            "is_exploration": row.get("is_exploration"),
+            "companions": row.get("companions") or [],
+        }
 
     week_meta = {}
     for row in events:
@@ -309,11 +293,11 @@ def build():
         xy = _project({"lat": lat, "lng": lng}, "bay_area")
         reference_cities.append({"name": name, "lat": lat, "lng": lng, "xy": xy})
 
-    # score_summary.json's suppressed_summary.total (59) is the raw pipeline count and includes
-    # every excluded non-California row — showing it as-is next to a board that no longer
-    # displays those rows at all would overstate what's on screen. Recompute the total from the
-    # already-CA-filtered out_events instead, so the "N suppressed" line matches what a click
-    # into the drawer can actually show.
+    # score_summary.json's suppressed_summary.total is the raw pipeline count and includes
+    # whatever reached score/ before ingest's region filter existed — showing it as-is next to a
+    # board that no longer carries those rows at all would overstate what's on screen. Recompute
+    # from out_events instead, so the "N suppressed" line matches what a click into the drawer can
+    # actually show.
     ca_suppressed_total = sum(1 for e in out_events if e["verdict"] == "suppressed")
 
     # The week the board should default to on load. Derived from the pipeline's own scored_at
@@ -333,7 +317,10 @@ def build():
         "weeks": [{"key": k, "label": v} for k, v in sorted(week_meta.items())],
         "score_summary": score_summary,
         "ca_suppressed_total": ca_suppressed_total,
-        "excluded_non_california_count": len(excluded_non_ca),
+        # Should always be 0 — see the verification-pass comment above out_of_region_names. A
+        # nonzero value here means ingest's region filter has a bug, not that this script needs
+        # to compensate for it.
+        "out_of_region_count": len(out_of_region_names),
         "social_cohort_overrides_note": overrides_doc.get("_note"),
         "map_bounds": BAY_AREA_BOUNDS,
         "map_reference_cities": reference_cities,
@@ -342,6 +329,11 @@ def build():
         "generated_at": public_payload["generated_at"],
         "outcomes": outcomes,
         "pending_hypotheses": pending_hypotheses,
+        # PLANS vs. METHOD split (see the event_private comment above): intent, rsvp_state,
+        # is_exploration, companions — keyed by event id, joined back onto the public event in
+        # app/data_access.js when this file is present. Companions in particular can carry other
+        # people's names; this must never reach app/generated/data.js.
+        "event_private": event_private,
     }
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -351,10 +343,17 @@ def build():
         "window.EVENT_FILTER_PRIVATE_DATA = " + json.dumps(private_payload, indent=2) + ";\n"
     )
     print(f"wrote {OUT_PATH} ({len(out_events)} events, {len(week_meta)} weeks)")
-    print(f"wrote {PRIVATE_OUT_PATH} (gitignored — outcomes + pending hypotheses)")
-    print(f"excluded {len(excluded_non_ca)} non-California events entirely (not shown, not counted):")
-    for name in excluded_non_ca:
-        print(f"  - {name}")
+    print(f"wrote {PRIVATE_OUT_PATH} (gitignored — outcomes + pending hypotheses + per-event plans)")
+    if out_of_region_names:
+        print(
+            f"WARNING: {len(out_of_region_names)} out_of_region row(s) reached build_data.py — "
+            f"ingest's region filter should have dropped these. Check config/calendars.json's "
+            f"region_filter coverage:"
+        )
+        for name in out_of_region_names:
+            print(f"  - {name}")
+    else:
+        print("0 out-of-region events reached this script (ingest's region filter is working).")
 
 
 if __name__ == "__main__":

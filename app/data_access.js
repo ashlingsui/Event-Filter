@@ -14,16 +14,31 @@ const DataAccess = (() => {
     return window.EVENT_FILTER_DATA;
   }
 
+  // PLANS vs. METHOD split (SPEC.md §4, app/build_data.py's event_private comment): intent,
+  // rsvp_state, is_exploration, and companions (which can carry OTHER PEOPLE'S NAMES) never ship
+  // in the committed app/generated/data.js. When private_data.js is present (local use), this
+  // joins them back onto the event transparently, so every existing call site keeps working
+  // unchanged. When it's absent (public deploy), the merge is a no-op and those four keys are
+  // simply missing — every current reader already falls back safely on undefined (`e.companions
+  // && ...`, `e.rsvp_state || "none"`, `!!(e && e.is_exploration)`), so this degrades to showing
+  // verdicts/reasoning with no want/pass or companion context, never a crash or blank screen.
+  function _withPrivateFields(event) {
+    const p = window.EVENT_FILTER_PRIVATE_DATA;
+    const extra = p && p.event_private && p.event_private[event.id];
+    return extra ? { ...event, ...extra } : event;
+  }
+
   function getEvents() {
-    return raw().events;
+    return raw().events.map(_withPrivateFields);
   }
 
   function getEvent(id) {
-    return raw().events.find((e) => e.id === id) || null;
+    const e = raw().events.find((e) => e.id === id);
+    return e ? _withPrivateFields(e) : null;
   }
 
   function getEventsForWeek(weekKey) {
-    return raw().events.filter((e) => e.week_key === weekKey);
+    return raw().events.filter((e) => e.week_key === weekKey).map(_withPrivateFields);
   }
 
   function getWeeks() {
@@ -75,15 +90,17 @@ const DataAccess = (() => {
     return raw().map_reference_cities;
   }
 
-  // California-only count, recomputed after excluding out-of-state/international rows
-  // entirely (Ashling's call, 2026-09-21) — not the raw score_summary.json total, which still
-  // includes them. getExcludedNonCaliforniaCount() exists for later use; nothing renders it today.
+  // California-only count — not the raw score_summary.json total, which predates ingest's region
+  // filter and still includes rows that never reach data/events.json anymore.
   function getCaliforniaSuppressedTotal() {
     return raw().ca_suppressed_total;
   }
 
-  function getExcludedNonCaliforniaCount() {
-    return raw().excluded_non_california_count;
+  // Should always be 0 — see app/build_data.py's verification-pass comment. Non-zero means
+  // ingest's region filter (ingest/region.py) let an out-of-region row through; nothing renders
+  // this in the UI today, it exists for that diagnosis.
+  function getOutOfRegionCount() {
+    return raw().out_of_region_count;
   }
 
   return {
@@ -101,6 +118,6 @@ const DataAccess = (() => {
     getMapBounds,
     getMapReferenceCities,
     getCaliforniaSuppressedTotal,
-    getExcludedNonCaliforniaCount,
+    getOutOfRegionCount,
   };
 })();

@@ -25,8 +25,21 @@
   const contextSection = document.getElementById("context");
   const toastEl = document.getElementById("toast");
 
+  // Bug fixed 2026-10-01: findIndex returning -1 (current week has no events, so it never made
+  // it into `weeks`) through Math.max(0, -1) always landed on index 0 — the OLDEST week in the
+  // whole dataset, not a nearby one. `weeks` is pre-sorted chronologically (build_data.py emits
+  // "YYYY-Www" keys in sorted order), so nearest-by-date is just "first week at or after the
+  // current key, else the last week before it."
+  function nearestWeekIndex(targetKey) {
+    if (!weeks.length) return 0;
+    const exact = weeks.findIndex((w) => w.key === targetKey);
+    if (exact !== -1) return exact;
+    const upcoming = weeks.findIndex((w) => w.key > targetKey);
+    return upcoming !== -1 ? upcoming : weeks.length - 1;
+  }
+
   const currentWeekKey = DataAccess.getCurrentWeekKey();
-  let currentWeekIndex = Math.max(0, weeks.findIndex((w) => w.key === currentWeekKey));
+  let currentWeekIndex = nearestWeekIndex(currentWeekKey);
   let selectedId = null;
   let detailEventId = null;
   let detailContext = { ride: null, companion: null, hook: null };
@@ -176,17 +189,19 @@
   }
 
   const PROFESSIONAL_VERDICTS = new Set(["go", "part", "go_if", "wildcard"]);
-  const PROF_STATE_LABEL = { go: "GO", part: "PART", go_if: "GO IF", wildcard: "WILDCARD" };
+  const PROF_STATE_LABEL = { go: "GO", part: "PART", go_if: "GO IF", wildcard: "WILDCARD", unscored: "UNSCORED" };
   // Skip's map color is deliberately lighter than the grey used for its text/badges elsewhere
   // (--faint #7e8782) — on a real, visually dark map style, a dark-grey dot on dark-grey tiles
   // has almost no contrast to register as a point at all, "quiet" or not. A light neutral grey
   // reads clearly against the dark basemap while still staying desaturated/calm, never a color.
-  const KIND_HEX = { go: "#00b94f", part: "#ffc400", go_if: "#ffc400", wildcard: "#00b94f", social_cohort: "#189fd8", skip: "#cfd2cb" };
+  // `unscored` (SPEC.md §3c) gets its own violet, not grey — it must never read as a soft skip.
+  const KIND_HEX = { go: "#00b94f", part: "#ffc400", go_if: "#ffc400", wildcard: "#00b94f", social_cohort: "#189fd8", skip: "#cfd2cb", unscored: "#a78bfa" };
 
   const DETAIL_GLOW = {
     go: "rgba(0,185,79,.25)", wildcard: "rgba(0,185,79,.25)",
     part: "rgba(255,196,0,.25)", go_if: "rgba(255,196,0,.25)",
     social_cohort: "rgba(24,159,216,.25)", skip: "rgba(130,140,135,.16)",
+    unscored: "rgba(167,139,250,.2)",
   };
 
   // The handoff's four decision-tier lines (Set B), reserved for this exact banner per the
@@ -197,6 +212,7 @@
     if (kind === "social_cohort") return "A shared plan, not a professional bet.";
     if (verdict === "go" || verdict === "go_if" || verdict === "wildcard") return "Strong room + real access. Go with intent.";
     if (verdict === "part") return "Interesting, but the outcome is not clear enough.";
+    if (verdict === "unscored") return "Not enough information to judge yet — neither a go nor a skip.";
     return "Not everything good belongs on your calendar."; // skip, suppressed, blocked
   }
 
@@ -254,13 +270,25 @@
     weekEyebrow.textContent = `Week of ${week.label} · Bay Area`;
     document.getElementById("crumb").textContent = `DECISION BOARD · ${week.label.toUpperCase()}`;
 
+    // Only a genuine fallback (the pipeline's actual current week has zero events, so it never
+    // made it into `weeks` at all) gets the note — deliberately browsing to another week with
+    // Prev/Next or the dropdown is normal use, not a silent wrong-week bug, and shouldn't nag.
+    const fallbackNote = document.getElementById("weekFallbackNote");
+    const currentWeekExists = weeks.some((w) => w.key === currentWeekKey);
+    fallbackNote.hidden = currentWeekExists;
+    if (!currentWeekExists) {
+      fallbackNote.textContent = `The pipeline's current week has no events, so this starts on the nearest week that does — ${weeks[nearestWeekIndex(currentWeekKey)].label}.`;
+    }
+
     const professional = events.filter((e) => e.track === "professional" && PROFESSIONAL_VERDICTS.has(e.verdict));
     const social = events.filter((e) => e.track === "social_cohort");
     const skip = events.filter((e) => e.track === "professional" && (e.verdict === "skip" || e.verdict === "blocked"));
     const suppressed = events.filter((e) => e.track === "professional" && e.verdict === "suppressed");
+    // SPEC.md §3c: "unscored is a queue, not a dead end" — its own group, never folded into skip.
+    const unscored = events.filter((e) => e.track === "professional" && e.verdict === "unscored");
 
     // Default selection: first professional GO, else first professional event, else anything.
-    const defaultPick = professional.find((e) => e.verdict === "go") || professional[0] || social[0] || skip[0] || null;
+    const defaultPick = professional.find((e) => e.verdict === "go") || professional[0] || social[0] || skip[0] || unscored[0] || null;
     selectedId = defaultPick ? defaultPick.id : null;
 
     // Bug fixed 2026-09-22: this used to also require `googleMap` truthy, but googleMap only
@@ -271,7 +299,7 @@
     if (mapMode === "google") renderMapGoogle(events);
     else renderMapSchematic(events);
     renderSelected(selectedId ? DataAccess.getEvent(selectedId) : null);
-    renderInventory(professional, social, skip);
+    renderInventory(professional, social, skip, unscored);
     renderSuppressed(week, suppressed);
     renderCoverageLine(week, suppressed);
   }
@@ -624,7 +652,14 @@
   function inventoryRow(e) {
     const kind = rowKind(e);
     const label = kind === "social_cohort" ? "SOCIAL" : kind === "skip" ? "SKIP" : (PROF_STATE_LABEL[e.verdict] || e.verdict.toUpperCase());
-    const scoreCell = kind === "social_cohort" ? `${pText(e)} · plan` : kind === "skip" ? "SETTLED" : pText(e);
+    // Unscored rows never show a P — that number was computed off neutral priors, and a bare
+    // decimal here would read as a real judgment (SPEC.md §3c: "never display a confident value
+    // derived from an absence"). Confidence — how much of the judgment is actually known — is the
+    // honest number to show instead.
+    const scoreCell = kind === "social_cohort" ? `${pText(e)} · plan`
+      : kind === "skip" ? "SETTLED"
+      : kind === "unscored" ? (typeof e.confidence === "number" ? `${Math.round(e.confidence * 100)}% known` : "pending")
+      : pText(e);
     return `<article class="inventory-row ${kind}${e.id === selectedId ? " selected" : ""}">
       <span class="item-state">${label}</span>
       <button class="event-name" type="button" data-id="${e.id}">${escapeHtml(e.name)}</button>
@@ -634,10 +669,11 @@
     </article>`;
   }
 
-  function renderInventory(professional, social, skip) {
+  function renderInventory(professional, social, skip, unscored) {
     const groups = [
       ["PROFESSIONAL DECISIONS", professional],
       ["SOCIAL / COHORT", social],
+      ["WE DON'T KNOW ENOUGH YET", unscored || []],
       ["SET ASIDE / SKIP", skip],
     ];
     inventoryStack.innerHTML = groups.map(([title, items]) => `
@@ -1124,12 +1160,35 @@
     toggleAddEvent.setAttribute("aria-expanded", String(open));
     toggleAddEvent.textContent = open ? "− Hide the add-event form" : ADD_EVENT_LABEL;
   });
-  const ADD_EVENT_LABEL = "+ Add an event by link — to help me understand why you think the way you think about one event";
+  const ADD_EVENT_LABEL = "+ Add an event by link";
 
   // Just the link — she doesn't want to also type a name/date. There's no server to fetch the
   // URL and scrape its real title (cross-origin fetch to an arbitrary site would be blocked
   // anyway), so this derives a short, honest stand-in label from the URL itself rather than
   // inventing an event name. Date defaults to today (LocalOutcomeStore.add's own fallback).
+  // hostname + path, lowercased, no trailing slash/query/hash/www — good enough to recognize
+  // "https://lu.ma/5cewfkx1" and "https://lu.ma/5cewfkx1?x=1" as the same listing without needing
+  // an exact string match against whatever data/events.json happened to store.
+  function normalizeEventUrl(url) {
+    try {
+      const u = new URL(url);
+      let host = u.hostname.replace(/^www\./, "").toLowerCase();
+      if (host === "luma.com") host = "lu.ma"; // same platform, two domains seen in the wild
+      return (host + u.pathname.replace(/\/$/, "")).toLowerCase();
+    } catch (err) {
+      return (url || "").trim().toLowerCase();
+    }
+  }
+
+  // A pasted link may already be a real, scored event on the board — she just doesn't know its
+  // id. Checking first means "add by link" never buries real pipeline data (score, verdict, host,
+  // decision line) under a bare unscored stub for something we already fully know.
+  function findEventByUrl(url) {
+    const normalized = normalizeEventUrl(url);
+    if (!normalized) return null;
+    return DataAccess.getEvents().find((e) => e.url && normalizeEventUrl(e.url) === normalized) || null;
+  }
+
   function deriveNameFromUrl(url) {
     try {
       const u = new URL(url);
@@ -1163,7 +1222,8 @@
   // mostly don't implement this API at all, so the button only appears when it's actually usable.
   (() => {
     const voiceButton = document.getElementById("voiceButton");
-    const voiceButtonLabel = document.getElementById("voiceButtonLabel");
+    const voiceWave = document.getElementById("voiceWave");
+    const waveBars = voiceWave ? Array.from(voiceWave.children) : [];
     const voiceNote = document.getElementById("voiceNote");
     const feedback = document.getElementById("readbackFeedback");
     const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1180,15 +1240,64 @@
     let isRecording = false;
     let baseText = "";
 
-    function setLabel(text) {
-      voiceButtonLabel.textContent = text;
+    // Separate from SpeechRecognition (which exposes no audio levels): a plain getUserMedia +
+    // AnalyserView reads live volume so the bars actually reflect her voice, not a canned
+    // animation. Same "microphone" permission grant as the recognizer, so this doesn't prompt twice.
+    let audioStream = null;
+    let audioCtx = null;
+    let analyser = null;
+    let waveRaf = null;
+
+    function stopWave() {
+      if (waveRaf) cancelAnimationFrame(waveRaf);
+      waveRaf = null;
+      voiceWave.hidden = true;
+      waveBars.forEach((bar) => { bar.style.height = "3px"; });
+      if (audioStream) { audioStream.getTracks().forEach((t) => t.stop()); audioStream = null; }
+      if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; }
+      analyser = null;
+    }
+
+    function tickWave() {
+      if (!analyser) return;
+      const data = new Uint8Array(analyser.fftSize);
+      analyser.getByteTimeDomainData(data);
+      let sumSquares = 0;
+      for (let i = 0; i < data.length; i++) {
+        const v = (data[i] - 128) / 128;
+        sumSquares += v * v;
+      }
+      const rms = Math.sqrt(sumSquares / data.length); // 0 (silent) .. ~1 (loud)
+      waveBars.forEach((bar, i) => {
+        const wobble = 0.6 + 0.4 * Math.sin(Date.now() / 120 + i * 1.3);
+        const px = 3 + Math.min(1, rms * 6) * 15 * wobble;
+        bar.style.height = `${px.toFixed(1)}px`;
+      });
+      waveRaf = requestAnimationFrame(tickWave);
+    }
+
+    async function startWave() {
+      try {
+        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaStreamSource(audioStream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        voiceWave.hidden = false;
+        tickWave();
+      } catch (err) {
+        // Voice-to-text still works without the wave — this is decoration, not the feature.
+      }
     }
 
     function stopVoice() {
       isRecording = false;
       voiceButton.classList.remove("recording");
       voiceButton.setAttribute("aria-pressed", "false");
-      setLabel("🎤 Speak instead of typing");
+      voiceButton.setAttribute("aria-label", "Speak instead of typing");
+      voiceButton.title = "Speak instead of typing";
+      stopWave();
       try { recognizer.stop(); } catch (err) { /* already stopped */ }
     }
 
@@ -1197,7 +1306,9 @@
       isRecording = true;
       voiceButton.classList.add("recording");
       voiceButton.setAttribute("aria-pressed", "true");
-      setLabel("⏺ Listening… click to stop");
+      voiceButton.setAttribute("aria-label", "Listening — click to stop");
+      voiceButton.title = "Listening — click to stop";
+      startWave();
       try { recognizer.start(); } catch (err) { /* already running */ }
     }
 
@@ -1232,21 +1343,562 @@
     });
   })();
 
+  // ---------- Prep (step 4a) ----------
+  // Prep is for an event already marked "want to go" (IntentStore, see the event-detail overlay
+  // above) — SPEC.md has no separate "attending" state, so intent="want" is the real signal that
+  // exists for "already intends to attend." Everything shown here is either a real scraped field
+  // (host_names, speakers, decision_line) or a prompt explicitly derived from those fields and
+  // labeled as such — never a fabricated bio, attendee list, or claim about the room.
+
+  function wantEvents() {
+    return DataAccess.getEvents()
+      .filter((e) => {
+        const saved = IntentStore.get(e.id);
+        return saved && saved.intent === "want";
+      })
+      .sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0));
+  }
+
+  // Real "want" events first (soonest first), then anything added by link (PrepLinkStore) —
+  // newest-added first, same precedence read-back already uses for its own by-link additions.
+  function prepAllItems() {
+    const real = wantEvents();
+    const local = PrepLinkStore.getAll().slice().sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+    return [...real, ...local];
+  }
+
+  function prepItemId(item) {
+    return item.local ? item.event_id : item.id;
+  }
+
+  function findPrepItem(id) {
+    if (!id) return null;
+    const real = DataAccess.getEvent(id);
+    if (real) return real;
+    return PrepLinkStore.getAll().find((r) => r.event_id === id) || null;
+  }
+
+  function speakerName(s) {
+    return typeof s === "string" ? s : (s && s.name) || null;
+  }
+
+  const HOST_TIER_LABEL = {
+    tier1_vc: "Tier-1 VC", scaled_co: "Scaled company", startup: "Startup",
+    student_club: "Student club", unknown: "Unknown",
+  };
+
+  // "Who is who" — data/events.json's host_names[] is a flat list (people and orgs mixed
+  // together, e.g. ["George Pickett", "WorkOS", "Parallel Web Systems"]) with nothing marking
+  // which entries are a person vs a company. Listing each name as its own row at least stops
+  // collapsing them into one blurred string; host_tier is a real classified field and is shown
+  // as-is, not a guess at which name is the person.
+  function renderPrepHost(e) {
+    const names = (e.host_names || []).filter(Boolean);
+    const rows = names.length
+      ? names.map((n) => `<div><b>${escapeHtml(n)}</b><span class="pending">Named as host on the listing — not yet marked person vs. organization, background not sourced.</span></div>`)
+      : [`<div><b>Host</b><span>Not listed on this event.</span></div>`];
+    rows.push(`<div><b>Host tier</b><span>${escapeHtml(HOST_TIER_LABEL[e.host_tier] || "Unknown")}</span></div>`);
+    document.getElementById("prepHost").innerHTML = rows.join("");
+  }
+
+  // Sourced from the people/event_people tables (app/people.js), themselves built from
+  // e.speakers — not a new extraction. appearance_count is a literal repeat-name count across
+  // scanned events, not identity resolution (PREP_SPEC.md §2/§3, not built yet).
+  function renderPrepPeople(e) {
+    const rows = PeopleData.getPeopleForEvent(e.id);
+    const container = document.getElementById("prepPeople");
+    if (!rows.length) {
+      container.innerHTML = `<div><b>Speakers</b><span>Not published on this listing.</span></div>`;
+      return;
+    }
+    container.innerHTML = rows.map((p) => {
+      const repeats = p.appearance_count - 1;
+      const repeatNote = repeats > 0 ? ` Also named at ${repeats} other scanned event${repeats === 1 ? "" : "s"}.` : "";
+      return `<div><b>${escapeHtml(p.display_name)}</b><span class="pending">Named on the listing — role and background not sourced yet.${repeatNote}</span></div>`;
+    }).join("");
+  }
+
+  // A prompt built from this event's own scored fields (participation, room proximity, prior
+  // hook, cohort saturation) — never a claim about specific named people, since nothing here
+  // scrapes attendee lists. Design brief: "questions are prompts, not scripts."
+  function prepQuestionFor(e) {
+    const bits = [];
+    if (e.participant === true) bits.push("You can do the thing this event is for, not just watch it — ask what people are actually building today.");
+    else if (e.participant === false) bits.push("This is a spectator format — plan a question for the Q&A or the hallway rather than counting on hands-on time.");
+    if (e.prior_hook === "topic") bits.push("You already have a hook into this topic — open with what actually drew you in, not small talk.");
+    if (e.target_proximity === "high" || e.target_proximity === "some") bits.push("This room skews toward people at your target companies — ask what they're working on right now, not just what they do.");
+    else if (e.target_proximity === "wrong_ladder") bits.push("This room is mostly VCs and founders, not target-company peers — treat it as a listening night.");
+    if (e.cohort_saturation === "high") bits.push("Expect a lot of familiar faces — the highest-value conversation may be the one person you don't already know.");
+    const note = "Derived from this event's own scored fields (participation, room proximity, prior hook, cohort saturation) — not a claim about who is actually attending.";
+    if (!bits.length) return { text: "No structured signal to build a prompt from yet — open with a plain question about what they're working on.", note };
+    return { text: bits.slice(0, 2).join(" "), note };
+  }
+
+  // Added by link on this page — never scraped or scored, so every section is honestly pending
+  // rather than derived from anything. Distinct from LocalOutcomeStore (read-back's by-link
+  // add): that one is post-event (felt_score/felt_note); this one is pre-event, nothing to
+  // score yet.
+  function renderPrepLocalItem(row) {
+    document.getElementById("prepStatus").textContent = `ADDED BY YOU · ${new Date(row.created_at).toLocaleDateString()}`;
+    document.getElementById("prepSource").textContent = "Added by you · not on a followed calendar";
+    document.getElementById("prepTitle").textContent = row.name;
+    document.getElementById("prepLine").textContent = "Never scraped or scored by the pipeline — added here just to hold a link and a place to prep.";
+
+    const listing = document.getElementById("prepListing");
+    if (row.url) {
+      listing.href = row.url;
+      listing.style.display = "";
+    } else {
+      listing.removeAttribute("href");
+      listing.style.display = "none";
+    }
+
+    document.getElementById("prepHost").innerHTML =
+      `<div><b>Host</b><span class="pending">Pending — no listing was scraped for this event.</span></div>`;
+    document.getElementById("prepPeople").innerHTML =
+      `<div><b>Speakers</b><span class="pending">Pending — no listing was scraped for this event.</span></div>`;
+    document.getElementById("prepQuestion").textContent =
+      "No structured signal to build a prompt from yet — open with a plain question about what they're working on.";
+    document.getElementById("prepQuestionNote").textContent =
+      "This event has no scored fields (added by link, not from a followed calendar) — there's nothing to derive a sharper prompt from yet.";
+  }
+
+  function renderPrepPipelineEvent(e) {
+    const kind = rowKind(e);
+    const stateLabel = kind === "social_cohort" ? "SOCIAL / COHORT" : kind === "skip" ? "SETTLED SKIP" : (PROF_STATE_LABEL[e.verdict] || (e.verdict || "unscored").toUpperCase());
+    document.getElementById("prepStatus").textContent = `${stateLabel} · ${fmtTime(e.start).toUpperCase()} · ${place(e).toUpperCase()}`;
+    document.getElementById("prepSource").textContent = e.source ? `${e.source} · listing` : "Source unknown";
+    document.getElementById("prepTitle").textContent = e.name;
+    document.getElementById("prepLine").textContent = e.decision_line || "No decision line recorded.";
+
+    const listing = document.getElementById("prepListing");
+    if (e.url) {
+      listing.href = e.url;
+      listing.style.display = "";
+    } else {
+      listing.removeAttribute("href");
+      listing.style.display = "none";
+    }
+
+    renderPrepHost(e);
+    renderPrepPeople(e);
+    const q = prepQuestionFor(e);
+    document.getElementById("prepQuestion").textContent = q.text;
+    document.getElementById("prepQuestionNote").textContent = q.note;
+  }
+
+  function selectPrepEvent(id) {
+    const brief = document.getElementById("prepBrief");
+    const select = document.getElementById("prepEvent");
+    const item = findPrepItem(id);
+    if (!item) {
+      brief.hidden = true;
+      return;
+    }
+    if (select.value !== id) select.value = id;
+    brief.hidden = false;
+
+    if (item.local) renderPrepLocalItem(item);
+    else renderPrepPipelineEvent(item);
+  }
+
+  function renderPrep() {
+    const items = prepAllItems();
+    const select = document.getElementById("prepEvent");
+    const picker = document.querySelector(".prep-picker");
+    const empty = document.getElementById("prepEmpty");
+
+    select.innerHTML = items.length
+      ? items.map((it) => `<option value="${escapeAttr(prepItemId(it))}">${it.local ? "Added by you" : escapeHtml(fmtTime(it.start))} · ${escapeHtml(it.name)}</option>`).join("")
+      : "";
+
+    if (!items.length) {
+      picker.hidden = true;
+      empty.hidden = false;
+      document.getElementById("prepBrief").hidden = true;
+      return;
+    }
+    picker.hidden = false;
+    empty.hidden = true;
+    selectPrepEvent(prepItemId(items[0]));
+  }
+
+  document.getElementById("prepEvent").addEventListener("change", (ev) => selectPrepEvent(ev.target.value));
+
+  const togglePrepLink = document.getElementById("togglePrepLink");
+  const prepLinkForm = document.getElementById("prepLinkForm");
+  const ADD_PREP_LINK_LABEL = "+ Add an event by link";
+  togglePrepLink.addEventListener("click", () => {
+    const open = prepLinkForm.hidden;
+    prepLinkForm.hidden = !open;
+    togglePrepLink.setAttribute("aria-expanded", String(open));
+    togglePrepLink.textContent = open ? "− Hide the add-event form" : ADD_PREP_LINK_LABEL;
+  });
+  prepLinkForm.addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    const url = document.getElementById("prepLinkUrl").value.trim();
+    if (!url) return;
+    prepLinkForm.reset();
+    prepLinkForm.hidden = true;
+    togglePrepLink.setAttribute("aria-expanded", "false");
+    togglePrepLink.textContent = ADD_PREP_LINK_LABEL;
+
+    const matched = findEventByUrl(url);
+    if (matched) {
+      const saved = IntentStore.get(matched.id);
+      if (!saved || saved.intent !== "want") {
+        IntentStore.set(matched.id, { intent: "want", context: (saved && saved.context) || { ride: null, companion: null, hook: null } });
+      }
+      renderPrep();
+      selectPrepEvent(matched.id);
+      showToast(`"${matched.name}" is already on the board, scored — marked want to go and opened its real brief instead of a bare stub.`);
+      return;
+    }
+
+    const row = PrepLinkStore.add({ url, name: deriveNameFromUrl(url) });
+    renderPrep();
+    selectPrepEvent(row.event_id);
+    showToast(`Added "${row.name}" — saved on this device. No matching pipeline event was found, so its brief stays pending until you fill in what you know.`);
+  });
+
+  // ---------- Learning (step 4b) ----------
+  // Every number and quote on this page comes from data/outcomes.json / data/pending_hypotheses.json
+  // (via DataAccess, private_data.js — gitignored, named real people) — none of design_v12.html's
+  // prototype prose is copied in, per DESIGN_V12_HANDOFF.md's "Prototype-only material to replace."
+
+  // "~10" is the disclosure threshold DESIGN_BRIEF.md itself specifies verbatim ("1 of ~10 rows.
+  // Too few for a rate.") — an editorial floor for a trustworthy sample, not a frozen SPEC.md number.
+  const CALIBRATION_MIN_ROWS = 10;
+
+  function renderCalibration(outcomes) {
+    const rows = outcomes.rows || [];
+    const attended = rows.filter((r) => r.attended).length;
+    const labeled = rows.filter((r) => r.label_status === "labeled").length;
+    const awaiting = rows.filter((r) => r.attended && r.label_status !== "labeled");
+    // Usable for CALIBRATION (prediction vs. outcome) means predicted_p was recorded before the
+    // event — not merely that a row has since been labeled. See outcomes.json's own
+    // _calibration_warning: conflating the two would fabricate a track record that doesn't exist.
+    const usable = rows.filter((r) => typeof r.predicted_p === "number");
+
+    document.getElementById("calibRing").textContent = `${usable.length} / ~${CALIBRATION_MIN_ROWS}`;
+    const headlineEl = document.getElementById("calibHeadline");
+    const detailEl = document.getElementById("calibDetail");
+
+    if (usable.length < CALIBRATION_MIN_ROWS) {
+      headlineEl.textContent = "Too few for a rate.";
+      if (usable.length === 0) {
+        detailEl.textContent = "No row has a probability recorded before the event happened yet — every labelled row so far was backfilled after the fact, which grows the training set but not the calibration record.";
+      } else if (usable.length === 1) {
+        const r = usable[0];
+        const toolBit = typeof r.predicted_p_tool === "number" ? `, ${r.predicted_p_tool.toFixed(2)} by the tool` : "";
+        const rankBit = r.tool_rank ? `, ranked ${r.tool_rank}` : "";
+        const rest = rows.length - usable.length;
+        detailEl.textContent = `Only ${r.name}, ${fmtDateShort(r.date)}, had a probability recorded before it happened: ${r.predicted_p.toFixed(2)} by hand${toolBit}${rankBit}. The other ${rest} were labelled retrospectively and can never enter this track record.`;
+      } else {
+        detailEl.textContent = `${usable.length} rows have a probability recorded before the event happened; the rest were labelled retrospectively and can't enter this track record.`;
+      }
+    } else {
+      // SPEC.md §1: "If unknowns exceed 30%, the calibration panel refuses to show a hit rate."
+      const unknownShare = rows.length ? (rows.length - labeled) / rows.length : 1;
+      if (unknownShare > 0.3) {
+        headlineEl.textContent = "Refusing to show a hit rate.";
+        detailEl.textContent = `${Math.round(unknownShare * 100)}% of rows are still unknown — above the 30% ceiling SPEC.md sets before a rate can be trusted.`;
+      } else {
+        const hits = usable.filter((r) => r.hit === true).length;
+        const rate = Math.round((hits / usable.length) * 100);
+        headlineEl.textContent = `${rate}% hit rate`;
+        detailEl.textContent = `${hits} of ${usable.length} usable predictions produced a hit (contact or build).`;
+      }
+    }
+
+    const t7Row = awaiting.find((r) => r.t7_due);
+    const wildcardsResolved = rows.filter((r) => {
+      if (r.label_status !== "labeled") return false;
+      const ev = DataAccess.getEvent(r.event_id);
+      return !!(ev && ev.is_exploration);
+    }).length;
+    document.getElementById("calibFineprint").textContent =
+      `${attended} attended · ${labeled} labelled · ${awaiting.length} awaiting T+7${t7Row ? ` on ${fmtDateShort(t7Row.t7_due)}` : ""} · ${wildcardsResolved} wildcard${wildcardsResolved === 1 ? "" : "s"} resolved. Missing is unknown, not no; hit remains contact OR build.`;
+  }
+
+  const HYPOTHESIS_THRESHOLD = 3; // capture/schema.py's HYPOTHESIS_THRESHOLD
+
+  function renderHypotheses(hyps) {
+    const container = document.getElementById("hypothesesList");
+    const all = hyps && hyps.hypotheses ? Object.values(hyps.hypotheses) : [];
+    if (!all.length) {
+      container.innerHTML = `<p class="suspected-empty">No pending hypotheses recorded yet.</p>`;
+      return;
+    }
+    container.innerHTML = all.map((h) => {
+      const n = (h.supporting_events || []).length;
+      const pct = Math.min(100, Math.round((n / HYPOTHESIS_THRESHOLD) * 100));
+      const label = h.protected ? "Frozen — can never become actionable" : `${n} of ${HYPOTHESIS_THRESHOLD}`;
+      const note = h.seeded_note || (h.evidence && h.evidence[0] && h.evidence[0].note) || "No supporting evidence recorded yet.";
+      return `<div class="hyp-card">
+        <b>${escapeHtml(h.hypothesis)}</b>
+        <p>${escapeHtml(note)}</p>
+        <div class="support"><span>${escapeHtml(label)}</span><i style="--support:${pct}%"></i></div>
+      </div>`;
+    }).join("");
+  }
+
+  function renderFeltCases(outcomes) {
+    const container = document.getElementById("feltCases");
+    const rows = (outcomes.rows || [])
+      .filter((r) => r.label_status === "labeled")
+      .slice()
+      .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+    if (!rows.length) {
+      container.innerHTML = `<p class="recorded-empty">No labeled rows yet.</p>`;
+      return;
+    }
+    container.innerHTML = rows.map((r) => {
+      const streams = ["s1_pov", "s2_contact", "s3_build", "s4_cohort"]
+        .map((k) => `${k.slice(0, 2).toUpperCase()} ${r[k] === true ? "yes" : r[k] === false ? "no" : "—"}`)
+        .join(" · ");
+      const hitLabel = r.hit === true ? "HIT" : r.hit === false ? "NO HIT" : "PENDING";
+      return `<div class="felt-case">
+        <b>${escapeHtml(r.name)}</b>
+        <div class="felt-meta">${escapeHtml(fmtDateShort(r.date))} · FELT ${r.felt_score != null ? r.felt_score : "—"}/10 · ${hitLabel}</div>
+        <p class="felt-streams">${escapeHtml(streams)}</p>
+        ${r.felt_note ? `<p class="felt-quote">"${escapeHtml(r.felt_note)}"</p>` : ""}
+      </div>`;
+    }).join("");
+  }
+
+  function renderLearn() {
+    const outcomes = DataAccess.getOutcomes();
+    const hyps = DataAccess.getPendingHypotheses();
+    const emptyNote = document.getElementById("learnEmptyNote");
+    const grid = document.querySelector(".learn-grid");
+    const cases = document.querySelector(".learn-cases");
+    const standards = document.querySelector(".learn .standards");
+
+    if (!outcomes) {
+      emptyNote.hidden = false;
+      grid.style.display = "none";
+      cases.style.display = "none";
+      standards.style.display = "none";
+      return;
+    }
+    emptyNote.hidden = true;
+    grid.style.display = "";
+    cases.style.display = "";
+    standards.style.display = "";
+
+    renderCalibration(outcomes);
+    renderHypotheses(hyps);
+    renderFeltCases(outcomes);
+  }
+
+  // ---------- Why this matters (step 4c) ----------
+  // Editorial copy stays static (it's describing the frozen methodology, not a per-event fact),
+  // per DESIGN_V12_HANDOFF.md §8 — one readable flow, P's factors without the formula. Only the
+  // coverage paragraph pulls a live number, so "not everything in the Bay Area" stays grounded in
+  // this run's real count rather than reading as a vague disclaimer.
+  function renderAbout() {
+    const el = document.getElementById("aboutCoverageDetail");
+    if (!el) return;
+    const total = DataAccess.getEvents().length;
+    const caSuppressed = DataAccess.getCaliforniaSuppressedTotal();
+    const scoredAt = DataAccess.getSourceScoredAt();
+    el.textContent = `As of the pipeline's last run${scoredAt ? ` (${fmtTime(scoredAt)})` : ""}, that's ${total} scored California events across those calendars — ${caSuppressed} of them suppressed as unreachable and counted, not shown as rows.`;
+  }
+
+  // ---------- Score a link / intake (step 4d) ----------
+  // Pasting a URL creates an UNSCORED candidate — DESIGN_V12_HANDOFF.md §5. There is no server
+  // here to fetch or parse an arbitrary URL (cross-origin fetch to an arbitrary site would be
+  // blocked anyway, same constraint as read-back's by-link add), so nothing below is guessed:
+  // every field past the URL itself renders as an explicit "not yet enriched," never a fabricated
+  // format/participant/score. IntakeStore is a fourth localStorage store alongside intent/readback/
+  // prep-link — this one's shape is "candidate awaiting a real pipeline run," not a felt score or
+  // a prep brief.
+
+  function deriveSourceLabel(url) {
+    try {
+      const host = new URL(url).hostname.replace(/^www\./, "");
+      if (host === "lu.ma" || host.endsWith("luma.com")) return "Luma";
+      if (host.endsWith("partiful.com")) return "Partiful";
+      if (host.endsWith("campusgroups.com")) return "Haas CampusGroups";
+      return host;
+    } catch (err) {
+      return "Unknown platform";
+    }
+  }
+
+  function intakeCandidateRow(row) {
+    return `<button type="button" class="intake-candidate-row" data-id="${escapeAttr(row.event_id)}">
+      <span class="intake-candidate-state">UNSCORED</span>
+      <span class="intake-candidate-name">${escapeHtml(row.name)}</span>
+      <span class="intake-candidate-meta">${escapeHtml(row.source_label)} · added ${escapeHtml(fmtDateShort(row.created_at.slice(0, 10)))}</span>
+    </button>`;
+  }
+
+  function renderIntakeCandidates() {
+    const list = document.getElementById("intakeCandidateList");
+    const rows = IntakeStore.getAll().slice().sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+    list.innerHTML = rows.length
+      ? rows.map(intakeCandidateRow).join("")
+      : `<p class="recorded-empty">No candidates added yet — paste a listing URL above.</p>`;
+    list.querySelectorAll(".intake-candidate-row").forEach((btn) => {
+      btn.addEventListener("click", () => openIntakeCandidate(btn.dataset.id));
+    });
+  }
+
+  function openIntakeCandidate(id) {
+    const row = IntakeStore.getAll().find((r) => r.event_id === id);
+    const detail = document.getElementById("intakeDetail");
+    if (!row) {
+      detail.hidden = true;
+      return;
+    }
+    detail.hidden = false;
+    document.getElementById("intakeDetailSource").textContent = `${row.source_label} · unscored candidate`;
+    document.getElementById("intakeDetailTitle").textContent = row.name;
+    const listing = document.getElementById("intakeDetailListing");
+    if (row.url) {
+      listing.href = row.url;
+      listing.style.display = "";
+    } else {
+      listing.removeAttribute("href");
+      listing.style.display = "none";
+    }
+    const facts = [
+      ["Added", new Date(row.created_at).toLocaleString()],
+      ["Source", row.source_label],
+      ["Format", "Unknown — not yet enriched"],
+      ["Participant", "Unknown — not yet enriched"],
+      ["P(contact ∪ build)", "Unscored — needs a real pipeline run"],
+      ["Verdict", "UNSCORED"],
+    ];
+    document.getElementById("intakeDetailFacts").innerHTML =
+      facts.map(([k, v]) => `<div><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`).join("");
+    detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function renderIntake() {
+    renderIntakeCandidates();
+  }
+
+  document.getElementById("bigIntake").addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    const urlInput = document.getElementById("bigUrl");
+    const url = urlInput.value.trim();
+    if (!url) return;
+
+    // A pasted link may already be a real, scored event on the decision board — creating a second
+    // "UNSCORED" candidate for it would bury the real score/verdict under a fake gap. Say so
+    // instead of duplicating it.
+    const matched = findEventByUrl(url);
+    if (matched) {
+      urlInput.value = "";
+      const stateLabel = rowKind(matched) === "social_cohort" ? "a social/cohort plan" : `${(PROF_STATE_LABEL[matched.verdict] || matched.verdict || "scored").toUpperCase()}, ${pText(matched)} P`;
+      document.getElementById("bigStatus").textContent = `"${matched.name}" is already on the decision board — ${stateLabel}. Not adding a duplicate unscored candidate; find it on the board or its week's inventory instead.`;
+      showToast(`"${matched.name}" is already scored on the board — no candidate added.`);
+      return;
+    }
+
+    const row = IntakeStore.add({ url, name: deriveNameFromUrl(url), source_label: deriveSourceLabel(url) });
+    urlInput.value = "";
+    document.getElementById("bigStatus").textContent = `Saved "${row.name}" as an unscored candidate — on this device only.`;
+    renderIntakeCandidates();
+    openIntakeCandidate(row.event_id);
+    showToast(`Added "${row.name}" as an unscored candidate — saved on this device.`);
+  });
+
+  // ---------- Now / attention entry ----------
+  // This is deliberately a routing surface, not a dashboard: it exposes only a next decision,
+  // a read-back due, and a brief worth preparing. Counts and event names are derived on render
+  // from the same snapshot/local intent state the focused workflows use.
+  function plural(count, singular, pluralWord) {
+    return `${count} ${count === 1 ? singular : (pluralWord || `${singular}s`)}`;
+  }
+
+  function renderHome() {
+    const week = currentWeek();
+    const events = DataAccess.getEventsForWeek(week.key);
+    const decisions = events.filter((e) => (
+      e.track === "professional" && PROFESSIONAL_VERDICTS.has(e.verdict) &&
+      (!IntentStore.get(e.id) || IntentStore.get(e.id).intent === "undecided")
+    ));
+    const nextDecision = decisions.find((e) => e.verdict === "go" || e.verdict === "go_if") || decisions[0] || null;
+
+    const outcomes = DataAccess.getOutcomes();
+    const readbacksDue = (outcomes && outcomes.rows ? outcomes.rows : [])
+      .filter((r) => r.attended && r.label_status !== "labeled")
+      .slice()
+      .sort((a, b) => String(a.t7_due || a.date).localeCompare(String(b.t7_due || b.date)));
+    const nextReadback = readbacksDue[0] || null;
+
+    const prepItems = wantEvents();
+    const nextPrep = prepItems[0] || null;
+    const totalActions = decisions.length + readbacksDue.length;
+
+    document.getElementById("homeEyebrow").textContent = `Week of ${week.label} · current pipeline snapshot`;
+    document.getElementById("homeSummary").textContent = totalActions
+      ? `${plural(decisions.length, "decision")} and ${plural(readbacksDue.length, "read-back")} need attention. ${plural(prepItems.length, "brief")} ready to prepare.`
+      : `Nothing urgent in this snapshot. ${plural(prepItems.length, "brief")} ready to prepare.`;
+    document.getElementById("homeNavBadge").textContent = totalActions || "✓";
+
+    const decisionTitle = document.getElementById("homeDecisionTitle");
+    const decisionDetail = document.getElementById("homeDecisionDetail");
+    const decisionAction = document.getElementById("homeDecisionAction");
+    if (nextDecision) {
+      decisionTitle.textContent = `${plural(decisions.length, "decision")} ready`;
+      decisionDetail.textContent = `Next: ${nextDecision.name}. ${nextDecision.decision_line}`;
+      decisionAction.textContent = "OPEN DECISION BOARD →";
+    } else {
+      decisionTitle.textContent = "Decisions are settled";
+      decisionDetail.textContent = "No professional event in this week is waiting on an intent.";
+      decisionAction.textContent = "REVIEW THE BOARD →";
+    }
+
+    const readbackTitle = document.getElementById("homeReadbackTitle");
+    const readbackDetail = document.getElementById("homeReadbackDetail");
+    const readbackAction = document.getElementById("homeReadbackAction");
+    if (nextReadback) {
+      readbackTitle.textContent = "Record event feedback";
+      readbackDetail.textContent = `${nextReadback.name}${nextReadback.t7_due ? ` · T+7 due ${fmtDateShort(nextReadback.t7_due)}` : ""}.`;
+      readbackAction.textContent = "OPEN READ-BACK →";
+    } else {
+      readbackTitle.textContent = "No read-back is due";
+      readbackDetail.textContent = "Attended events with a known outcome are up to date in this snapshot.";
+      readbackAction.textContent = "VIEW READ-BACK →";
+    }
+
+    const prepTitle = document.getElementById("homePrepTitle");
+    const prepDetail = document.getElementById("homePrepDetail");
+    const prepAction = document.getElementById("homePrepAction");
+    if (nextPrep) {
+      prepTitle.textContent = "A brief is ready";
+      prepDetail.textContent = `${nextPrep.name}. Listing facts are ready; unsourced research stays pending.`;
+      prepAction.textContent = "OPEN PREP →";
+    } else {
+      prepTitle.textContent = "No brief yet";
+      prepDetail.textContent = "Mark an event Want to go on its detail page, then return here for a focused prep brief.";
+      prepAction.textContent = "OPEN PREP →";
+    }
+
+    const settled = events.filter((e) => e.track === "professional" && (e.verdict === "skip" || e.verdict === "blocked")).length;
+    const social = events.filter((e) => e.track === "social_cohort").length;
+    document.getElementById("homeSettledNote").innerHTML = `<b>NOT ASKING FOR ATTENTION</b>${plural(settled, "settled skip")} keep their reasons on the board; ${plural(social, "social/cohort plan")} stay outside professional scores and read-backs.`;
+  }
+
   // ---------- Routing ----------
   const navLinks = document.querySelectorAll(".nav-link[data-view]");
+  const VIEW_CRUMB = { home: "NOW", readback: "READ-BACK", prep: "PREP", learn: "LEARNING", about: "WHY THIS MATTERS", intake: "SCORE A LINK" };
+  const VIEW_RENDER = { home: renderHome, readback: renderReadback, prep: renderPrep, learn: renderLearn, about: renderAbout, intake: renderIntake };
   function showView(viewId) {
     document.querySelectorAll(".view").forEach((v) => v.classList.toggle("active", v.id === viewId));
     navLinks.forEach((a) => a.classList.toggle("on", a.dataset.view === viewId));
-    if (viewId === "readback") {
-      document.getElementById("crumb").textContent = "READ-BACK";
-      renderReadback();
-    } else {
-      document.getElementById("crumb").textContent = `DECISION BOARD · ${currentWeek().label.toUpperCase()}`;
-    }
+    document.getElementById("crumb").textContent = VIEW_CRUMB[viewId] || `DECISION BOARD · ${currentWeek().label.toUpperCase()}`;
+    if (VIEW_RENDER[viewId]) VIEW_RENDER[viewId]();
   }
+  const KNOWN_VIEWS = new Set(["home", "choose", "readback", "prep", "learn", "about", "intake"]);
   function routeFromHash() {
-    const id = location.hash.replace("#/", "") || "choose";
-    showView(id === "readback" ? "readback" : "choose");
+    const id = location.hash.replace("#/", "") || "home";
+    showView(KNOWN_VIEWS.has(id) ? id : "home");
   }
   window.addEventListener("hashchange", routeFromHash);
 
