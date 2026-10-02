@@ -17,8 +17,7 @@ Updated: 2026-10-02
 - `enrich/rules.py` (tier 1, no model) also fills `participant` and `target_proximity`
   (employer list: `config/target_employers.json`).
 - The page shows data age and a loud banner past 48h (`data/ingest_meta.json` records the scrape time).
-- OPEN, awaiting a decision: SPEC.md §3d proposes replacing the `predicted_p - cost_blocks` slot ranking
-  (mixed units). Not implemented.
+- Slot ranking is by value, with cost as gate and tiebreak (SPEC.md §3d, option B, approved 2026-10-02).
 - Not deployed: the site is local-only; `vercel.json` exists but no Vercel project is linked.
 
 - Current frontend UX reference: `design_v12.html`. Implementation contract for the

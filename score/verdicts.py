@@ -209,12 +209,16 @@ def _can_conflict(row):
 
 
 def _rank_key(row):
-    """Order in which slot candidates are served, best first. An RSVP she has already confirmed
-    outranks every unconfirmed candidate — it is a commitment, not a prediction, so it can never
-    lose a slot to something merely scored higher. Then (value - cost_blocks), with a stable
-    tiebreak (earlier start, then name) so equal scores resolve the same way on every run."""
+    """Order in which slot candidates are served, best first (SPEC.md §3d, option B, approved
+    2026-10-02). Rank by VALUE ALONE: predicted_p is a probability and cost_blocks a block count,
+    so `p - cost` silently assumed one block costs a whole unit of probability (and let a 0.42
+    event beat a 0.80 one). Cost still acts, as a gate rather than a subtracted number — Pass 4
+    turns a won GO into PART at cost >= COST_DOWNGRADES_TO_PART, and known-unreachable events need
+    top-3 value to become go_if — and as the tiebreak here (cheaper first). A confirmed RSVP
+    outranks every unconfirmed candidate: it is a commitment, not a prediction. Final tiebreaks
+    (earlier start, then name) keep equal scores resolving identically on every run."""
     confirmed_first = 0 if row.get("rsvp_state") == "confirmed" else 1
-    return (confirmed_first, -((row["predicted_p"] or 0.0) - row["cost_blocks"]),
+    return (confirmed_first, -(row["predicted_p"] or 0.0), row["cost_blocks"],
             row.get("start") or "", row.get("name") or "")
 
 
@@ -324,8 +328,8 @@ def resolve(rows):
     #   (a) go_if eligibility — pending unreachable rows must rank top-3 by raw predicted_p among
     #       EVERYONE that week to even be considered, and still clear GO_BAR outright (a weak week
     #       can't manufacture a "top 3" out of zeros).
-    #   (b) the slot quota — "eligible" and "go_if" candidates are ranked by (value - cost_blocks),
-    #       not by value alone with cost as a mere tiebreak. Only the top N (that week's budget)
+    #   (b) the slot quota — "eligible" and "go_if" candidates are ranked by value alone, with cost
+    #       as the tiebreak (SPEC.md §3d). Only the top N (that week's budget)
     #       become "go"; everyone else eligible loses to quota_full. Non-eligible rows (skip/part
     #       from Pass 2) never enter this competition at all — they already have their own reason.
     by_week = defaultdict(list)

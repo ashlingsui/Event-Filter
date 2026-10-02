@@ -738,10 +738,11 @@ derived from an absence.**
 
 ---
 
-## §3d SLOT RANKING — PROPOSAL, NOT IMPLEMENTED — 2026-10-02
+## §3d SLOT RANKING — OPTION B APPROVED AND IMPLEMENTED — 2026-10-02
 
-**Status: awaiting approval. `score/verdicts.py::_rank_key` still ranks by `predicted_p −
-cost_blocks`. Nothing below has been built.**
+**Status: option B approved 2026-10-02 and implemented in `score/verdicts.py::_rank_key`. The
+text below is kept as the record of the decision; "today"/"currently" in it describes the
+pre-change behavior.**
 
 ### The bug
 
@@ -800,7 +801,7 @@ outcome data on the alternatives. Revisit once there are labelled events (SPEC.m
 Only `_rank_key` in `score/verdicts.py` (one function, one line of intent) plus its tests. Pass 4,
 the `go_if` gate, conflict resolution and the confirmed-first rule are untouched.
 
-### Decision needed
+### Decision
 
-Approve B, or choose A and state λ. Until then the current ranking stays and this section is the
-record that it is known to be wrong.
+Option B approved and built. `_rank_key` orders by confirmed-first, then `predicted_p` descending,
+then `cost_blocks` ascending, then start and name. No new constant was introduced.

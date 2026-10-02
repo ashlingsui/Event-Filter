@@ -232,6 +232,34 @@ def a_stale_stored_cost_is_recomputed_unless_marked_manual():
     assert kept["cost_blocks"] == 1.5 and kept["_raw"]["cost_blocks_source"] == "manual"
 
 
+@test
+def slot_ranking_uses_value_not_value_minus_cost():
+    # 0.80 at cost 1.5 must beat 0.42 at cost 0.5 for the only slot. Under p - cost it lost.
+    high = _cand("HIGH", "2026-10-07T00:00:00Z", 0.80, cost=1.5)
+    cheap = _cand("CHEAP", "2026-10-08T00:00:00Z", 0.42, cost=0.5)
+    saved = verdicts._load_quota_overrides
+    verdicts._load_quota_overrides = lambda: {"2026-W41": 1}
+    try:
+        verdicts.resolve([high, cheap])
+    finally:
+        verdicts._load_quota_overrides = saved
+    assert high["verdict"] in ("go", "part") and cheap["primary_reason"] == "quota_full", (
+        high["verdict"], cheap["verdict"], cheap["primary_reason"])
+
+
+@test
+def cost_breaks_ties_between_equal_value_events():
+    a = _cand("A", "2026-10-07T00:00:00Z", 0.50, cost=1.0)
+    b = _cand("B", "2026-10-08T00:00:00Z", 0.50, cost=0.5)
+    saved = verdicts._load_quota_overrides
+    verdicts._load_quota_overrides = lambda: {"2026-W41": 1}
+    try:
+        verdicts.resolve([a, b])
+    finally:
+        verdicts._load_quota_overrides = saved
+    assert b["verdict"] == "go" and a["primary_reason"] == "quota_full"
+
+
 def main():
     failures = []
     for fn in TESTS:

@@ -1,6 +1,6 @@
 window.EVENT_FILTER_DATA = {
-  "generated_at": "2026-10-02T19:22:07.216889Z",
-  "source_scored_at": "2026-10-02T19:18:39.557631Z",
+  "generated_at": "2026-10-02T19:48:16.763317Z",
+  "source_scored_at": "2026-10-02T19:48:16.688487Z",
   "source_ingested_at": null,
   "current_week_key": "2026-W40",
   "events": [
@@ -6279,7 +6279,7 @@ window.EVENT_FILTER_DATA = {
     }
   ],
   "score_summary": {
-    "scored_at": "2026-10-02T19:18:39.557631Z",
+    "scored_at": "2026-10-02T19:48:16.688487Z",
     "verdict_counts": {
       "unscored": 77,
       "skip": 26,
