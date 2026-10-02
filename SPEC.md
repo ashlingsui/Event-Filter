@@ -658,3 +658,80 @@ un-scrapable fields to become scrapable.
 **`outcomes.predicted_p_locked` is immutable** and the database trigger will reject any change to
 it. A model revision must never be able to rewrite a prediction that was already recorded against
 an outcome.
+
+---
+
+## §3c UNKNOWN IS NOT ZERO — 2026-10-01
+
+Not frozen. But it is a direct extension of a frozen principle, and it must not be undone.
+
+### The bug
+
+`score/scorer.py`:
+
+```python
+s3 = FORMAT_S3_POINTS.get(row.get("format"), 0.0) if row.get("participant") else 0.0
+s2 = TARGET_PROXIMITY_POINTS.get(row.get("target_proximity"), 0.0)
+```
+
+`.get(..., 0.0)` scores an **unknown** format identically to a **known-bad** one. A null
+`participant` is falsy, so S3 also collapses. The model cannot distinguish *"this is a lecture for
+VCs"* from *"we have no idea what this is."*
+
+On 2026-10-01 that was **150 of 171 events** — all sitting at `predicted_p = 0.0` with a confident
+`below_bar` verdict, when the honest statement was *"not enough information."*
+
+### The principle, which is already ours
+
+`SPEC.md` §1 (frozen): *unanswered = `unknown`, excluded from the fit, counted and displayed.*
+*"Treating silence as 'no outcome' would teach the model everything fails."*
+
+That was written for **outcomes**. It was never applied to **features**. It must be. Silence about
+an event's format is not evidence the format is bad.
+
+### Rules
+
+1. **`null` and `0` are different values and must stay distinguishable** end to end — scorer,
+   generated payload, UI.
+2. **Unknown features score at a documented neutral prior**, not at zero. The prior is a stated
+   constant, not computed from the currently-enriched sample: those 21 rows were hand-picked and
+   are biased upward, so deriving a prior from them would bake that bias in. Replace with a real
+   base rate once there is an unbiased sample.
+3. **Every scored event carries `confidence`** = the fraction of scoring-relevant features that are
+   actually known.
+4. **Low confidence gets its own verdict, not a fake one.** Add `unscored` to the verdict set: *not
+   enough information to judge*. It is a new enum value, which the §1 freeze rule permits (fields
+   and values may be **added**; nothing existing is redefined).
+
+   An event the model knows nothing about must never receive a confident `skip` **or** a confident
+   `go`. Uncertainty cuts both ways.
+5. **`unscored` is a queue, not a dead end.** Surfaced in the UI as its own group — *"12 events we
+   don't know enough about yet"* — so missing data becomes something actionable rather than a
+   silent mass of skips.
+
+### Three-tier enrichment — no paid API required
+
+The LLM pass is **tier 2 of 3**, not a prerequisite. Ashling declined metered API spend
+2026-10-01; the system must work without it.
+
+**Tier 1 — deterministic rules.** Most classification here is keyword work: *workshop, build night,
+hackathon, demo, fireside, panel, mixer, office hours*. And §3b's rule — classify from the
+described agenda, not the title — is largely parseable: *"first 30 minutes hanging out... then
+about an hour of live demos"* yields segments with no model at all. Expected to cover the majority
+of events deterministically, and deterministic beats probabilistic for something this mechanical.
+
+**Tier 2 — a Claude session, not a metered API call.** ~30 new events a week is one paste. A
+session reads the descriptions, classifies against this spec, and writes back to
+`data/events.json`. Uses the subscription she already has, and a session applying the spec with
+full context will outperform a terse API prompt.
+
+**Tier 3 — metered API.** Optional, off by default. If a key is absent the pipeline must say so
+loudly and exit non-zero — never continue silently leaving 93 rows null, which is what produced
+this entire failure.
+
+### Why this matters beyond the bug
+
+A tool that renders `0.0 · below_bar` for an event it has never looked at is lying with a number.
+It is the same failure as a calibration panel showing n=4 when only one row has a prediction, and
+the same failure as a UI implying coverage it does not have. **Never display a confident value
+derived from an absence.**
