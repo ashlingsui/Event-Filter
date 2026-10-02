@@ -1,0 +1,4 @@
+{
+  "buildCommand": "echo \"window.GOOGLE_MAPS_API_KEY = '$GOOGLE_MAPS_API_KEY';\" > app/maps_key.local.js",
+  "outputDirectory": "app"
+}
